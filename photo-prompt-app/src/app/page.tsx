@@ -20,7 +20,7 @@ export default function HomePage() {
             </p>
             <div className="mt-10 flex items-center justify-center gap-4 flex-col sm:flex-row">
               <Link
-                href="/dashboard"
+                href="/dashboard/create"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-lg font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
               >
                 Start Creating Events
@@ -155,7 +155,7 @@ export default function HomePage() {
                   like never before.
                 </p>
                 <Link
-                  href="/dashboard"
+                  href="/dashboard/create"
                   className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-blue-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-600 focus:ring-white transition-colors"
                 >
                   Create Your First Event

@@ -58,11 +58,13 @@ export default function CreateEventPage() {
     slug: '',
     type: 'general',
     description: '',
+    email: '',
   })
   const [prompts, setPrompts] = useState<string[]>(DEFAULT_PROMPTS.general)
   const [newPrompt, setNewPrompt] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState(false)
 
   const generateSlug = (name: string) => {
     return name
@@ -100,6 +102,7 @@ export default function CreateEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setSuccess(false)
     setIsSubmitting(true)
 
     try {
@@ -107,7 +110,10 @@ export default function CreateEventPage() {
       const eventResponse = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          email: formData.email.trim(),
+        }),
       })
 
       if (!eventResponse.ok) {
@@ -130,12 +136,45 @@ export default function CreateEventPage() {
         }
       }
 
-      router.push(`/dashboard/events/${event.slug}`)
+      // Show success message
+      setSuccess(true)
+      
+      // Redirect after a short delay to let the session cookie be set
+      setTimeout(() => {
+        router.push('/dashboard')
+      }, 1500)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create event')
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Plus className="w-8 h-8 text-green-600" />
+          </div>
+          
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Event Created Successfully! 🎉
+          </h1>
+          
+          <p className="text-gray-600 mb-6">
+            Your event is ready! You can now manage it from this device. 
+            Use your email to access it from other devices.
+          </p>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              <strong>Redirecting to your dashboard...</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -144,7 +183,7 @@ export default function CreateEventPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center py-6">
             <Link
-              href="/dashboard"
+              href="/"
               className="mr-4 p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -236,6 +275,24 @@ export default function CreateEventPage() {
               </div>
 
               <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  Your Email Address *
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="your@email.com"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  <strong>Important:</strong> Save this email! You'll need it to access your event from other devices.
+                </p>
+              </div>
+
+              <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                   Description (Optional)
                 </label>
@@ -297,14 +354,14 @@ export default function CreateEventPage() {
           {/* Submit */}
           <div className="flex justify-end space-x-3">
             <Link
-              href="/dashboard"
+              href="/"
               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               Cancel
             </Link>
             <button
               type="submit"
-              disabled={isSubmitting || !formData.name || !formData.slug}
+              disabled={isSubmitting || !formData.name || !formData.slug || !formData.email}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Creating...' : 'Create Event'}

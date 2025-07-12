@@ -13,18 +13,11 @@ const createEventSchema = z.object({
   type: z.string().optional().default('general'),
   description: z.string().optional(),
   settings: z.record(z.string(), z.unknown()).optional(),
+  email: z.string().email('Please enter a valid email address'),
 })
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
-
     const body = await request.json()
     const data = createEventSchema.parse(body)
 
@@ -40,6 +33,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Check if user exists, create if not
+    let user = await prisma.user.findUnique({
+      where: { email: data.email }
+    })
+
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          email: data.email,
+          emailVerified: new Date(), // Auto-verify since they're creating their first event
+        }
+      })
+    }
+
     // Create the event
     const event = await prisma.event.create({
       data: {
@@ -48,7 +55,7 @@ export async function POST(request: NextRequest) {
         type: data.type,
         description: data.description,
         settings: data.settings,
-        userId: session.user.id,
+        userId: user.id,
       },
       include: {
         prompts: true,
@@ -60,10 +67,35 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    return NextResponse.json({
+    // Create a session for the user (auto-login)
+    const sessionToken = crypto.randomUUID()
+    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+
+    await prisma.session.create({
+      data: {
+        sessionToken,
+        userId: user.id,
+        expires,
+      }
+    })
+
+    // Set the session cookie
+    const response = NextResponse.json({
       success: true,
-      event
+      event,
+      message: 'Event created successfully! You can manage it from this device. Use your email to access from other devices.'
     }, { status: 201 })
+
+    // Set secure session cookie
+    response.cookies.set('next-auth.session-token', sessionToken, {
+      expires,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    })
+
+    return response
 
   } catch (error) {
     if (error instanceof z.ZodError) {

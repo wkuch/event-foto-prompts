@@ -17,6 +17,7 @@ export const testEvents = {
     slug: 'sarah-john-wedding',
     type: 'wedding',
     description: 'A beautiful wedding celebration',
+    email: 'organizer@test.com',
     settings: {
       allowAnonymousUploads: true,
       moderationRequired: false,
@@ -27,11 +28,13 @@ export const testEvents = {
     slug: 'birthday-party-2024',
     type: 'birthday',
     description: 'Fun birthday celebration',
+    email: 'organizer@test.com',
   },
   corporate: {
     name: 'Company Retreat',
     slug: 'company-retreat',
     type: 'corporate',
+    email: 'organizer@test.com',
   }
 }
 

@@ -28,8 +28,10 @@ describe('Events API', () => {
 
   describe('POST /api/events', () => {
     it('should create a new event with valid data', async () => {
-      // Mock Prisma responses
+      // Mock existing user (email already in system)
+      mockPrisma.user.findUnique.mockResolvedValue(testUser)
       mockPrisma.event.findUnique.mockResolvedValue(null) // No existing event with slug
+      
       const mockEvent = {
         id: 'event-123',
         name: testEvents.wedding.name,
@@ -45,14 +47,16 @@ describe('Events API', () => {
         _count: { uploads: 0 }
       }
       mockPrisma.event.create.mockResolvedValue(mockEvent)
-
-      const request = createMockRequest('POST', '/api/events', {
-        name: testEvents.wedding.name,
-        slug: testEvents.wedding.slug,
-        type: testEvents.wedding.type,
-        description: testEvents.wedding.description,
-        settings: testEvents.wedding.settings,
+      
+      // Mock session creation for auto-login
+      mockPrisma.session.create.mockResolvedValue({
+        id: 'session-123',
+        sessionToken: 'mock-token',
+        userId: testUser.id,
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       })
+
+      const request = createMockRequest('POST', '/api/events', testEvents.wedding)
 
       const response = await POST(request)
       const data = await response.json()
@@ -67,63 +71,40 @@ describe('Events API', () => {
         userId: testUser.id,
         isActive: true,
       })
-      expect(mockPrisma.event.create).toHaveBeenCalledWith({
-        data: {
-          name: testEvents.wedding.name,
-          slug: testEvents.wedding.slug,
-          type: testEvents.wedding.type,
-          description: testEvents.wedding.description,
-          settings: testEvents.wedding.settings,
-          userId: testUser.id,
-        },
-        include: {
-          prompts: true,
-          _count: {
-            select: {
-              uploads: true,
-            }
-          }
-        }
+      
+      // Verify existing user was used (not created)
+      expect(mockPrisma.user.create).not.toHaveBeenCalled()
+      expect(mockPrisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email: testEvents.wedding.email }
       })
+      
+      // Verify session was created for auto-login
+      expect(mockPrisma.session.create).toHaveBeenCalled()
     })
 
     it('should reject duplicate slugs', async () => {
-      // Mock Prisma to return null first (no existing event), then an existing event
-      mockPrisma.event.findUnique
-        .mockResolvedValueOnce(null) // First call returns null (no existing event)
-        .mockResolvedValueOnce({ id: 'existing', slug: 'duplicate-slug' }) // Second call returns existing event
-
-      mockPrisma.event.create.mockResolvedValue({
-        id: 'event-123',
-        name: 'First Event',
+      // Mock existing event with duplicate slug
+      mockPrisma.event.findUnique.mockResolvedValue({ 
+        id: 'existing', 
         slug: 'duplicate-slug',
+        name: 'Existing Event',
+        userId: 'other-user',
         type: 'wedding',
-        userId: testUser.id,
         isActive: true,
-        settings: null,
         description: null,
+        settings: null,
         createdAt: new Date(),
         updatedAt: new Date(),
-        prompts: [],
-        _count: { uploads: 0 }
       })
 
-      // Create first event
-      const firstRequest = createMockRequest('POST', '/api/events', {
-        name: 'First Event',
-        slug: 'duplicate-slug',
-        type: 'wedding',
-      })
-      await POST(firstRequest)
-
-      // Try to create second event with same slug
-      const secondRequest = createMockRequest('POST', '/api/events', {
+      const request = createMockRequest('POST', '/api/events', {
         name: 'Second Event',
         slug: 'duplicate-slug',
         type: 'birthday',
+        email: 'test@example.com',
       })
 
-      const response = await POST(secondRequest)
+      const response = await POST(request)
       const data = await response.json()
 
       expect(response.status).toBe(409)
@@ -133,7 +114,7 @@ describe('Events API', () => {
     it('should validate required fields', async () => {
       const request = createMockRequest('POST', '/api/events', {
         slug: 'test-slug',
-        // Missing required 'name' field
+        // Missing required 'name' and 'email' fields
       })
 
       const response = await POST(request)
@@ -141,8 +122,9 @@ describe('Events API', () => {
 
       expect(response.status).toBe(400)
       expect(data.error).toBe('Invalid input')
-      expect(data.details).toHaveLength(1)
-      expect(data.details[0].field).toBe('name')
+      expect(data.details).toHaveLength(2)
+      expect(data.details.some((d: any) => d.field === 'name')).toBe(true)
+      expect(data.details.some((d: any) => d.field === 'email')).toBe(true)
     })
 
     it('should validate slug format', async () => {
@@ -160,24 +142,78 @@ describe('Events API', () => {
       expect(data.details[0].message).toContain('lowercase letters, numbers, and hyphens')
     })
 
-    it('should require authentication', async () => {
+    it('should create event without prior authentication and auto-login user', async () => {
       mockGetServerSession.mockResolvedValue(null)
+      
+      // Mock Prisma responses for user creation and event creation
+      mockPrisma.user.findUnique.mockResolvedValue(null) // User doesn't exist
+      const mockUser = {
+        id: 'new-user-123',
+        email: 'newuser@test.com',
+        emailVerified: new Date(),
+        name: null,
+        image: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }
+      mockPrisma.user.create.mockResolvedValue(mockUser)
+      
+      mockPrisma.event.findUnique.mockResolvedValue(null) // No existing event with slug
+      const mockEvent = {
+        id: 'event-123',
+        name: 'Test Event',
+        slug: 'test-slug',
+        type: 'general',
+        description: null,
+        settings: null,
+        userId: mockUser.id,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        prompts: [],
+        _count: { uploads: 0 }
+      }
+      mockPrisma.event.create.mockResolvedValue(mockEvent)
+      
+      const mockSession = {
+        id: 'session-123',
+        sessionToken: 'mock-token',
+        userId: mockUser.id,
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      }
+      mockPrisma.session.create.mockResolvedValue(mockSession)
 
       const request = createMockRequest('POST', '/api/events', {
         name: 'Test Event',
         slug: 'test-slug',
+        email: 'newuser@test.com',
       })
 
       const response = await POST(request)
       const data = await response.json()
 
-      expect(response.status).toBe(401)
-      expect(data.error).toBe('Unauthorized')
+      expect(response.status).toBe(201)
+      expect(data.success).toBe(true)
+      expect(data.event.name).toBe('Test Event')
+      expect(data.message).toContain('You can manage it from this device')
+      
+      // Verify user was created
+      expect(mockPrisma.user.create).toHaveBeenCalledWith({
+        data: {
+          email: 'newuser@test.com',
+          emailVerified: expect.any(Date),
+        }
+      })
+      
+      // Verify session was created
+      expect(mockPrisma.session.create).toHaveBeenCalled()
     })
 
     it('should set default values correctly', async () => {
-      // Mock Prisma responses
+      // Mock user exists
+      mockPrisma.user.findUnique.mockResolvedValue(testUser)
       mockPrisma.event.findUnique.mockResolvedValue(null) // No existing event with slug
+      
       const mockEvent = {
         id: 'event-123',
         name: 'Minimal Event',
@@ -193,10 +229,17 @@ describe('Events API', () => {
         _count: { uploads: 0 }
       }
       mockPrisma.event.create.mockResolvedValue(mockEvent)
+      mockPrisma.session.create.mockResolvedValue({
+        id: 'session-123',
+        sessionToken: 'mock-token',
+        userId: testUser.id,
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      })
 
       const request = createMockRequest('POST', '/api/events', {
         name: 'Minimal Event',
         slug: 'minimal-event',
+        email: testUser.email,
       })
 
       const response = await POST(request)

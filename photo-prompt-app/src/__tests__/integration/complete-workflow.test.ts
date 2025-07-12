@@ -57,8 +57,10 @@ describe('Complete Event Workflow', () => {
 
   describe('Organizer Workflow: Event Setup', () => {
     it('should complete full organizer setup workflow', async () => {
-      // Step 1: Create Event
+      // Step 1: Create Event (with user auto-creation)
+      mockPrisma.user.findUnique.mockResolvedValue(testUser) // User exists
       mockPrisma.event.findUnique.mockResolvedValue(null) // No existing event
+      
       const mockEvent = {
         id: eventId,
         name: testEvents.wedding.name,
@@ -74,14 +76,16 @@ describe('Complete Event Workflow', () => {
         _count: { uploads: 0 }
       }
       mockPrisma.event.create.mockResolvedValue(mockEvent)
-
-      const createEventRequest = createMockRequest('POST', '/api/events', {
-        name: testEvents.wedding.name,
-        slug: eventSlug,
-        type: testEvents.wedding.type,
-        description: testEvents.wedding.description,
-        settings: testEvents.wedding.settings,
+      
+      // Mock session creation for auto-login
+      mockPrisma.session.create.mockResolvedValue({
+        id: 'session-123',
+        sessionToken: 'mock-token',
+        userId: testUser.id,
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       })
+
+      const createEventRequest = createMockRequest('POST', '/api/events', testEvents.wedding)
 
       const createEventResponse = await createEvent(createEventRequest)
       const eventData = await createEventResponse.json()

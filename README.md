@@ -52,26 +52,17 @@ Build a lightweight web platform that turns event photography into an interactiv
 # 📋 Project TODOs: Event Photo-Prompt Service
 
 ## 1. Determine Tech Stack
+Goal: Get to a good MVP fast, with a tech stack that is easy to maintain and scale. Choose cheap and well tested options. Choose tools that are well understood by AI so that AI can help us with the development.
 - [ ] Frontend framework  
-  • Evaluate React, Vue, Next.js/Nuxt  
 - [ ] CSS / component library  
-  • Tailwind CSS, Bootstrap, Material UI  
 - [ ] Backend framework  
-  • Node.js + Express, Django, Flask  
 - [ ] Database  
-  • PostgreSQL, MySQL  
 - [ ] Object storage  
-  • AWS S3, Google Cloud Storage, Azure Blob  
 - [ ] Hosting / CDN  
-  • Vercel, Netlify, AWS Amplify, S3+CloudFront  
 - [ ] Authentication  
-  • JWT vs. session-based, OAuth options  
 - [ ] QR-code generation  
-  • Client-side (qrcode.js) vs. server-side libs  
 - [ ] CI/CD & DevOps  
-  • GitHub Actions, GitLab CI, Dockerization  
 - [ ] Documentation of final decisions  
-  • Create “Tech Stack” spec doc  
 
 ## 2. Build & Ship MVP (Goal: ship in 2–4 weeks)
 ### 2.1 Project Setup
@@ -80,7 +71,10 @@ Build a lightweight web platform that turns event photography into an interactiv
 - [ ] Provision database & object storage  
 
 ### 2.2 Backend API
-- [ ] `POST /events` → create event (slug, type, settings)  
+- [ ] `POST /events` → create event (slug, type, settings)
+- [ ] `POST /events/:slug/prompts` → create new prompt
+- [ ] `PUT /events/:slug/prompts/:promptId` → update prompt
+- [ ] `DELETE /events/:slug/prompts/:promptId` → delete prompt
 - [ ] `GET /events/:slug/prompts` → fetch next prompt  
 - [ ] `POST /events/:slug/uploads` → handle image + metadata  
 - [ ] Serve generated QR as SVG/PNG  

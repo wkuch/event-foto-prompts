@@ -12,7 +12,7 @@ const createEventSchema = z.object({
     .regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   type: z.string().optional().default('general'),
   description: z.string().optional(),
-  settings: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.unknown()).optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
         { 
           error: 'Invalid input', 
           details: error.issues.map(e => ({
-            field: e.path.join('.'),
+            field: e.path.join('.'), // Convert path array to simple field string
             message: e.message
           }))
         },

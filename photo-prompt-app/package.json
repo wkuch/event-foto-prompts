@@ -6,7 +6,10 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
@@ -33,8 +36,14 @@
     "@types/qrcode": "^1.5.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/supertest": "^6.0.3",
+    "@vitejs/plugin-react": "^4.6.0",
+    "aws-sdk-client-mock": "^4.1.0",
+    "jsdom": "^26.1.0",
+    "supertest": "^7.1.3",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.5",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.4"
   }
 }

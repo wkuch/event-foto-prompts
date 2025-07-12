@@ -9,7 +9,7 @@ const updatePromptSchema = z.object({
   order: z.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
   maxUploads: z.number().int().min(1).optional(),
-  settings: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.unknown()).optional(),
 })
 
 export async function PUT(

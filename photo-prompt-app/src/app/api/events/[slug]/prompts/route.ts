@@ -3,12 +3,13 @@ import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
+import { type Prisma } from '../../../../../generated/prisma'
 
 const createPromptSchema = z.object({
   text: z.string().min(1, 'Prompt text is required').max(500, 'Prompt text too long'),
   order: z.number().int().min(0).optional(),
   maxUploads: z.number().int().min(1).optional(),
-  settings: z.record(z.any()).optional(),
+  settings: z.record(z.string(), z.unknown()).optional(),
 })
 
 export async function POST(
@@ -65,7 +66,7 @@ export async function POST(
         text: data.text,
         order,
         maxUploads: data.maxUploads,
-        settings: data.settings,
+        settings: data.settings as Prisma.InputJsonValue,
         eventId: event.id,
       }
     })
@@ -144,29 +145,12 @@ export async function GET(
       })
 
       // Filter out prompts that have reached their max uploads
-      let availablePrompt = prompt
+      let availablePrompt: typeof prompt = prompt
       if (prompt?.maxUploads && prompt._count.uploads >= prompt.maxUploads) {
-        availablePrompt = await prisma.prompt.findFirst({
+        const prompts = await prisma.prompt.findMany({
           where: {
             eventId: event.id,
             isActive: true,
-            OR: [
-              { maxUploads: null },
-              {
-                AND: [
-                  { maxUploads: { not: null } },
-                  {
-                    uploads: {
-                      aggregate: {
-                        count: {
-                          lt: { path: ['maxUploads'] }
-                        }
-                      }
-                    }
-                  }
-                ]
-              }
-            ]
           },
           include: {
             _count: {
@@ -177,6 +161,10 @@ export async function GET(
           },
           orderBy: { order: 'asc' }
         })
+        
+        availablePrompt = prompts.find(p => 
+          !p.maxUploads || p._count.uploads < p.maxUploads
+        ) || null
       }
 
       return NextResponse.json({

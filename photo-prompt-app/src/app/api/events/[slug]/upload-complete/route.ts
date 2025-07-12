@@ -84,7 +84,7 @@ export async function POST(
         { 
           error: 'Invalid input', 
           details: error.issues.map((e) => ({
-            field: e.path.join('.'),
+            field: e.path.join('.'), // Mobile-friendly field string
             message: e.message
           }))
         },

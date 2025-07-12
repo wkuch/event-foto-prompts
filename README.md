@@ -81,10 +81,10 @@ Note see "Tech stack spec.md" for more details
 - [x] Serve generated QR as SVG/PNG  
 
 ### 2.3 Frontend
-- [ ] Organizer Dashboard (list/create events)  
-- [ ] Event-creation wizard (slug, type, prompts)  
-- [ ] Guest upload page (prompt display + upload form)  
-- [ ] Public gallery page (grid of uploads)  
+- [x] Organizer Dashboard (list/create events)  
+- [x] Event-creation wizard (slug, type, prompts)  
+- [x] Guest upload page (prompt display + upload form)  
+- [x] Public gallery page (grid of uploads)  
 
 ### 2.4 Deployment & Testing
 - [ ] Deploy MVP to staging & production  

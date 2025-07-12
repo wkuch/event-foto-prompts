@@ -53,22 +53,23 @@ Build a lightweight web platform that turns event photography into an interactiv
 
 ## 1. Determine Tech Stack
 Goal: Get to a good MVP fast, with a tech stack that is easy to maintain and scale. Choose cheap and well tested options. Choose tools that are well understood by AI so that AI can help us with the development.
-- [ ] Frontend framework  
-- [ ] CSS / component library  
-- [ ] Backend framework  
-- [ ] Database  
-- [ ] Object storage  
-- [ ] Hosting / CDN  
-- [ ] Authentication  
-- [ ] QR-code generation  
-- [ ] CI/CD & DevOps  
-- [ ] Documentation of final decisions  
+- [x] Frontend framework  
+- [x] CSS / component library  
+- [x] Backend framework  
+- [x] Database  
+- [x] Object storage  
+- [x] Hosting / CDN  
+- [x] Authentication  
+- [x] QR-code generation  
+- [x] CI/CD & DevOps  
+- [x] Documentation of final decisions
+Note see "Tech stack spec.md" for more details
 
 ## 2. Build & Ship MVP (Goal: ship in 2–4 weeks)
 ### 2.1 Project Setup
-- [ ] Initialize Git repos (frontend & backend)  
-- [ ] Configure CI/CD pipelines  
-- [ ] Provision database & object storage  
+- [x] Initialize Git repos (frontend & backend)  
+- [x] Configure CI/CD pipelines  (done later, or maybe not needed when using Vercel)
+- [x] Provision database & object storage (done locally for now) 
 
 ### 2.2 Backend API
 - [ ] `POST /events` → create event (slug, type, settings)

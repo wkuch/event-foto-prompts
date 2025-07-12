@@ -72,13 +72,13 @@ Note see "Tech stack spec.md" for more details
 - [x] Provision database & object storage (done locally for now) 
 
 ### 2.2 Backend API
-- [ ] `POST /events` → create event (slug, type, settings)
-- [ ] `POST /events/:slug/prompts` → create new prompt
-- [ ] `PUT /events/:slug/prompts/:promptId` → update prompt
-- [ ] `DELETE /events/:slug/prompts/:promptId` → delete prompt
-- [ ] `GET /events/:slug/prompts` → fetch next prompt  
-- [ ] `POST /events/:slug/uploads` → handle image + metadata  
-- [ ] Serve generated QR as SVG/PNG  
+- [x] `POST /events` → create event (slug, type, settings)
+- [x] `POST /events/:slug/prompts` → create new prompt
+- [x] `PUT /events/:slug/prompts/:promptId` → update prompt
+- [x] `DELETE /events/:slug/prompts/:promptId` → delete prompt
+- [x] `GET /events/:slug/prompts` → fetch next prompt  
+- [x] `POST /events/:slug/uploads` → handle image + metadata  
+- [x] Serve generated QR as SVG/PNG  
 
 ### 2.3 Frontend
 - [ ] Organizer Dashboard (list/create events)  

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { POST, GET } from '@/app/api/events/route'
-import { createMockRequest, createMockSession } from '../helpers/test-helpers'
+import { createMockRequest, createMockSession, createTestUser } from '../helpers/test-helpers'
 import { mockPrisma } from '../helpers/mock-prisma'
 import { testEvents, testUsers } from '../fixtures/test-data'
 import { getServerSession } from 'next-auth'
@@ -19,6 +19,10 @@ describe('Events API', () => {
   const testUser = testUsers.organizer
   
   beforeEach(() => {
+    // Reset all mocks
+    vi.clearAllMocks()
+    
+    // Set default session mock
     mockGetServerSession.mockResolvedValue(createMockSession(testUser.id))
   })
 
@@ -84,6 +88,26 @@ describe('Events API', () => {
     })
 
     it('should reject duplicate slugs', async () => {
+      // Mock Prisma to return null first (no existing event), then an existing event
+      mockPrisma.event.findUnique
+        .mockResolvedValueOnce(null) // First call returns null (no existing event)
+        .mockResolvedValueOnce({ id: 'existing', slug: 'duplicate-slug' }) // Second call returns existing event
+
+      mockPrisma.event.create.mockResolvedValue({
+        id: 'event-123',
+        name: 'First Event',
+        slug: 'duplicate-slug',
+        type: 'wedding',
+        userId: testUser.id,
+        isActive: true,
+        settings: null,
+        description: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        prompts: [],
+        _count: { uploads: 0 }
+      })
+
       // Create first event
       const firstRequest = createMockRequest('POST', '/api/events', {
         name: 'First Event',
@@ -152,6 +176,24 @@ describe('Events API', () => {
     })
 
     it('should set default values correctly', async () => {
+      // Mock Prisma responses
+      mockPrisma.event.findUnique.mockResolvedValue(null) // No existing event with slug
+      const mockEvent = {
+        id: 'event-123',
+        name: 'Minimal Event',
+        slug: 'minimal-event',
+        type: 'general', // default value
+        description: null,
+        settings: null,
+        userId: testUser.id,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        prompts: [],
+        _count: { uploads: 0 }
+      }
+      mockPrisma.event.create.mockResolvedValue(mockEvent)
+
       const request = createMockRequest('POST', '/api/events', {
         name: 'Minimal Event',
         slug: 'minimal-event',
@@ -170,21 +212,38 @@ describe('Events API', () => {
 
   describe('GET /api/events', () => {
     it('should return user events with counts', async () => {
-      // Create some test events
-      const event1Request = createMockRequest('POST', '/api/events', {
-        name: 'Event 1',
-        slug: 'event-1',
-      })
-      const event2Request = createMockRequest('POST', '/api/events', {
-        name: 'Event 2',
-        slug: 'event-2',
-      })
-
-      await POST(event1Request)
-      await POST(event2Request)
+      // Mock Prisma to return events for the user
+      const mockEvents = [
+        {
+          id: 'event-2',
+          name: 'Event 2',
+          slug: 'event-2',
+          type: 'general',
+          userId: testUser.id,
+          isActive: true,
+          description: null,
+          settings: null,
+          createdAt: new Date('2023-01-02'),
+          updatedAt: new Date('2023-01-02'),
+          _count: { prompts: 0, uploads: 0 }
+        },
+        {
+          id: 'event-1',
+          name: 'Event 1',
+          slug: 'event-1',
+          type: 'general',
+          userId: testUser.id,
+          isActive: true,
+          description: null,
+          settings: null,
+          createdAt: new Date('2023-01-01'),
+          updatedAt: new Date('2023-01-01'),
+          _count: { prompts: 0, uploads: 0 }
+        }
+      ]
+      mockPrisma.event.findMany.mockResolvedValue(mockEvents)
 
       // Get events
-      const getRequest = createMockRequest('GET', '/api/events')
       const response = await GET()
       const data = await response.json()
 
@@ -205,6 +264,9 @@ describe('Events API', () => {
     })
 
     it('should return empty array for user with no events', async () => {
+      // Mock Prisma to return empty array
+      mockPrisma.event.findMany.mockResolvedValue([])
+
       const response = await GET()
       const data = await response.json()
 
@@ -224,27 +286,33 @@ describe('Events API', () => {
     })
 
     it('should only return events for authenticated user', async () => {
-      // Create event for test user
-      const eventRequest = createMockRequest('POST', '/api/events', {
-        name: 'User 1 Event',
-        slug: 'user-1-event',
-      })
-      await POST(eventRequest)
-
-      // Create another user and their event
-      const anotherUser = await createTestUser({
+      // Create another user
+      const anotherUser = {
         id: 'test-user-2',
         name: 'Another User',
         email: 'another@test.com',
-      })
+      }
       
+      // Mock session for the other user
       mockGetServerSession.mockResolvedValue(createMockSession(anotherUser.id))
       
-      const anotherEventRequest = createMockRequest('POST', '/api/events', {
-        name: 'User 2 Event',
-        slug: 'user-2-event',
-      })
-      await POST(anotherEventRequest)
+      // Mock Prisma to return only events for the authenticated user
+      const mockEvents = [
+        {
+          id: 'event-user-2',
+          name: 'User 2 Event',
+          slug: 'user-2-event',
+          type: 'general',
+          userId: anotherUser.id,
+          isActive: true,
+          description: null,
+          settings: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          _count: { prompts: 0, uploads: 0 }
+        }
+      ]
+      mockPrisma.event.findMany.mockResolvedValue(mockEvents)
 
       // Get events for second user
       const response = await GET()

@@ -134,6 +134,8 @@ npx prisma init
 npx shadcn-ui@latest init
 ```
 
+NOTE: DONE!
+
 ## 📝 Key Decisions & Rationale
 
 ### Why Next.js over separate frontend/backend?

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Download, Eye, Filter, Grid, List, Loader, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Download, Eye, Filter, Grid, List, Loader, RefreshCw, X } from 'lucide-react'
 
 interface Upload {
   id: string
@@ -107,9 +107,10 @@ export default function GalleryPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString('de-DE', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
     })
@@ -121,28 +122,19 @@ export default function GalleryPage() {
         console.error('No URL available for download')
         return
       }
-
-      // Try direct download first
-      const response = await fetch(upload.r2Url, {
-        mode: 'cors'
-      })
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch image: ${response.status}`)
-      }
-      
+      const response = await fetch(upload.r2Url)
+      if (!response.ok) throw new Error('Network response was not ok.')
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = `${upload.uploaderName || 'photo'}-${upload.id}.jpg`
+      a.download = `event-photo-${upload.id}.jpg`
       document.body.appendChild(a)
       a.click()
+      a.remove()
       window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
     } catch (err) {
       console.error('Failed to download image:', err)
-      // Fallback: try opening in new tab
       if (upload.r2Url) {
         window.open(upload.r2Url, '_blank')
       }
@@ -151,10 +143,10 @@ export default function GalleryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFF9E5' }}>
-        <div className="text-center bg-white rounded-lg p-8 shadow-sm border border-gray-100">
-          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#4A9782' }} />
-          <p className="font-light" style={{ color: '#004030' }}>Galerie wird geladen...</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#27374D' }}>
+        <div className="text-center p-8">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#DDE6ED' }} />
+          <p className="font-light" style={{ color: '#DDE6ED' }}>Galerie wird geladen...</p>
         </div>
       </div>
     )
@@ -162,19 +154,19 @@ export default function GalleryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FFF9E5' }}>
-        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100">
-          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#4A9782' }}>
-            <RefreshCw className="w-6 h-6 text-white" />
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#27374D' }}>
+        <div className="max-w-md w-full rounded-lg p-8 text-center" style={{ backgroundColor: '#526D82' }}>
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9DB2BF' }}>
+            <RefreshCw className="w-6 h-6" style={{ color: '#27374D' }}/>
           </div>
-          <h2 className="text-lg font-light mb-3" style={{ color: '#004030' }}>
+          <h2 className="text-lg font-light mb-3" style={{ color: '#DDE6ED' }}>
             Galerie konnte nicht geladen werden
           </h2>
-          <p className="text-gray-600 mb-6 font-light">{error}</p>
+          <p className="mb-6 font-light" style={{ color: '#9DB2BF' }}>{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-colors"
-            style={{ borderColor: '#4A9782', color: '#4A9782' }}
+            className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:opacity-90 transition-colors"
+            style={{ borderColor: '#9DB2BF', color: '#DDE6ED' }}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Erneut versuchen
@@ -185,24 +177,24 @@ export default function GalleryPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FFF9E5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#27374D' }}>
       {/* Header */}
-      <div className="shadow-sm" style={{ backgroundColor: '#004030' }}>
+      <div style={{ backgroundColor: '#526D82' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-8">
+          <div className="flex items-center justify-between py-6">
             <div className="flex items-center">
               <Link
                 href={`/event/${event?.slug}`}
                 className="mr-4 p-2 rounded-md hover:bg-white/10 transition-colors"
-                style={{ color: '#DCD0A8' }}
+                style={{ color: '#DDE6ED' }}
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div>
-                <h1 className="text-2xl font-light text-white tracking-wide">
+                <h1 className="text-2xl font-light tracking-wide" style={{ color: '#DDE6ED' }}>
                   {event?.name} Galerie
                 </h1>
-                <p className="text-sm font-light" style={{ color: '#DCD0A8' }}>
+                <p className="text-sm font-light" style={{ color: '#9DB2BF' }}>
                   {filteredUploads.length} {filteredUploads.length === 1 ? 'Foto' : 'Fotos'}
                   {selectedPromptId !== 'all' && ' für diese Aufgabe'}
                 </p>
@@ -210,32 +202,24 @@ export default function GalleryPage() {
             </div>
             
             <div className="flex items-center space-x-4">
-              {/* View Mode Toggle */}
-              <div className="flex rounded-md">
+              <div className="flex rounded-md border" style={{ borderColor: '#9DB2BF' }}>
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`px-3 py-2 text-sm font-medium rounded-l-md border transition-colors ${
-                    viewMode === 'grid'
-                      ? 'text-white border-white/30'
-                      : 'border-white/20 hover:bg-white/10'
-                  }`}
+                  className={`px-3 py-2 text-sm font-medium rounded-l-md transition-colors ${viewMode === 'grid' ? '' : 'hover:bg-white/10'}`}
                   style={{ 
-                    backgroundColor: viewMode === 'grid' ? '#4A9782' : 'transparent',
-                    color: viewMode === 'grid' ? 'white' : '#DCD0A8'
+                    backgroundColor: viewMode === 'grid' ? '#9DB2BF' : 'transparent',
+                    color: viewMode === 'grid' ? '#27374D' : '#DDE6ED'
                   }}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-3 py-2 text-sm font-medium rounded-r-md border-t border-r border-b transition-colors ${
-                    viewMode === 'list'
-                      ? 'text-white border-white/30'
-                      : 'border-white/20 hover:bg-white/10'
-                  }`}
+                  className={`px-3 py-2 text-sm font-medium rounded-r-md transition-colors border-l ${viewMode === 'list' ? '' : 'hover:bg-white/10'}`}
                   style={{ 
-                    backgroundColor: viewMode === 'list' ? '#4A9782' : 'transparent',
-                    color: viewMode === 'list' ? 'white' : '#DCD0A8'
+                    borderColor: '#9DB2BF',
+                    backgroundColor: viewMode === 'list' ? '#9DB2BF' : 'transparent',
+                    color: viewMode === 'list' ? '#27374D' : '#DDE6ED'
                   }}
                 >
                   <List className="w-4 h-4" />
@@ -248,21 +232,19 @@ export default function GalleryPage() {
 
       {/* Filters */}
       {prompts.length > 0 && (
-        <div className="border-b" style={{ backgroundColor: '#DCD0A8', borderColor: '#4A9782' }}>
+        <div className="border-b" style={{ backgroundColor: '#526D82', borderColor: '#27374D' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center space-x-4">
-              <Filter className="w-5 h-5" style={{ color: '#004030' }} />
+              <Filter className="w-5 h-5" style={{ color: '#DDE6ED' }} />
               <select
                 value={selectedPromptId}
                 onChange={(e) => setSelectedPromptId(e.target.value)}
                 className="border rounded-md shadow-sm focus:ring-1 focus:outline-none transition-colors font-medium"
                 style={{ 
-                  borderColor: '#4A9782', 
-                  color: '#004030',
-                  backgroundColor: 'white'
+                  borderColor: '#9DB2BF', 
+                  color: '#27374D',
+                  backgroundColor: '#DDE6ED'
                 }}
-                onFocus={(e) => e.target.style.borderColor = '#004030'}
-                onBlur={(e) => e.target.style.borderColor = '#4A9782'}
               >
                 <option value="all">Alle Aufgaben ({uploads.length})</option>
                 {prompts.map((prompt) => {
@@ -283,19 +265,19 @@ export default function GalleryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {filteredUploads.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#4A9782' }}>
-              <Eye className="w-10 h-10 text-white" />
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#526D82' }}>
+              <Eye className="w-10 h-10" style={{ color: '#DDE6ED' }} />
             </div>
-            <h3 className="text-xl font-light mb-3" style={{ color: '#004030' }}>
+            <h3 className="text-xl font-light mb-3" style={{ color: '#DDE6ED' }}>
               Noch keine Fotos
             </h3>
-            <p className="text-gray-600 mb-8 font-light">
+            <p className="mb-8 font-light" style={{ color: '#9DB2BF' }}>
               Fotos werden hier angezeigt, sobald Gäste sie hochladen
             </p>
             <Link
               href={`/event/${event?.slug}`}
-              className="inline-flex items-center px-6 py-3 border rounded-lg text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-colors"
-              style={{ borderColor: '#4A9782', color: '#4A9782' }}
+              className="inline-flex items-center px-6 py-3 border rounded-lg text-sm font-medium hover:opacity-90 transition-colors"
+              style={{ borderColor: '#9DB2BF', color: '#DDE6ED' }}
             >
               Mit dem Hochladen von Fotos beginnen
             </Link>
@@ -305,50 +287,32 @@ export default function GalleryPage() {
             {filteredUploads.map((upload) => (
               <div
                 key={upload.id}
-                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group cursor-pointer border border-gray-100"
+                className="rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
+                style={{ backgroundColor: '#526D82' }}
                 onClick={() => setSelectedImage(upload)}
               >
-                <div className="aspect-square relative overflow-hidden" style={{ backgroundColor: '#FFF9E5' }}>
-                  {/* Loading placeholder */}
+                <div className="aspect-square relative overflow-hidden" style={{ backgroundColor: '#27374D' }}>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-6 h-6 border-2 border-t-2 rounded-full animate-spin" style={{ borderColor: '#DCD0A8', borderTopColor: '#4A9782' }}></div>
+                    <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: '#9DB2BF', borderTopColor: '#DDE6ED' }}></div>
                   </div>
-                  
                   <img
                     src={upload.r2Url}
                     alt={upload.caption || 'Event photo'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 relative z-10"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 relative z-10"
                     loading="lazy"
-                    onLoad={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.opacity = '1'
-                      // Hide loading spinner
-                      const parent = target.parentElement
-                      const spinner = parent?.querySelector('.animate-spin')?.parentElement
-                      if (spinner) {
-                        (spinner as HTMLElement).style.display = 'none'
-                      }
-                    }}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
-                      const parent = target.parentElement
-                      if (parent) {
-                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-500 text-sm">Bild nicht verfügbar</span></div>'
-                      }
-                    }}
-                    style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
+                    style={{ opacity: 0, transition: 'opacity 0.5s ease-in-out' }}
+                    onLoad={(e) => (e.target as HTMLImageElement).style.opacity = '1'}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
-                    <Eye className="w-6 h-6 text-white opacity-0 group-hover:opacity-90 transition-opacity duration-200" />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
+                    <Eye className="w-8 h-8 text-white opacity-0 group-hover:opacity-90 transition-opacity duration-300" />
                   </div>
                 </div>
                 <div className="p-4">
-                  <p className="text-sm text-gray-600 mb-1">{upload.prompt.text}</p>
+                  <p className="text-sm mb-1 truncate" style={{ color: '#9DB2BF' }}>{upload.prompt.text}</p>
                   {upload.caption && (
-                    <p className="text-sm text-gray-900 mb-2 line-clamp-2">{upload.caption}</p>
+                    <p className="text-sm mb-2 line-clamp-2" style={{ color: '#DDE6ED' }}>{upload.caption}</p>
                   )}
-                  <div className="flex justify-between items-center text-xs text-gray-500">
+                  <div className="flex justify-between items-center text-xs" style={{ color: '#9DB2BF' }}>
                     <span>{upload.uploaderName || 'Anonym'}</span>
                     <span>{formatDate(upload.createdAt)}</span>
                   </div>
@@ -361,55 +325,32 @@ export default function GalleryPage() {
             {filteredUploads.map((upload) => (
               <div
                 key={upload.id}
-                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 flex items-center space-x-6"
+                className="rounded-lg shadow hover:shadow-md transition-shadow p-4 flex items-center space-x-6"
+                style={{ backgroundColor: '#526D82' }}
               >
-                <div className="w-20 h-20 bg-gray-200 rounded-md overflow-hidden relative">
-                  {/* Loading placeholder */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-                  </div>
-                  
+                <div className="w-24 h-24 rounded-md overflow-hidden relative flex-shrink-0" style={{ backgroundColor: '#27374D' }}>
                   <img
                     src={upload.r2Url}
                     alt={upload.caption || 'Event photo'}
-                    className="w-full h-full object-cover cursor-pointer relative z-10"
+                    className="w-full h-full object-cover cursor-pointer"
                     loading="lazy"
                     onClick={() => setSelectedImage(upload)}
-                    onLoad={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.opacity = '1'
-                      // Hide loading spinner
-                      const parent = target.parentElement
-                      const spinner = parent?.querySelector('.animate-spin')?.parentElement
-                      if (spinner) {
-                        (spinner as HTMLElement).style.display = 'none'
-                      }
-                    }}
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement
-                      target.style.display = 'none'
-                      const parent = target.parentElement
-                      if (parent) {
-                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-400 text-xs">Kein Bild</span></div>'
-                      }
-                    }}
-                    style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
                   />
                 </div>
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600 mb-1">{upload.prompt.text}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm truncate mb-1" style={{ color: '#9DB2BF' }}>{upload.prompt.text}</p>
                   {upload.caption && (
-                    <p className="text-gray-900 mb-2">{upload.caption}</p>
+                    <p className="mb-2 truncate" style={{ color: '#DDE6ED' }}>{upload.caption}</p>
                   )}
-                  <div className="flex justify-between items-center text-sm text-gray-500">
+                  <div className="flex justify-between items-center text-sm" style={{ color: '#9DB2BF' }}>
                     <span>Von {upload.uploaderName || 'Anonym'}</span>
                     <span>{formatDate(upload.createdAt)}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => downloadImage(upload)}
-                  className="p-2 rounded-md hover:bg-gray-50 transition-colors"
-                  style={{ color: '#4A9782' }}
+                  className="p-2 rounded-md hover:bg-white/10 transition-colors"
+                  style={{ color: '#DDE6ED' }}
                 >
                   <Download className="w-5 h-5" />
                 </button>
@@ -422,49 +363,43 @@ export default function GalleryPage() {
       {/* Image Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
           onClick={() => setSelectedImage(null)}
         >
           <div
-            className="max-w-4xl w-full bg-white rounded-lg overflow-hidden"
+            className="max-w-4xl w-full rounded-lg overflow-hidden"
+            style={{ backgroundColor: '#526D82' }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative bg-gray-100">
+            <div className="relative" style={{ backgroundColor: '#27374D' }}>
               <img
                 src={selectedImage.r2Url}
                 alt={selectedImage.caption || 'Event photo'}
-                className="w-full h-auto max-h-[70vh] object-contain"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement
-                  target.style.display = 'none'
-                  const parent = target.parentElement
-                  if (parent) {
-                    parent.innerHTML = '<div class="w-full h-64 flex items-center justify-center bg-gray-200"><span class="text-gray-500">Bild nicht verfügbar</span></div>'
-                  }
-                }}
+                className="w-full h-auto max-h-[80vh] object-contain"
               />
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 p-2 bg-white shadow-lg rounded-full hover:bg-gray-50 transition-colors"
+                className="absolute top-4 right-4 p-2 rounded-full transition-colors"
+                style={{ backgroundColor: 'rgba(39, 55, 77, 0.7)', color: '#DDE6ED' }}
               >
-                <X className="w-4 h-4" style={{ color: '#004030' }} />
+                <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-6">
-              <p className="text-sm text-gray-600 mb-2">{selectedImage.prompt.text}</p>
+              <p className="text-sm mb-2" style={{ color: '#9DB2BF' }}>{selectedImage.prompt.text}</p>
               {selectedImage.caption && (
-                <p className="text-gray-900 mb-4">{selectedImage.caption}</p>
+                <p className="mb-4" style={{ color: '#DDE6ED' }}>{selectedImage.caption}</p>
               )}
               <div className="flex justify-between items-center">
-                <div className="text-sm text-gray-500">
+                <div className="text-sm" style={{ color: '#9DB2BF' }}>
                   <span>Von {selectedImage.uploaderName || 'Anonym'}</span>
                   <span className="mx-2">•</span>
                   <span>{formatDate(selectedImage.createdAt)}</span>
                 </div>
                 <button
                   onClick={() => downloadImage(selectedImage)}
-                  className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-all"
-                  style={{ backgroundColor: '#004030', borderColor: '#004030' }}
+                  className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:opacity-90 transition-all"
+                  style={{ backgroundColor: '#27374D', borderColor: '#9DB2BF', color: '#DDE6ED' }}
                 >
                   <Download className="w-4 h-4 mr-2" />
                   Herunterladen

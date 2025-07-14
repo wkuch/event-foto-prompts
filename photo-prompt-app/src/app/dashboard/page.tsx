@@ -114,18 +114,18 @@ export default async function DashboardPage() {
                     <span>{event._count.uploads} Fotos</span>
                   </div>
 
-                  <div className="flex space-x-3">
+                  <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 sm:gap-3">
                     <Link
                       href={`/dashboard/events/${event.slug}`}
-                      className="flex-1 text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
                       Verwalten
                     </Link>
                     <Link
                       href={`/event/${event.slug}`}
-                      className="flex-1 text-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="text-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
-                      Anzeigen
+                      Event anzeigen
                     </Link>
                   </div>
                 </div>

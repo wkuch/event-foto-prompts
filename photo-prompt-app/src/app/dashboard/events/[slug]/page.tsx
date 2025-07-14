@@ -168,41 +168,43 @@ export default function EventManagePage() {
       {/* Header */}
       <div className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center py-6">
-            <Link
-              href="/dashboard"
-              className="mr-4 p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div className="flex-1">
-              <div className="flex items-center space-x-3">
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {event.name}
-                </h1>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  event.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {event.isActive ? 'Aktiv' : 'Inaktiv'}
-                </span>
+          <div className="py-6">
+            <div className="flex items-center mb-4">
+              <Link
+                href="/dashboard"
+                className="mr-4 p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </Link>
+              <div className="flex-1 min-w-0">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">
+                    {event.name}
+                  </h1>
+                  <span className={`mt-1 sm:mt-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium w-fit ${
+                    event.isActive 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-gray-100 text-gray-800'
+                  }`}>
+                    {event.isActive ? 'Aktiv' : 'Inaktiv'}
+                  </span>
+                </div>
+                <p className="mt-1 text-sm text-gray-600">
+                  Event-Verwaltung und Statistiken
+                </p>
               </div>
-              <p className="mt-1 text-sm text-gray-600">
-                Event-Verwaltung und Statistiken
-              </p>
             </div>
-            <div className="flex space-x-3">
+            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
               <Link
                 href={`/gallery/${event.id}`}
-                className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                className="inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >
                 <Image className="w-4 h-4 mr-2" />
                 Galerie
               </Link>
               <Link
                 href={`/event/${event.slug}`}
-                className="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
               >
                 <Eye className="w-4 h-4 mr-2" />
                 Event anzeigen

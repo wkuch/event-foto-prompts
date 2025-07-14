@@ -84,7 +84,10 @@ Note see "Tech stack spec.md" for more details
 - [x] Organizer Dashboard (list/create events)  
 - [x] Event-creation wizard (slug, type, prompts)  
 - [x] Guest upload page (prompt display + upload form)  
-- [x] Public gallery page (grid of uploads)  
+- [ ] Public gallery page (grid of uploads)
+
+#### Issues with current frontend:
+- 
 
 ### 2.4 Deployment & Testing
 - [ ] Deploy MVP to staging & production  

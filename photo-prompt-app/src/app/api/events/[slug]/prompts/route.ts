@@ -128,8 +128,8 @@ export async function GET(
     }
 
     if (nextOnly) {
-      // Return the next prompt that has available upload slots
-      const prompt = await prisma.prompt.findFirst({
+      // Get all available prompts that have upload slots
+      const prompts = await prisma.prompt.findMany({
         where: {
           eventId: event.id,
           isActive: true,
@@ -145,31 +145,20 @@ export async function GET(
       })
 
       // Filter out prompts that have reached their max uploads
-      let availablePrompt: typeof prompt = prompt
-      if (prompt?.maxUploads && prompt._count.uploads >= prompt.maxUploads) {
-        const prompts = await prisma.prompt.findMany({
-          where: {
-            eventId: event.id,
-            isActive: true,
-          },
-          include: {
-            _count: {
-              select: {
-                uploads: true
-              }
-            }
-          },
-          orderBy: { order: 'asc' }
-        })
-        
-        availablePrompt = prompts.find(p => 
-          !p.maxUploads || p._count.uploads < p.maxUploads
-        ) || null
+      const availablePrompts = prompts.filter(p => 
+        !p.maxUploads || p._count.uploads < p.maxUploads
+      )
+
+      // Return a random prompt from available ones
+      let selectedPrompt = null
+      if (availablePrompts.length > 0) {
+        const randomIndex = Math.floor(Math.random() * availablePrompts.length)
+        selectedPrompt = availablePrompts[randomIndex]
       }
 
       return NextResponse.json({
         success: true,
-        prompt: availablePrompt
+        prompt: selectedPrompt
       })
     }
 

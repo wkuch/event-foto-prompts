@@ -115,7 +115,20 @@ export default function EventGalleryPage() {
 
   const downloadImage = async (upload: Upload) => {
     try {
-      const response = await fetch(upload.r2Url)
+      if (!upload.r2Url) {
+        console.error('No URL available for download')
+        return
+      }
+
+      // Try direct download first
+      const response = await fetch(upload.r2Url, {
+        mode: 'cors'
+      })
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.status}`)
+      }
+      
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -127,6 +140,10 @@ export default function EventGalleryPage() {
       document.body.removeChild(a)
     } catch (err) {
       console.error('Failed to download image:', err)
+      // Fallback: try opening in new tab
+      if (upload.r2Url) {
+        window.open(upload.r2Url, '_blank')
+      }
     }
   }
 
@@ -271,11 +288,36 @@ export default function EventGalleryPage() {
                 className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden group cursor-pointer"
                 onClick={() => setSelectedImage(upload)}
               >
-                <div className="aspect-square relative overflow-hidden">
+                <div className="aspect-square relative overflow-hidden bg-gray-200">
+                  {/* Loading placeholder */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+                  </div>
+                  
                   <img
                     src={upload.r2Url}
                     alt={upload.caption || 'Event photo'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200 relative z-10"
+                    loading="lazy"
+                    onLoad={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.opacity = '1'
+                      // Hide loading spinner
+                      const parent = target.parentElement
+                      const spinner = parent?.querySelector('.animate-spin')?.parentElement
+                      if (spinner) {
+                        (spinner as HTMLElement).style.display = 'none'
+                      }
+                    }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const parent = target.parentElement
+                      if (parent) {
+                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-500 text-sm">Image unavailable</span></div>'
+                      }
+                    }}
+                    style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
                   />
                   <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
                     <Eye className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
@@ -301,12 +343,39 @@ export default function EventGalleryPage() {
                 key={upload.id}
                 className="bg-white rounded-lg shadow hover:shadow-md transition-shadow p-6 flex items-center space-x-6"
               >
-                <img
-                  src={upload.r2Url}
-                  alt={upload.caption || 'Event photo'}
-                  className="w-20 h-20 object-cover rounded-md cursor-pointer"
-                  onClick={() => setSelectedImage(upload)}
-                />
+                <div className="w-20 h-20 bg-gray-200 rounded-md overflow-hidden relative">
+                  {/* Loading placeholder */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+                  </div>
+                  
+                  <img
+                    src={upload.r2Url}
+                    alt={upload.caption || 'Event photo'}
+                    className="w-full h-full object-cover cursor-pointer relative z-10"
+                    loading="lazy"
+                    onClick={() => setSelectedImage(upload)}
+                    onLoad={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.opacity = '1'
+                      // Hide loading spinner
+                      const parent = target.parentElement
+                      const spinner = parent?.querySelector('.animate-spin')?.parentElement
+                      if (spinner) {
+                        (spinner as HTMLElement).style.display = 'none'
+                      }
+                    }}
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement
+                      target.style.display = 'none'
+                      const parent = target.parentElement
+                      if (parent) {
+                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-400 text-xs">No image</span></div>'
+                      }
+                    }}
+                    style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
+                  />
+                </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-600 mb-1">{upload.prompt.text}</p>
                   {upload.caption && (
@@ -339,11 +408,19 @@ export default function EventGalleryPage() {
             className="max-w-4xl w-full bg-white rounded-lg overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative">
+            <div className="relative bg-gray-100">
               <img
                 src={selectedImage.r2Url}
                 alt={selectedImage.caption || 'Event photo'}
                 className="w-full h-auto max-h-[70vh] object-contain"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                  const parent = target.parentElement
+                  if (parent) {
+                    parent.innerHTML = '<div class="w-full h-64 flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>'
+                  }
+                }}
               />
               <button
                 onClick={() => setSelectedImage(null)}

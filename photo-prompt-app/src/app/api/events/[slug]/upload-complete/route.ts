@@ -44,6 +44,9 @@ export async function POST(
       )
     }
 
+    // Generate API proxy URL instead of direct R2 URL
+    const apiUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/images/${data.r2Key}`
+
     // Save upload record to database
     const upload = await prisma.upload.create({
       data: {
@@ -54,7 +57,7 @@ export async function POST(
         fileSize: data.fileSize,
         mimeType: data.mimeType,
         r2Key: data.r2Key,
-        r2Url: data.r2Url,
+        r2Url: apiUrl, // Use API proxy URL instead of direct R2 URL
         caption: data.caption || null,
         uploaderName: data.uploaderName || null,
         uploaderInfo: data.uploaderInfo ? JSON.parse(JSON.stringify(data.uploaderInfo)) : null,

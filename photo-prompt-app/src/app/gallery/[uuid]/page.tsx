@@ -25,9 +25,9 @@ interface Event {
   isActive: boolean
 }
 
-export default function EventGalleryPage() {
+export default function GalleryPage() {
   const params = useParams()
-  const slug = params.slug as string
+  const uuid = params.uuid as string
   
   const [event, setEvent] = useState<Event | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
@@ -43,7 +43,7 @@ export default function EventGalleryPage() {
     fetchEventData()
     fetchUploads()
     fetchPrompts()
-  }, [slug])
+  }, [uuid])
 
   useEffect(() => {
     if (selectedPromptId === 'all') {
@@ -55,25 +55,27 @@ export default function EventGalleryPage() {
 
   const fetchEventData = async () => {
     try {
-      // For now, we'll create a minimal event object
-      // In a real app, you'd fetch this from an endpoint
-      setEvent({
-        id: slug,
-        name: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-        slug,
-        isActive: true
-      })
+      const response = await fetch(`/api/galleries/${uuid}`)
+      
+      if (!response.ok) {
+        throw new Error('Event nicht gefunden')
+      }
+
+      const data = await response.json()
+      if (data.success) {
+        setEvent(data.event)
+      }
     } catch (err) {
-      setError('Failed to load event information')
+      setError('Event-Informationen konnten nicht geladen werden')
     }
   }
 
   const fetchUploads = async () => {
     try {
-      const response = await fetch(`/api/events/${slug}/uploads`)
+      const response = await fetch(`/api/galleries/${uuid}/uploads`)
       
       if (!response.ok) {
-        throw new Error('Failed to fetch uploads')
+        throw new Error('Uploads konnten nicht abgerufen werden')
       }
 
       const data = await response.json()
@@ -81,16 +83,16 @@ export default function EventGalleryPage() {
         setUploads(data.uploads)
       }
     } catch (err) {
-      setError('Failed to load photos')
+      setError('Fotos konnten nicht geladen werden')
     }
   }
 
   const fetchPrompts = async () => {
     try {
-      const response = await fetch(`/api/events/${slug}/prompts`)
+      const response = await fetch(`/api/galleries/${uuid}/prompts`)
       
       if (!response.ok) {
-        throw new Error('Failed to fetch prompts')
+        throw new Error('Aufgaben konnten nicht abgerufen werden')
       }
 
       const data = await response.json()
@@ -98,7 +100,7 @@ export default function EventGalleryPage() {
         setPrompts(data.prompts)
       }
     } catch (err) {
-      console.warn('Failed to load prompts for filtering')
+      console.warn('Aufgaben für Filter konnten nicht geladen werden')
     } finally {
       setIsLoading(false)
     }
@@ -149,10 +151,10 @@ export default function EventGalleryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading gallery...</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFF9E5' }}>
+        <div className="text-center bg-white rounded-lg p-8 shadow-sm border border-gray-100">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#4A9782' }} />
+          <p className="font-light" style={{ color: '#004030' }}>Galerie wird geladen...</p>
         </div>
       </div>
     )
@@ -160,21 +162,22 @@ export default function EventGalleryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <RefreshCw className="w-8 h-8 text-red-600" />
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FFF9E5' }}>
+        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100">
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#4A9782' }}>
+            <RefreshCw className="w-6 h-6 text-white" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Unable to Load Gallery
+          <h2 className="text-lg font-light mb-3" style={{ color: '#004030' }}>
+            Galerie konnte nicht geladen werden
           </h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-gray-600 mb-6 font-light">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-colors"
+            style={{ borderColor: '#4A9782', color: '#4A9782' }}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Try Again
+            Erneut versuchen
           </button>
         </div>
       </div>
@@ -182,49 +185,58 @@ export default function EventGalleryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#FFF9E5' }}>
       {/* Header */}
-      <div className="bg-white shadow">
+      <div className="shadow-sm" style={{ backgroundColor: '#004030' }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
+          <div className="flex items-center justify-between py-8">
             <div className="flex items-center">
               <Link
-                href={`/event/${slug}`}
-                className="mr-4 p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
+                href={`/event/${event?.slug}`}
+                className="mr-4 p-2 rounded-md hover:bg-white/10 transition-colors"
+                style={{ color: '#DCD0A8' }}
               >
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  {event?.name} Gallery
+                <h1 className="text-2xl font-light text-white tracking-wide">
+                  {event?.name} Galerie
                 </h1>
-                <p className="text-sm text-gray-600">
-                  {filteredUploads.length} {filteredUploads.length === 1 ? 'photo' : 'photos'}
-                  {selectedPromptId !== 'all' && ' for this prompt'}
+                <p className="text-sm font-light" style={{ color: '#DCD0A8' }}>
+                  {filteredUploads.length} {filteredUploads.length === 1 ? 'Foto' : 'Fotos'}
+                  {selectedPromptId !== 'all' && ' für diese Aufgabe'}
                 </p>
               </div>
             </div>
             
             <div className="flex items-center space-x-4">
               {/* View Mode Toggle */}
-              <div className="flex rounded-md shadow-sm">
+              <div className="flex rounded-md">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`px-3 py-2 text-sm font-medium rounded-l-md border ${
+                  className={`px-3 py-2 text-sm font-medium rounded-l-md border transition-colors ${
                     viewMode === 'grid'
-                      ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                      ? 'text-white border-white/30'
+                      : 'border-white/20 hover:bg-white/10'
                   }`}
+                  style={{ 
+                    backgroundColor: viewMode === 'grid' ? '#4A9782' : 'transparent',
+                    color: viewMode === 'grid' ? 'white' : '#DCD0A8'
+                  }}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`px-3 py-2 text-sm font-medium rounded-r-md border-t border-r border-b ${
+                  className={`px-3 py-2 text-sm font-medium rounded-r-md border-t border-r border-b transition-colors ${
                     viewMode === 'list'
-                      ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                      ? 'text-white border-white/30'
+                      : 'border-white/20 hover:bg-white/10'
                   }`}
+                  style={{ 
+                    backgroundColor: viewMode === 'list' ? '#4A9782' : 'transparent',
+                    color: viewMode === 'list' ? 'white' : '#DCD0A8'
+                  }}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -236,16 +248,23 @@ export default function EventGalleryPage() {
 
       {/* Filters */}
       {prompts.length > 0 && (
-        <div className="bg-white border-b border-gray-200">
+        <div className="border-b" style={{ backgroundColor: '#DCD0A8', borderColor: '#4A9782' }}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center space-x-4">
-              <Filter className="w-5 h-5 text-gray-400" />
+              <Filter className="w-5 h-5" style={{ color: '#004030' }} />
               <select
                 value={selectedPromptId}
                 onChange={(e) => setSelectedPromptId(e.target.value)}
-                className="border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                className="border rounded-md shadow-sm focus:ring-1 focus:outline-none transition-colors font-medium"
+                style={{ 
+                  borderColor: '#4A9782', 
+                  color: '#004030',
+                  backgroundColor: 'white'
+                }}
+                onFocus={(e) => e.target.style.borderColor = '#004030'}
+                onBlur={(e) => e.target.style.borderColor = '#4A9782'}
               >
-                <option value="all">All Prompts ({uploads.length})</option>
+                <option value="all">Alle Aufgaben ({uploads.length})</option>
                 {prompts.map((prompt) => {
                   const count = uploads.filter(u => u.prompt.id === prompt.id).length
                   return (
@@ -264,20 +283,21 @@ export default function EventGalleryPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {filteredUploads.length === 0 ? (
           <div className="text-center py-12">
-            <div className="w-24 h-24 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
-              <Eye className="w-12 h-12 text-gray-400" />
+            <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#4A9782' }}>
+              <Eye className="w-10 h-10 text-white" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No photos yet
+            <h3 className="text-xl font-light mb-3" style={{ color: '#004030' }}>
+              Noch keine Fotos
             </h3>
-            <p className="text-gray-600 mb-6">
-              Photos will appear here as guests upload them
+            <p className="text-gray-600 mb-8 font-light">
+              Fotos werden hier angezeigt, sobald Gäste sie hochladen
             </p>
             <Link
-              href={`/event/${slug}`}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+              href={`/event/${event?.slug}`}
+              className="inline-flex items-center px-6 py-3 border rounded-lg text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-colors"
+              style={{ borderColor: '#4A9782', color: '#4A9782' }}
             >
-              Start Uploading Photos
+              Mit dem Hochladen von Fotos beginnen
             </Link>
           </div>
         ) : viewMode === 'grid' ? (
@@ -285,13 +305,13 @@ export default function EventGalleryPage() {
             {filteredUploads.map((upload) => (
               <div
                 key={upload.id}
-                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow overflow-hidden group cursor-pointer"
+                className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden group cursor-pointer border border-gray-100"
                 onClick={() => setSelectedImage(upload)}
               >
-                <div className="aspect-square relative overflow-hidden bg-gray-200">
+                <div className="aspect-square relative overflow-hidden" style={{ backgroundColor: '#FFF9E5' }}>
                   {/* Loading placeholder */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                    <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-6 h-6 border-2 border-t-2 rounded-full animate-spin" style={{ borderColor: '#DCD0A8', borderTopColor: '#4A9782' }}></div>
                   </div>
                   
                   <img
@@ -314,13 +334,13 @@ export default function EventGalleryPage() {
                       target.style.display = 'none'
                       const parent = target.parentElement
                       if (parent) {
-                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-500 text-sm">Image unavailable</span></div>'
+                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-500 text-sm">Bild nicht verfügbar</span></div>'
                       }
                     }}
                     style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                    <Eye className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-200 flex items-center justify-center">
+                    <Eye className="w-6 h-6 text-white opacity-0 group-hover:opacity-90 transition-opacity duration-200" />
                   </div>
                 </div>
                 <div className="p-4">
@@ -329,7 +349,7 @@ export default function EventGalleryPage() {
                     <p className="text-sm text-gray-900 mb-2 line-clamp-2">{upload.caption}</p>
                   )}
                   <div className="flex justify-between items-center text-xs text-gray-500">
-                    <span>{upload.uploaderName || 'Anonymous'}</span>
+                    <span>{upload.uploaderName || 'Anonym'}</span>
                     <span>{formatDate(upload.createdAt)}</span>
                   </div>
                 </div>
@@ -370,7 +390,7 @@ export default function EventGalleryPage() {
                       target.style.display = 'none'
                       const parent = target.parentElement
                       if (parent) {
-                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-400 text-xs">No image</span></div>'
+                        parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-400 text-xs">Kein Bild</span></div>'
                       }
                     }}
                     style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
@@ -382,13 +402,14 @@ export default function EventGalleryPage() {
                     <p className="text-gray-900 mb-2">{upload.caption}</p>
                   )}
                   <div className="flex justify-between items-center text-sm text-gray-500">
-                    <span>By {upload.uploaderName || 'Anonymous'}</span>
+                    <span>Von {upload.uploaderName || 'Anonym'}</span>
                     <span>{formatDate(upload.createdAt)}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => downloadImage(upload)}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md"
+                  className="p-2 rounded-md hover:bg-gray-50 transition-colors"
+                  style={{ color: '#4A9782' }}
                 >
                   <Download className="w-5 h-5" />
                 </button>
@@ -418,15 +439,15 @@ export default function EventGalleryPage() {
                   target.style.display = 'none'
                   const parent = target.parentElement
                   if (parent) {
-                    parent.innerHTML = '<div class="w-full h-64 flex items-center justify-center bg-gray-200"><span class="text-gray-500">Image unavailable</span></div>'
+                    parent.innerHTML = '<div class="w-full h-64 flex items-center justify-center bg-gray-200"><span class="text-gray-500">Bild nicht verfügbar</span></div>'
                   }
                 }}
               />
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 p-2 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
+                className="absolute top-4 right-4 p-2 bg-white shadow-lg rounded-full hover:bg-gray-50 transition-colors"
               >
-                ×
+                <X className="w-4 h-4" style={{ color: '#004030' }} />
               </button>
             </div>
             <div className="p-6">
@@ -436,16 +457,17 @@ export default function EventGalleryPage() {
               )}
               <div className="flex justify-between items-center">
                 <div className="text-sm text-gray-500">
-                  <span>By {selectedImage.uploaderName || 'Anonymous'}</span>
+                  <span>Von {selectedImage.uploaderName || 'Anonym'}</span>
                   <span className="mx-2">•</span>
                   <span>{formatDate(selectedImage.createdAt)}</span>
                 </div>
                 <button
                   onClick={() => downloadImage(selectedImage)}
-                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium text-white hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-all"
+                  style={{ backgroundColor: '#004030', borderColor: '#004030' }}
                 >
                   <Download className="w-4 h-4 mr-2" />
-                  Download
+                  Herunterladen
                 </button>
               </div>
             </div>

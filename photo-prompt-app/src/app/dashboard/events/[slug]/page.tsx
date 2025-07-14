@@ -70,13 +70,13 @@ export default function EventManagePage() {
       }
       
       if (!response.ok) {
-        throw new Error('Failed to load event')
+        throw new Error('Event konnte nicht geladen werden')
       }
       
       const data = await response.json()
       setEvent(data.event)
     } catch (err) {
-      setError('Failed to load event data')
+      setError('Event-Daten konnten nicht geladen werden')
     } finally {
       setIsLoading(false)
     }
@@ -94,21 +94,21 @@ export default function EventManagePage() {
       })
       
       if (!response.ok) {
-        throw new Error('Failed to add prompt')
+        throw new Error('Aufgabe konnte nicht hinzugefügt werden')
       }
       
       setNewPromptText('')
       setShowAddPrompt(false)
       await fetchEventData() // Refresh the data
     } catch (err) {
-      setError('Failed to add prompt')
+      setError('Aufgabe konnte nicht hinzugefügt werden')
     } finally {
       setIsAddingPrompt(false)
     }
   }
 
   const deletePrompt = async (promptId: string) => {
-    if (!confirm('Are you sure you want to delete this prompt? This action cannot be undone.')) {
+    if (!confirm('Bist du sicher, dass du diese Aufgabe löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.')) {
       return
     }
     
@@ -118,12 +118,12 @@ export default function EventManagePage() {
       })
       
       if (!response.ok) {
-        throw new Error('Failed to delete prompt')
+        throw new Error('Aufgabe konnte nicht gelöscht werden')
       }
       
       await fetchEventData() // Refresh the data
     } catch (err) {
-      setError('Failed to delete prompt')
+      setError('Aufgabe konnte nicht gelöscht werden')
     }
   }
 
@@ -132,7 +132,7 @@ export default function EventManagePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading event...</p>
+          <p className="text-gray-600">Event wird geladen...</p>
         </div>
       </div>
     )
@@ -152,7 +152,7 @@ export default function EventManagePage() {
             href="/dashboard"
             className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
           >
-            Back to Dashboard
+            Zurück zum Dashboard
           </Link>
         </div>
       </div>
@@ -185,27 +185,27 @@ export default function EventManagePage() {
                     ? 'bg-green-100 text-green-800' 
                     : 'bg-gray-100 text-gray-800'
                 }`}>
-                  {event.isActive ? 'Active' : 'Inactive'}
+                  {event.isActive ? 'Aktiv' : 'Inaktiv'}
                 </span>
               </div>
               <p className="mt-1 text-sm text-gray-600">
-                Event management and statistics
+                Event-Verwaltung und Statistiken
               </p>
             </div>
             <div className="flex space-x-3">
               <Link
-                href={`/event/${event.slug}/gallery`}
+                href={`/gallery/${event.id}`}
                 className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >
                 <Image className="w-4 h-4 mr-2" />
-                Gallery
+                Galerie
               </Link>
               <Link
                 href={`/event/${event.slug}`}
                 className="inline-flex items-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
               >
                 <Eye className="w-4 h-4 mr-2" />
-                View Event
+                Event anzeigen
               </Link>
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function EventManagePage() {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Total Photos
+                    Fotos insgesamt
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
                     {totalUploads}
@@ -241,7 +241,7 @@ export default function EventManagePage() {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Active Prompts
+                    Aktive Aufgaben
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
                     {activePrompts} of {event.prompts.length}
@@ -259,7 +259,7 @@ export default function EventManagePage() {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Event Type
+                    Event-Art
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 capitalize">
                     {event.type}
@@ -277,7 +277,7 @@ export default function EventManagePage() {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Created
+                    Erstellt
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
                     {new Date(event.createdAt).toLocaleDateString()}
@@ -292,12 +292,12 @@ export default function EventManagePage() {
           {/* Event Settings */}
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Event Settings</h2>
+              <h2 className="text-lg font-medium text-gray-900">Event-Einstellungen</h2>
             </div>
             <div className="p-6 space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Event URL
+                  Event-URL
                 </label>
                 <div className="flex rounded-md shadow-sm">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -315,7 +315,7 @@ export default function EventManagePage() {
               {event.description && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Description
+                    Beschreibung
                   </label>
                   <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
                     {event.description}
@@ -325,9 +325,9 @@ export default function EventManagePage() {
 
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Event Status</h3>
+                  <h3 className="text-sm font-medium text-gray-900">Event-Status</h3>
                   <p className="text-sm text-gray-500">
-                    {event.isActive ? 'Guests can upload photos' : 'Event is closed to new uploads'}
+                    {event.isActive ? 'Gäste können Fotos hochladen' : 'Event ist für neue Uploads geschlossen'}
                   </p>
                 </div>
                 <button
@@ -348,27 +348,27 @@ export default function EventManagePage() {
           {/* QR Code */}
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">QR Code</h2>
+              <h2 className="text-lg font-medium text-gray-900">QR-Code</h2>
             </div>
             <div className="p-6 text-center">
               <div className="inline-flex items-center justify-center w-32 h-32 bg-gray-100 rounded-lg mb-4">
                 <QrCode className="w-16 h-16 text-gray-400" />
               </div>
               <p className="text-sm text-gray-600 mb-4">
-                Share this QR code with guests to let them participate in your photo challenge.
+                Teile diesen QR-Code mit Gästen, damit sie an deiner Foto-Challenge teilnehmen können.
               </p>
               <div className="space-y-2">
                 <Link
                   href={`/api/events/${event.slug}/qr?format=png&download=true`}
                   className="block w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
                 >
-                  Download PNG
+                  PNG herunterladen
                 </Link>
                 <Link
                   href={`/api/events/${event.slug}/qr?format=svg&download=true`}
                   className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                 >
-                  Download SVG
+                  SVG herunterladen
                 </Link>
               </div>
             </div>
@@ -378,13 +378,13 @@ export default function EventManagePage() {
         {/* Prompts Management */}
         <div className="mt-8 bg-white rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 className="text-lg font-medium text-gray-900">Photo Prompts</h2>
+            <h2 className="text-lg font-medium text-gray-900">Foto-Aufgaben</h2>
             <button 
               onClick={() => setShowAddPrompt(true)}
               className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Add Prompt
+              Aufgabe hinzufügen
             </button>
           </div>
           <div className="p-6">
@@ -397,7 +397,7 @@ export default function EventManagePage() {
                   <div className="flex-1">
                     <p className="text-sm font-medium text-gray-900">{prompt.text}</p>
                     <p className="text-xs text-gray-500">
-                      {prompt._count.uploads} photos uploaded
+                      {prompt._count.uploads} Fotos hochgeladen
                       {prompt.maxUploads && ` • Max: ${prompt.maxUploads}`}
                     </p>
                   </div>
@@ -407,12 +407,12 @@ export default function EventManagePage() {
                         ? 'bg-green-100 text-green-800' 
                         : 'bg-gray-100 text-gray-800'
                     }`}>
-                      {prompt.isActive ? 'Active' : 'Inactive'}
+                      {prompt.isActive ? 'Aktiv' : 'Inaktiv'}
                     </span>
                     <button 
                       onClick={() => deletePrompt(prompt.id)}
                       className="text-gray-400 hover:text-red-600"
-                      title="Delete prompt"
+                      title="Aufgabe löschen"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -427,12 +427,12 @@ export default function EventManagePage() {
         {recentUploads.length > 0 && (
           <div className="mt-8 bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-medium text-gray-900">Recent Uploads</h2>
+              <h2 className="text-lg font-medium text-gray-900">Neueste Uploads</h2>
               <Link
-                href={`/event/${event.slug}/gallery`}
+                href={`/gallery/${event.id}`}
                 className="text-sm text-blue-600 hover:text-blue-500"
               >
-                View all →
+                Alle anzeigen →
               </Link>
             </div>
             <div className="p-6">
@@ -465,7 +465,7 @@ export default function EventManagePage() {
                           target.style.display = 'none'
                           const parent = target.parentElement
                           if (parent) {
-                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-500 text-xs">No image</span></div>'
+                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-500 text-xs">Kein Bild</span></div>'
                           }
                         }}
                         style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
@@ -477,7 +477,7 @@ export default function EventManagePage() {
                       </p>
                       {upload.uploaderName && (
                         <p className="text-xs text-gray-500 truncate">
-                          by {upload.uploaderName}
+                          von {upload.uploaderName}
                         </p>
                       )}
                     </div>
@@ -494,7 +494,7 @@ export default function EventManagePage() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="max-w-md w-full bg-white rounded-lg overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">Add New Prompt</h3>
+              <h3 className="text-lg font-medium text-gray-900">Neue Aufgabe hinzufügen</h3>
               <button
                 onClick={() => setShowAddPrompt(false)}
                 className="text-gray-400 hover:text-gray-600"
@@ -505,7 +505,7 @@ export default function EventManagePage() {
             <div className="p-6">
               <div className="mb-4">
                 <label htmlFor="promptText" className="block text-sm font-medium text-gray-700 mb-2">
-                  Prompt Text
+                  Aufgaben-Text
                 </label>
                 <textarea
                   id="promptText"
@@ -513,7 +513,7 @@ export default function EventManagePage() {
                   value={newPromptText}
                   onChange={(e) => setNewPromptText(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  placeholder="e.g., Take a photo with someone wearing blue"
+                  placeholder="z.B. Mache ein Foto mit jemandem in Blau"
                 />
               </div>
               <div className="flex justify-end space-x-3">
@@ -521,14 +521,14 @@ export default function EventManagePage() {
                   onClick={() => setShowAddPrompt(false)}
                   className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
-                  Cancel
+                  Abbrechen
                 </button>
                 <button
                   onClick={addPrompt}
                   disabled={!newPromptText.trim() || isAddingPrompt}
                   className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isAddingPrompt ? 'Adding...' : 'Add Prompt'}
+                  {isAddingPrompt ? 'Wird hinzugefügt...' : 'Aufgabe hinzufügen'}
                 </button>
               </div>
             </div>

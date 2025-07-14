@@ -40,12 +40,12 @@ export default function SignInPage() {
       })
 
       if (result?.error) {
-        setError('Failed to send magic link. Please try again.')
+        setError('Magic Link konnte nicht gesendet werden. Bitte versuche es erneut.')
       } else {
         setEmailSent(true)
       }
     } catch (err) {
-      setError('Something went wrong. Please try again.')
+      setError('Etwas ist schief gelaufen. Bitte versuche es erneut.')
     } finally {
       setIsLoading(false)
     }
@@ -61,22 +61,22 @@ export default function SignInPage() {
             </div>
             
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Check Your Email
+              Prüfe deine E-Mails
             </h1>
             
             <p className="text-gray-600 mb-6">
-              We've sent a magic link to <strong>{email}</strong>
+              Wir haben einen Magic Link an <strong>{email}</strong> gesendet
             </p>
             
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <p className="text-sm text-blue-800">
                 {process.env.NODE_ENV === 'development' ? (
                   <>
-                    <strong>Development Mode:</strong> Check your terminal/console for the magic link instead of your email.
+                    <strong>Entwicklungsmodus:</strong> Schaue in dein Terminal/Konsole für den Magic Link anstatt in deine E-Mails.
                   </>
                 ) : (
                   <>
-                    Click the link in the email to sign in. The link will expire in 24 hours.
+                    Klicke den Link in der E-Mail zum Einloggen. Der Link läuft in 24 Stunden ab.
                   </>
                 )}
               </p>
@@ -87,14 +87,14 @@ export default function SignInPage() {
                 onClick={() => setEmailSent(false)}
                 className="w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
               >
-                Try Different Email
+                Andere E-Mail versuchen
               </button>
               
               <Link
                 href="/"
                 className="block w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-center"
               >
-                Back to Home
+                Zurück zur Startseite
               </Link>
             </div>
           </div>
@@ -108,9 +108,9 @@ export default function SignInPage() {
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-white text-center">
-          <h1 className="text-2xl font-bold mb-2">Welcome Back</h1>
+          <h1 className="text-2xl font-bold mb-2">Willkommen zurück</h1>
           <p className="text-blue-100">
-            Sign in to manage your events
+            Melde dich an, um deine Events zu verwalten
           </p>
         </div>
 
@@ -125,10 +125,10 @@ export default function SignInPage() {
             </Link>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                Access Your Events
+                Zugang zu deinen Events
               </h2>
               <p className="text-sm text-gray-600">
-                Enter your email to get a magic link
+                Gib deine E-Mail ein, um einen Magic Link zu erhalten
               </p>
             </div>
           </div>
@@ -136,7 +136,7 @@ export default function SignInPage() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
+                E-Mail-Adresse
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -148,7 +148,7 @@ export default function SignInPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter the email you used to create events"
+                  placeholder="Gib die E-Mail ein, mit der du Events erstellt hast"
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -169,12 +169,12 @@ export default function SignInPage() {
               {isLoading ? (
                 <>
                   <Loader className="w-5 h-5 mr-2 animate-spin" />
-                  Sending Magic Link...
+                  Magic Link wird gesendet...
                 </>
               ) : (
                 <>
                   <Mail className="w-5 h-5 mr-2" />
-                  Send Magic Link
+                  Magic Link senden
                 </>
               )}
             </button>
@@ -182,9 +182,9 @@ export default function SignInPage() {
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500 text-center">
-              Don't have an account yet?{' '}
+              Noch kein Account?{' '}
               <Link href="/dashboard/create" className="text-blue-600 hover:text-blue-500 font-medium">
-                Create your first event
+                Erstelle dein erstes Event
               </Link>
             </p>
           </div>

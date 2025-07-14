@@ -6,48 +6,48 @@ import Link from 'next/link'
 import { ArrowLeft, Plus, X } from 'lucide-react'
 
 const EVENT_TYPES = [
-  { value: 'wedding', label: 'Wedding', description: 'Capture special moments from the big day' },
-  { value: 'birthday', label: 'Birthday Party', description: 'Fun celebration photos' },
-  { value: 'corporate', label: 'Corporate Event', description: 'Professional networking and team building' },
-  { value: 'conference', label: 'Conference', description: 'Educational and networking event' },
-  { value: 'general', label: 'General Event', description: 'Any other type of gathering' },
+  { value: 'wedding', label: 'Hochzeit', description: 'Halte besondere Momente des großen Tages fest' },
+  { value: 'birthday', label: 'Geburtstagsfeier', description: 'Spaßige Feier-Fotos' },
+  { value: 'corporate', label: 'Firmenevent', description: 'Professionelles Networking und Teambuilding' },
+  { value: 'conference', label: 'Konferenz', description: 'Bildungs- und Networking-Event' },
+  { value: 'general', label: 'Allgemeines Event', description: 'Jede andere Art von Veranstaltung' },
 ]
 
 const DEFAULT_PROMPTS = {
   wedding: [
-    'Take a photo with someone in your favorite color',
-    'Capture a candid moment of laughter',
-    'Photo with the happy couple',
-    'Picture of your table having fun',
-    'Snap the best dance move of the night'
+    'Mache ein Foto mit jemandem in deiner Lieblingsfarbe',
+    'Halte einen spontanen Lachmoment fest',
+    'Foto mit dem glücklichen Paar',
+    'Bild von eurem Tisch beim Spaß haben',
+    'Schnapp den besten Tanzschritt des Abends'
   ],
   birthday: [
-    'Photo with the birthday person',
-    'Capture someone making a wish',
-    'Picture of the best party outfit',
-    'Snap a group selfie',
-    'Photo of the cake or treats'
+    'Foto mit dem Geburtstagskind',
+    'Halte jemanden beim Wünschen fest',
+    'Bild vom besten Party-Outfit',
+    'Schnapp ein Gruppen-Selfie',
+    'Foto vom Kuchen oder den Leckereien'
   ],
   corporate: [
-    'Professional headshot with a colleague',
-    'Picture of your workspace or setup',
-    'Photo showcasing teamwork',
-    'Capture a networking moment',
-    'Picture of the event venue'
+    'Professionelles Porträt mit einem Kollegen',
+    'Bild von deinem Arbeitsplatz oder Setup',
+    'Foto, das Teamwork zeigt',
+    'Halte einen Networking-Moment fest',
+    'Bild vom Event-Veranstaltungsort'
   ],
   conference: [
-    'Photo with a speaker or presenter',
-    'Picture of an interesting presentation slide',
-    'Networking photo with new connections',
-    'Capture a learning moment',
-    'Photo of the conference swag or materials'
+    'Foto mit einem Sprecher oder Referenten',
+    'Bild einer interessanten Präsentationsfolie',
+    'Networking-Foto mit neuen Kontakten',
+    'Halte einen Lernmoment fest',
+    'Foto von den Konferenz-Goodies oder Materialien'
   ],
   general: [
-    'Take a photo with someone new',
-    'Capture a candid moment',
-    'Picture of the venue or setup',
-    'Snap a group photo',
-    'Photo showing the event atmosphere'
+    'Mache ein Foto mit jemandem Neuem',
+    'Halte einen spontanen Moment fest',
+    'Bild vom Veranstaltungsort oder Setup',
+    'Schnapp ein Gruppenfoto',
+    'Foto, das die Event-Atmosphäre zeigt'
   ]
 }
 
@@ -159,17 +159,17 @@ export default function CreateEventPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Event Created Successfully! 🎉
+            Event erfolgreich erstellt! 🎉
           </h1>
           
           <p className="text-gray-600 mb-6">
-            Your event is ready! You can now manage it from this device. 
-            Use your email to access it from other devices.
+            Dein Event ist bereit! Du kannst es jetzt von diesem Gerät aus verwalten. 
+            Nutze deine E-Mail, um von anderen Geräten darauf zuzugreifen.
           </p>
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-sm text-blue-800">
-              <strong>Redirecting to your dashboard...</strong>
+              <strong>Weiterleitung zu deinem Dashboard...</strong>
             </p>
           </div>
         </div>
@@ -190,10 +190,10 @@ export default function CreateEventPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Create New Event
+                Neues Event erstellen
               </h1>
               <p className="mt-1 text-sm text-gray-600">
-                Set up a new photo prompt event for your guests
+                Richte ein neues Foto-Aufgaben-Event für deine Gäste ein
               </p>
             </div>
           </div>
@@ -211,13 +211,13 @@ export default function CreateEventPage() {
           {/* Basic Info */}
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-6">
-              Event Information
+              Event-Informationen
             </h2>
             
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Event Name *
+                  Event-Name *
                 </label>
                 <input
                   type="text"
@@ -226,13 +226,13 @@ export default function CreateEventPage() {
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="My Amazing Event"
+                  placeholder="Mein tolles Event"
                 />
               </div>
 
               <div>
                 <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
-                  URL Slug *
+                  URL-Slug *
                 </label>
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -245,17 +245,17 @@ export default function CreateEventPage() {
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
                     className="flex-1 block w-full border-gray-300 rounded-none rounded-r-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="my-amazing-event"
+                    placeholder="mein-tolles-event"
                   />
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
-                  Must contain only lowercase letters, numbers, and hyphens
+                  Darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten
                 </p>
               </div>
 
               <div>
                 <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                  Event Type
+                  Event-Art
                 </label>
                 <select
                   id="type"
@@ -276,7 +276,7 @@ export default function CreateEventPage() {
 
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Your Email Address *
+                  Deine E-Mail-Adresse *
                 </label>
                 <input
                   type="email"
@@ -285,16 +285,16 @@ export default function CreateEventPage() {
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="your@email.com"
+                  placeholder="deine@email.com"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  <strong>Important:</strong> Save this email! You'll need it to access your event from other devices.
+                  <strong>Wichtig:</strong> Speichere diese E-Mail! Du brauchst sie, um von anderen Geräten auf dein Event zuzugreifen.
                 </p>
               </div>
 
               <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                  Description (Optional)
+                  Beschreibung (Optional)
                 </label>
                 <textarea
                   id="description"
@@ -302,7 +302,7 @@ export default function CreateEventPage() {
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Tell your guests about this event..."
+                  placeholder="Erzähle deinen Gästen von diesem Event..."
                 />
               </div>
             </div>
@@ -311,7 +311,7 @@ export default function CreateEventPage() {
           {/* Photo Prompts */}
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-6">
-              Photo Prompts
+              Foto-Aufgaben
             </h2>
             
             <div className="space-y-4 mb-6">
@@ -337,7 +337,7 @@ export default function CreateEventPage() {
                 type="text"
                 value={newPrompt}
                 onChange={(e) => setNewPrompt(e.target.value)}
-                placeholder="Add a new photo prompt..."
+                placeholder="Neue Foto-Aufgabe hinzufügen..."
                 className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addPrompt())}
               />
@@ -357,14 +357,14 @@ export default function CreateEventPage() {
               href="/"
               className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Cancel
+              Abbrechen
             </Link>
             <button
               type="submit"
               disabled={isSubmitting || !formData.name || !formData.slug || !formData.email}
               className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? 'Creating...' : 'Create Event'}
+              {isSubmitting ? 'Erstelle...' : 'Event erstellen'}
             </button>
           </div>
         </form>

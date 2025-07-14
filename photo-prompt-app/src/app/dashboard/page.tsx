@@ -38,10 +38,10 @@ export default async function DashboardPage() {
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Event Dashboard
+                Event-Dashboard
               </h1>
               <p className="mt-1 text-sm text-gray-600">
-                Manage your photo prompt events
+                Verwalte deine Foto-Aufgaben-Events
               </p>
             </div>
             <Link
@@ -49,7 +49,7 @@ export default async function DashboardPage() {
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Event
+              Event erstellen
             </Link>
           </div>
         </div>
@@ -62,17 +62,17 @@ export default async function DashboardPage() {
               <Plus className="w-12 h-12 text-gray-400" />
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              No events yet
+              Noch keine Events
             </h3>
             <p className="text-gray-600 mb-6">
-              Create your first event to start collecting photo prompts
+              Erstelle dein erstes Event, um mit dem Sammeln von Foto-Aufgaben zu beginnen
             </p>
             <Link
               href="/dashboard/create"
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
             >
               <Plus className="w-4 h-4 mr-2" />
-              Create Your First Event
+              Dein erstes Event erstellen
             </Link>
           </div>
         ) : (
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-gray-100 text-gray-800'
                       }`}>
-                        {event.isActive ? 'Active' : 'Inactive'}
+                        {event.isActive ? 'Aktiv' : 'Inaktiv'}
                       </span>
                     </div>
                   </div>
@@ -110,8 +110,8 @@ export default async function DashboardPage() {
                   </div>
 
                   <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
-                    <span>{event._count.prompts} prompts</span>
-                    <span>{event._count.uploads} photos</span>
+                    <span>{event._count.prompts} Aufgaben</span>
+                    <span>{event._count.uploads} Fotos</span>
                   </div>
 
                   <div className="flex space-x-3">
@@ -119,13 +119,13 @@ export default async function DashboardPage() {
                       href={`/dashboard/events/${event.slug}`}
                       className="flex-1 text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
-                      Manage
+                      Verwalten
                     </Link>
                     <Link
                       href={`/event/${event.slug}`}
                       className="flex-1 text-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                     >
-                      View
+                      Anzeigen
                     </Link>
                   </div>
                 </div>

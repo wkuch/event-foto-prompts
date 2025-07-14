@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
-import { Camera, Upload, CheckCircle, AlertCircle, Loader, RefreshCw } from 'lucide-react'
+import { Camera, Upload, CheckCircle, AlertCircle, Loader, RefreshCw, X } from 'lucide-react'
 
 interface Prompt {
   id: string
@@ -51,11 +51,11 @@ export default function EventPage() {
       
       if (!response.ok) {
         if (response.status === 404) {
-          setError('Event not found')
+          setError('Event nicht gefunden')
         } else if (response.status === 403) {
-          setError('This event is not currently active')
+          setError('Dieses Event ist derzeit nicht aktiv')
         } else {
-          setError('Failed to load event')
+          setError('Event konnte nicht geladen werden')
         }
         return
       }
@@ -71,10 +71,10 @@ export default function EventPage() {
           isActive: true
         })
       } else {
-        setError('No prompts available for this event')
+        setError('Keine Aufgaben für dieses Event verfügbar')
       }
     } catch (err) {
-      setError('Failed to connect to the event')
+      setError('Verbindung zum Event fehlgeschlagen')
     } finally {
       setIsLoading(false)
     }
@@ -86,13 +86,13 @@ export default function EventPage() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setError('Please select an image file')
+      setError('Bitte wähle eine Bilddatei aus')
       return
     }
 
     // Validate file size (10MB limit)
     if (file.size > 10 * 1024 * 1024) {
-      setError('File size must be less than 10MB')
+      setError('Dateigröße muss unter 10MB liegen')
       return
     }
 
@@ -199,10 +199,10 @@ export default function EventPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading event...</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFF9E5' }}>
+        <div className="text-center bg-white rounded-lg p-8 shadow-sm border border-gray-100">
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#4A9782' }} />
+          <p className="font-light" style={{ color: '#004030' }}>Event wird geladen...</p>
         </div>
       </div>
     )
@@ -210,19 +210,20 @@ export default function EventPage() {
 
   if (error && !currentPrompt) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Unable to Load Event
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FFF9E5' }}>
+        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100">
+          <AlertCircle className="w-12 h-12 mx-auto mb-4" style={{ color: '#4A9782' }} />
+          <h2 className="text-lg font-light mb-3" style={{ color: '#004030' }}>
+            Event konnte nicht geladen werden
           </h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-gray-600 mb-6 font-light">{error}</p>
           <button
             onClick={fetchEventAndPrompt}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-colors"
+            style={{ borderColor: '#4A9782', color: '#4A9782' }}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Try Again
+            Erneut versuchen
           </button>
         </div>
       </div>
@@ -231,17 +232,20 @@ export default function EventPage() {
 
   if (uploadSuccess) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            Photo Uploaded Successfully!
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FFF9E5' }}>
+        <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100">
+          <CheckCircle className="w-16 h-16 mx-auto mb-6" style={{ color: '#4A9782' }} />
+          <h2 className="text-xl font-light mb-4" style={{ color: '#004030' }}>
+            Foto erfolgreich hochgeladen
           </h2>
-          <p className="text-gray-600 mb-6">
-            Thank you for sharing! Getting your next prompt...
+          <p className="text-gray-600 mb-6 font-light">
+            Danke fürs Teilen dieses Moments
           </p>
-          <div className="w-8 h-8 mx-auto">
-            <Loader className="w-8 h-8 animate-spin text-blue-600" />
+          <p className="text-sm mb-6" style={{ color: '#4A9782' }}>
+            Deine nächste Aufgabe wird geladen...
+          </p>
+          <div className="w-6 h-6 mx-auto">
+            <Loader className="w-6 h-6 animate-spin" style={{ color: '#4A9782' }} />
           </div>
         </div>
       </div>
@@ -249,54 +253,59 @@ export default function EventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-2xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+    <div className="min-h-screen" style={{ backgroundColor: '#FFF9E5' }}>
+      <div className="w-full md:max-w-lg md:mx-auto px-0 md:px-6 py-0 md:py-8">
+        <div className="bg-white md:rounded-lg shadow-sm overflow-hidden border-0 md:border border-gray-100 min-h-screen md:min-h-0">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-white text-center">
-            <h1 className="text-2xl font-bold mb-2">📸 Photo Challenge</h1>
-            <p className="text-blue-100">
-              Help capture memories from this event!
+          <div className="px-6 md:px-8 py-8 md:py-12 text-center" style={{ backgroundColor: '#004030' }}>
+            <h1 className="text-2xl font-light mb-3 text-white tracking-wide">
+              Foto-Moment
+            </h1>
+            <p className="text-sm font-light" style={{ color: '#DCD0A8' }}>
+              Teile deine Sicht auf dieses besondere Event
             </p>
           </div>
 
           {/* Current Prompt */}
           {currentPrompt && (
-            <div className="px-6 py-8">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-4">
-                  <Camera className="w-6 h-6 text-blue-600" />
+            <div className="px-4 md:px-6 py-6 md:py-8">
+              <div className={`text-center ${selectedFile ? 'mb-6' : 'mb-10'}`}>
+                <div className="w-12 h-12 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#4A9782' }}>
+                  <Camera className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                  Your Photo Prompt
+                <h2 className="text-xl font-light mb-6" style={{ color: '#004030' }}>
+                  Deine Foto-Aufgabe
                 </h2>
-                <div className="bg-blue-50 rounded-lg p-6 mb-6">
-                  <p className="text-lg text-gray-800 font-medium">
+                <div className="rounded-lg p-6 mb-8 border" style={{ backgroundColor: '#DCD0A8', borderColor: '#4A9782' }}>
+                  <p className="text-lg font-medium leading-relaxed" style={{ color: '#004030' }}>
                     {currentPrompt.text}
                   </p>
                 </div>
                 
                 {currentPrompt.maxUploads && (
                   <p className="text-sm text-gray-500">
-                    {currentPrompt._count.uploads} of {currentPrompt.maxUploads} photos uploaded for this prompt
+                    {currentPrompt._count.uploads} von {currentPrompt.maxUploads} Fotos für diese Aufgabe hochgeladen
                   </p>
                 )}
                 
-                {/* Get New Prompt Button */}
-                <button
-                  onClick={fetchEventAndPrompt}
-                  disabled={isLoading}
-                  className="inline-flex items-center px-4 py-2 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
-                  Get New Prompt
-                </button>
+                {/* Get New Prompt Button - only show when no image is selected */}
+                {!selectedFile && (
+                  <button
+                    onClick={fetchEventAndPrompt}
+                    disabled={isLoading}
+                    className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-light hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    style={{ borderColor: '#4A9782', color: '#4A9782' }}
+                  >
+                    <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+                    Neue Aufgabe holen
+                  </button>
+                )}
               </div>
 
               {/* Upload Section */}
               <div className="space-y-6">
                 {!selectedFile ? (
-                  <div className="text-center">
+                  <div className="text-center py-4 md:py-6">
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -306,13 +315,14 @@ export default function EventPage() {
                     />
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center px-6 py-3 border border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors"
+                      className="inline-flex items-center px-8 py-4 border-2 border-dashed rounded-lg font-semibold text-white hover:opacity-90 transition-all shadow-lg"
+                      style={{ backgroundColor: '#004030', borderColor: '#4A9782' }}
                     >
-                      <Camera className="w-5 h-5 mr-2" />
-                      Take or Select Photo
+                      <Camera className="w-5 h-5 mr-3" />
+                      Foto auswählen
                     </button>
-                    <p className="mt-2 text-xs text-gray-500">
-                      JPG, PNG, WebP or GIF up to 10MB
+                    <p className="mt-3 text-sm font-light text-gray-500">
+                      JPG, PNG, WebP oder GIF bis 10MB
                     </p>
                   </div>
                 ) : (
@@ -323,44 +333,50 @@ export default function EventPage() {
                         <img
                           src={previewUrl}
                           alt="Preview"
-                          className="w-full h-64 object-cover rounded-lg"
+                          className="w-full max-h-80 object-contain bg-gray-50 rounded-lg"
                         />
                         <button
                           onClick={clearSelection}
-                          className="absolute top-2 right-2 p-1 bg-black bg-opacity-50 text-white rounded-full hover:bg-opacity-70"
+                          className="absolute top-2 right-2 p-2 bg-white shadow-lg rounded-full hover:bg-gray-50 transition-colors"
                         >
-                          ×
+                          <X className="w-4 h-4 text-gray-600" />
                         </button>
                       </div>
                     )}
 
                     {/* Upload Form */}
-                    <div className="space-y-4">
+                    <div className="space-y-4 md:space-y-6">
                       <div>
-                        <label htmlFor="uploaderName" className="block text-sm font-medium text-gray-700 mb-1">
-                          Your Name (Optional)
+                        <label htmlFor="uploaderName" className="block text-sm font-medium mb-2" style={{ color: '#004030' }}>
+                          Dein Name (Optional)
                         </label>
                         <input
                           type="text"
                           id="uploaderName"
                           value={uploaderName}
                           onChange={(e) => setUploaderName(e.target.value)}
-                          placeholder="Enter your name"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          placeholder="Gib deinen Namen ein"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:border-transparent transition-colors"
+                          style={{ '--tw-ring-color': '#4A9782' } as any}
+                          onFocus={(e) => e.target.style.borderColor = '#4A9782'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="caption" className="block text-sm font-medium text-gray-700 mb-1">
-                          Caption (Optional)
+                        <label htmlFor="caption" className="block text-sm font-medium mb-2" style={{ color: '#004030' }}>
+                          Bildunterschrift (Optional)
                         </label>
                         <textarea
                           id="caption"
                           value={caption}
                           onChange={(e) => setCaption(e.target.value)}
-                          placeholder="Add a caption to your photo..."
+                          placeholder="Erzähl die Geschichte hinter deinem Foto..."
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                          className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:border-transparent resize-none transition-colors"
+                          style={{ '--tw-ring-color': '#4A9782' } as any}
+                          onFocus={(e) => e.target.style.borderColor = '#4A9782'}
+                          onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
                       </div>
 
@@ -370,27 +386,28 @@ export default function EventPage() {
                         </div>
                       )}
 
-                      <div className="flex space-x-3">
+                      <div className="flex space-x-3 pt-2">
                         <button
                           onClick={clearSelection}
-                          className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-gray-300 transition-colors"
                         >
-                          Cancel
+                          Abbrechen
                         </button>
                         <button
                           onClick={handleUpload}
                           disabled={isUploading}
-                          className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-white font-medium hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                          style={{ backgroundColor: '#004030', '--tw-ring-color': '#004030' } as any}
                         >
                           {isUploading ? (
                             <>
                               <Loader className="w-4 h-4 mr-2 animate-spin" />
-                              Uploading...
+                              Wird hochgeladen...
                             </>
                           ) : (
                             <>
                               <Upload className="w-4 h-4 mr-2" />
-                              Upload Photo
+                              Foto hochladen
                             </>
                           )}
                         </button>
@@ -405,8 +422,8 @@ export default function EventPage() {
 
         {/* Footer */}
         <div className="text-center mt-8">
-          <p className="text-sm text-gray-500">
-            Powered by Event Photo Prompts
+          <p className="text-xs font-light text-gray-400">
+            Powered by Event-Foto-Aufgaben
           </p>
         </div>
       </div>

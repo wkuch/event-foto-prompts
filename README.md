@@ -86,8 +86,10 @@ Note see "Tech stack spec.md" for more details
 - [x] Guest upload page (prompt display + upload form)  
 - [ ] Public gallery page (grid of uploads)
 
-#### Issues with current frontend:
-- 
+#### Small UI improvements:
+- [ ] foto auswählen button is again not that prominent
+
+
 
 ### 2.4 Deployment & Testing
 - [ ] Deploy MVP to staging & production  

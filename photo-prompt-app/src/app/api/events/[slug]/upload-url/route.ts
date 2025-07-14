@@ -87,7 +87,7 @@ export async function POST(
     const randomString = Math.random().toString(36).substring(2, 15)
     const fileExtension = data.fileName.split('.').pop() || 'jpg'
     const fileName = `${timestamp}-${randomString}.${fileExtension}`
-    const r2Key = `events/${slug}/uploads/${fileName}`
+    const r2Key = `events/${event.id}/uploads/${fileName}`
 
     // Generate presigned URL
     const putObjectCommand = new PutObjectCommand({

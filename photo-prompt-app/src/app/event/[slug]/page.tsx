@@ -199,10 +199,10 @@ export default function EventPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FFF9E5' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#DDE6ED' }}>
         <div className="text-center bg-white rounded-lg p-8 shadow-sm border border-gray-100">
-          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#4A9782' }} />
-          <p className="font-light" style={{ color: '#004030' }}>Event wird geladen...</p>
+          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#526D82' }} />
+          <p className="font-light" style={{ color: '#27374D' }}>Event wird geladen...</p>
         </div>
       </div>
     )
@@ -210,17 +210,17 @@ export default function EventPage() {
 
   if (error && !currentPrompt) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FFF9E5' }}>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#DDE6ED' }}>
         <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100">
-          <AlertCircle className="w-12 h-12 mx-auto mb-4" style={{ color: '#4A9782' }} />
-          <h2 className="text-lg font-light mb-3" style={{ color: '#004030' }}>
+          <AlertCircle className="w-12 h-12 mx-auto mb-4" style={{ color: '#526D82' }} />
+          <h2 className="text-lg font-light mb-3" style={{ color: '#27374D' }}>
             Event konnte nicht geladen werden
           </h2>
           <p className="text-gray-600 mb-6 font-light">{error}</p>
           <button
             onClick={fetchEventAndPrompt}
             className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 transition-colors"
-            style={{ borderColor: '#4A9782', color: '#4A9782' }}
+            style={{ borderColor: '#526D82', color: '#526D82' }}
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             Erneut versuchen
@@ -232,20 +232,20 @@ export default function EventPage() {
 
   if (uploadSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FFF9E5' }}>
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#DDE6ED' }}>
         <div className="max-w-md w-full bg-white rounded-lg shadow-sm p-8 text-center border border-gray-100">
-          <CheckCircle className="w-16 h-16 mx-auto mb-6" style={{ color: '#4A9782' }} />
-          <h2 className="text-xl font-light mb-4" style={{ color: '#004030' }}>
+          <CheckCircle className="w-16 h-16 mx-auto mb-6" style={{ color: '#526D82' }} />
+          <h2 className="text-xl font-light mb-4" style={{ color: '#27374D' }}>
             Foto erfolgreich hochgeladen
           </h2>
           <p className="text-gray-600 mb-6 font-light">
             Danke fürs Teilen dieses Moments
           </p>
-          <p className="text-sm mb-6" style={{ color: '#4A9782' }}>
+          <p className="text-sm mb-6" style={{ color: '#526D82' }}>
             Deine nächste Aufgabe wird geladen...
           </p>
           <div className="w-6 h-6 mx-auto">
-            <Loader className="w-6 h-6 animate-spin" style={{ color: '#4A9782' }} />
+            <Loader className="w-6 h-6 animate-spin" style={{ color: '#526D82' }} />
           </div>
         </div>
       </div>
@@ -253,15 +253,15 @@ export default function EventPage() {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#FFF9E5' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#DDE6ED' }}>
       <div className="w-full md:max-w-lg md:mx-auto px-0 md:px-6 py-0 md:py-8">
         <div className="bg-white md:rounded-lg shadow-sm overflow-hidden border-0 md:border border-gray-100 min-h-screen md:min-h-0">
           {/* Header */}
-          <div className="px-6 md:px-8 py-8 md:py-12 text-center" style={{ backgroundColor: '#004030' }}>
+          <div className="px-6 md:px-8 py-8 md:py-12 text-center" style={{ backgroundColor: '#27374D' }}>
             <h1 className="text-2xl font-light mb-3 text-white tracking-wide">
               Foto-Moment
             </h1>
-            <p className="text-sm font-light" style={{ color: '#DCD0A8' }}>
+            <p className="text-sm font-light" style={{ color: '#9DB2BF' }}>
               Teile deine Sicht auf dieses besondere Event
             </p>
           </div>
@@ -270,14 +270,14 @@ export default function EventPage() {
           {currentPrompt && (
             <div className="px-4 md:px-6 py-6 md:py-8">
               <div className={`text-center ${selectedFile ? 'mb-6' : 'mb-10'}`}>
-                <div className="w-12 h-12 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#4A9782' }}>
+                <div className="w-12 h-12 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#526D82' }}>
                   <Camera className="w-6 h-6 text-white" />
                 </div>
-                <h2 className="text-xl font-light mb-6" style={{ color: '#004030' }}>
+                <h2 className="text-xl font-light mb-6" style={{ color: '#27374D' }}>
                   Deine Foto-Aufgabe
                 </h2>
-                <div className="rounded-lg p-6 mb-8 border" style={{ backgroundColor: '#DCD0A8', borderColor: '#4A9782' }}>
-                  <p className="text-lg font-medium leading-relaxed" style={{ color: '#004030' }}>
+                <div className="rounded-lg p-6 mb-8 border" style={{ backgroundColor: '#9DB2BF', borderColor: '#526D82' }}>
+                  <p className="text-lg font-medium leading-relaxed" style={{ color: '#27374D' }}>
                     {currentPrompt.text}
                   </p>
                 </div>
@@ -294,7 +294,7 @@ export default function EventPage() {
                     onClick={fetchEventAndPrompt}
                     disabled={isLoading}
                     className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-light hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                    style={{ borderColor: '#4A9782', color: '#4A9782' }}
+                    style={{ borderColor: '#526D82', color: '#526D82' }}
                   >
                     <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                     Neue Aufgabe holen
@@ -316,7 +316,7 @@ export default function EventPage() {
                     <button
                       onClick={() => fileInputRef.current?.click()}
                       className="inline-flex items-center px-8 py-4 border-2 border-dashed rounded-lg font-semibold text-white hover:opacity-90 transition-all shadow-lg"
-                      style={{ backgroundColor: '#004030', borderColor: '#4A9782' }}
+                      style={{ backgroundColor: '#27374D', borderColor: '#526D82' }}
                     >
                       <Camera className="w-5 h-5 mr-3" />
                       Foto auswählen
@@ -347,7 +347,7 @@ export default function EventPage() {
                     {/* Upload Form */}
                     <div className="space-y-4 md:space-y-6">
                       <div>
-                        <label htmlFor="uploaderName" className="block text-sm font-medium mb-2" style={{ color: '#004030' }}>
+                        <label htmlFor="uploaderName" className="block text-sm font-medium mb-2" style={{ color: '#27374D' }}>
                           Dein Name (Optional)
                         </label>
                         <input
@@ -357,14 +357,14 @@ export default function EventPage() {
                           onChange={(e) => setUploaderName(e.target.value)}
                           placeholder="Gib deinen Namen ein"
                           className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:border-transparent transition-colors"
-                          style={{ '--tw-ring-color': '#4A9782' } as any}
-                          onFocus={(e) => e.target.style.borderColor = '#4A9782'}
+                          style={{ '--tw-ring-color': '#526D82' } as any}
+                          onFocus={(e) => e.target.style.borderColor = '#526D82'}
                           onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
                       </div>
 
                       <div>
-                        <label htmlFor="caption" className="block text-sm font-medium mb-2" style={{ color: '#004030' }}>
+                        <label htmlFor="caption" className="block text-sm font-medium mb-2" style={{ color: '#27374D' }}>
                           Bildunterschrift (Optional)
                         </label>
                         <textarea
@@ -374,8 +374,8 @@ export default function EventPage() {
                           placeholder="Erzähl die Geschichte hinter deinem Foto..."
                           rows={3}
                           className="w-full px-3 py-2 border border-gray-200 rounded-md focus:outline-none focus:ring-1 focus:border-transparent resize-none transition-colors"
-                          style={{ '--tw-ring-color': '#4A9782' } as any}
-                          onFocus={(e) => e.target.style.borderColor = '#4A9782'}
+                          style={{ '--tw-ring-color': '#526D82' } as any}
+                          onFocus={(e) => e.target.style.borderColor = '#526D82'}
                           onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
                         />
                       </div>
@@ -397,7 +397,7 @@ export default function EventPage() {
                           onClick={handleUpload}
                           disabled={isUploading}
                           className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-white font-medium hover:opacity-90 focus:outline-none focus:ring-1 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                          style={{ backgroundColor: '#004030', '--tw-ring-color': '#004030' } as any}
+                          style={{ backgroundColor: '#27374D', '--tw-ring-color': '#27374D' } as any}
                         >
                           {isUploading ? (
                             <>

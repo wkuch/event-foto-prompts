@@ -9,7 +9,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
     const { searchParams } = new URL(request.url)
     const format = searchParams.get('format') || 'png'
     const size = parseInt(searchParams.get('size') || '200')
@@ -123,7 +123,7 @@ export async function POST(
       )
     }
 
-    const { slug } = params
+    const { slug } = await params
 
     // Check if event exists and user owns it
     const event = await prisma.event.findUnique({

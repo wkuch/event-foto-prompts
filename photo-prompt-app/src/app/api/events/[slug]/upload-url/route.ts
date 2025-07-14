@@ -1,23 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+import { PutObjectCommand } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
+import { r2, R2_BUCKET_NAME, R2_PUBLIC_URL } from '@/lib/r2'
 
 const presignedUrlSchema = z.object({
   fileName: z.string().min(1, 'File name is required'),
   fileType: z.string().min(1, 'File type is required'),
   fileSize: z.number().int().min(1).max(10 * 1024 * 1024), // 10MB max
   promptId: z.string().optional(),
-})
-
-const s3Client = new S3Client({
-  region: 'auto',
-  endpoint: process.env.R2_ENDPOINT,
-  credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
-  },
 })
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
@@ -27,7 +19,7 @@ export async function POST(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
     const body = await request.json()
     const data = presignedUrlSchema.parse(body)
 
@@ -99,18 +91,18 @@ export async function POST(
 
     // Generate presigned URL
     const putObjectCommand = new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
+      Bucket: R2_BUCKET_NAME,
       Key: r2Key,
       ContentType: data.fileType,
       ContentLength: data.fileSize,
     })
 
-    const presignedUrl = await getSignedUrl(s3Client, putObjectCommand, {
+    const presignedUrl = await getSignedUrl(r2, putObjectCommand, {
       expiresIn: 300, // 5 minutes
     })
 
     // Generate public URL
-    const publicUrl = `${process.env.R2_PUBLIC_URL}/${r2Key}`
+    const publicUrl = `${R2_PUBLIC_URL}/${r2Key}`
 
     return NextResponse.json({
       success: true,

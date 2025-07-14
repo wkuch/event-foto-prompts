@@ -20,7 +20,7 @@ export async function POST(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
     const body = await request.json()
     const data = completeUploadSchema.parse(body)
 

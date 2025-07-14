@@ -25,7 +25,7 @@ export async function POST(
       )
     }
 
-    const { slug } = params
+    const { slug } = await params
     const body = await request.json()
     const data = createPromptSchema.parse(body)
 
@@ -103,7 +103,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
     const { searchParams } = new URL(request.url)
     const nextOnly = searchParams.get('next') === 'true'
 

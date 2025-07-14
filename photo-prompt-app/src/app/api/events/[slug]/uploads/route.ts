@@ -27,7 +27,7 @@ export async function POST(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
 
     // Find the event
     const event = await prisma.event.findUnique({
@@ -206,7 +206,7 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
     const { searchParams } = new URL(request.url)
     const promptId = searchParams.get('promptId')
     const limit = parseInt(searchParams.get('limit') || '20')

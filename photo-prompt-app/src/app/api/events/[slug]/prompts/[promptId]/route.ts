@@ -25,7 +25,7 @@ export async function PUT(
       )
     }
 
-    const { slug, promptId } = params
+    const { slug, promptId } = await params
     const body = await request.json()
     const data = updatePromptSchema.parse(body)
 
@@ -116,7 +116,7 @@ export async function DELETE(
       )
     }
 
-    const { slug, promptId } = params
+    const { slug, promptId } = await params
 
     // Find the event and verify ownership
     const event = await prisma.event.findUnique({

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, QrCode, Eye, Image, Users, Clock, Settings, Plus, X, Trash2 } from 'lucide-react'
+import { ArrowLeft, QrCode, Eye, Image, Users, Clock, Settings, X, Trash2 } from 'lucide-react'
 
 interface Event {
   id: string
@@ -51,7 +51,6 @@ export default function EventManagePage() {
   const [event, setEvent] = useState<Event | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
-  const [showAddPrompt, setShowAddPrompt] = useState(false)
   const [newPromptText, setNewPromptText] = useState('')
   const [isAddingPrompt, setIsAddingPrompt] = useState(false)
 
@@ -97,9 +96,26 @@ export default function EventManagePage() {
         throw new Error('Aufgabe konnte nicht hinzugefügt werden')
       }
       
+      const newPrompt = await response.json()
+      
+      // Add the new prompt to the existing state instead of refetching
+      setEvent(prev => prev ? {
+        ...prev,
+        prompts: [...prev.prompts, {
+          id: newPrompt.prompt.id,
+          text: newPrompt.prompt.text,
+          order: newPrompt.prompt.order,
+          isActive: newPrompt.prompt.isActive,
+          maxUploads: newPrompt.prompt.maxUploads,
+          _count: { uploads: 0 }
+        }],
+        _count: {
+          ...prev._count,
+          prompts: prev._count.prompts + 1
+        }
+      } : null)
+      
       setNewPromptText('')
-      setShowAddPrompt(false)
-      await fetchEventData() // Refresh the data
     } catch (err) {
       setError('Aufgabe konnte nicht hinzugefügt werden')
     } finally {
@@ -379,15 +395,8 @@ export default function EventManagePage() {
 
         {/* Prompts Management */}
         <div className="mt-8 bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-medium text-gray-900">Foto-Aufgaben</h2>
-            <button 
-              onClick={() => setShowAddPrompt(true)}
-              className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Aufgabe hinzufügen
-            </button>
           </div>
           <div className="p-6">
             <div className="space-y-4">
@@ -421,6 +430,45 @@ export default function EventManagePage() {
                   </div>
                 </div>
               ))}
+              
+              {/* Always visible inline Add Prompt Form */}
+              <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
+                <span className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                  {event.prompts.length + 1}
+                </span>
+                <div className="flex-1">
+                  <textarea
+                    value={newPromptText}
+                    onChange={(e) => setNewPromptText(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
+                    placeholder="z.B. Mache ein Foto mit jemandem in Blau"
+                    rows={2}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault()
+                        addPrompt()
+                      }
+                    }}
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={addPrompt}
+                    disabled={!newPromptText.trim() || isAddingPrompt}
+                    className="px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isAddingPrompt ? 'Wird hinzugefügt...' : 'Hinzufügen'}
+                  </button>
+                  {newPromptText.trim() && (
+                    <button
+                      onClick={() => setNewPromptText('')}
+                      className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    >
+                      Löschen
+                    </button>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -491,52 +539,6 @@ export default function EventManagePage() {
         )}
       </div>
 
-      {/* Add Prompt Modal */}
-      {showAddPrompt && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="max-w-md w-full bg-white rounded-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">Neue Aufgabe hinzufügen</h3>
-              <button
-                onClick={() => setShowAddPrompt(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-6">
-              <div className="mb-4">
-                <label htmlFor="promptText" className="block text-sm font-medium text-gray-700 mb-2">
-                  Aufgaben-Text
-                </label>
-                <textarea
-                  id="promptText"
-                  rows={3}
-                  value={newPromptText}
-                  onChange={(e) => setNewPromptText(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  placeholder="z.B. Mache ein Foto mit jemandem in Blau"
-                />
-              </div>
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={() => setShowAddPrompt(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  Abbrechen
-                </button>
-                <button
-                  onClick={addPrompt}
-                  disabled={!newPromptText.trim() || isAddingPrompt}
-                  className="px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isAddingPrompt ? 'Wird hinzugefügt...' : 'Aufgabe hinzufügen'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

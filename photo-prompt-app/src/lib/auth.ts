@@ -29,8 +29,8 @@ export const authOptions: NextAuthOptions = {
     EmailProvider({
       from: process.env.RESEND_FROM_EMAIL || 'noreply@localhost',
       sendVerificationRequest: async ({ identifier: email, url, provider }) => {
-        // Development mode - log to console
-        if (!resend || process.env.NODE_ENV === 'development') {
+        // Development mode - log to console (only if no Resend API key)
+        if (!resend) {
           console.log('\n🔗 Magic Link Authentication')
           console.log('================================')
           console.log(`Email: ${email}`)
@@ -46,22 +46,22 @@ export const authOptions: NextAuthOptions = {
           await resend.emails.send({
             from: provider.from,
             to: email,
-            subject: 'Sign in to Event Photo Prompts',
+            subject: 'Anmelden bei Event Photo Prompts',
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #2563eb; margin-bottom: 24px;">Sign in to Event Photo Prompts</h1>
+                <h1 style="color: #2563eb; margin-bottom: 24px;">Anmelden bei Event Photo Prompts</h1>
                 <p style="color: #374151; margin-bottom: 24px; font-size: 16px;">
-                  Click the link below to sign in to your account and manage your events:
+                  Klicken Sie auf den Link unten, um sich anzumelden und Ihre Events zu verwalten:
                 </p>
                 <a href="${url}" style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">
-                  Sign in to your account
+                  Jetzt anmelden
                 </a>
                 <p style="color: #6b7280; margin-top: 24px; font-size: 14px;">
-                  This link will expire in 24 hours. If you didn't request this, you can safely ignore this email.
+                  Dieser Link läuft in 24 Stunden ab. Falls Sie diese E-Mail nicht angefordert haben, können Sie sie ignorieren.
                 </p>
                 <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0;">
                 <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-                  Event Photo Prompts - Making events more memorable, one photo at a time
+                  Event Photo Prompts - Events unvergesslicher machen, ein Foto nach dem anderen
                 </p>
               </div>
             `,

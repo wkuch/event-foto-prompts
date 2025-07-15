@@ -55,8 +55,8 @@ export async function GET(
       }
     }
 
-    // Generate the URL that the QR code will point to
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    // Generate the URL that the QR code will point to using current request URL
+    const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`
     const eventUrl = `${baseUrl}/event/${slug}`
 
     // QR code options
@@ -111,7 +111,7 @@ export async function GET(
 
 // Additional endpoint to get QR code metadata and download URLs
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
@@ -145,7 +145,7 @@ export async function POST(
       )
     }
 
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`
     const eventUrl = `${baseUrl}/event/${slug}`
     const qrApiBase = `${baseUrl}/api/events/${slug}/qr`
 

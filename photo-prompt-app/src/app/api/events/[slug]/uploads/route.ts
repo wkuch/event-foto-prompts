@@ -142,8 +142,9 @@ export async function POST(
 
     await s3Client.send(uploadCommand)
 
-    // Generate API proxy URL instead of direct R2 URL
-    const r2Url = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/images/${r2Key}`
+    // Generate API proxy URL using current request URL
+    const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`
+    const r2Url = `${baseUrl}/api/images/${r2Key}`
 
     // Save upload record to database
     const upload = await prisma.upload.create({

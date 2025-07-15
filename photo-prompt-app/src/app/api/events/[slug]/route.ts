@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)

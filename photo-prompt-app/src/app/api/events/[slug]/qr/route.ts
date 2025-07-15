@@ -6,7 +6,7 @@ import * as QRCode from 'qrcode'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const { slug } = await params
@@ -112,7 +112,7 @@ export async function GET(
 // Additional endpoint to get QR code metadata and download URLs
 export async function POST(
   _request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)

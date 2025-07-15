@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { uuid: string } }
+  { params }: { params: Promise<{ uuid: string }> }
 ) {
   try {
     const { uuid } = await params

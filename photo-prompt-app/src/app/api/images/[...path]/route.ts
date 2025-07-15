@@ -4,7 +4,7 @@ import { r2, R2_BUCKET_NAME } from '@/lib/r2'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
   try {
     const { path } = await params

@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
+import { type Prisma } from '@/generated/prisma'
 
 const createEventSchema = z.object({
   name: z.string().min(1, 'Event name is required').max(100, 'Event name too long'),
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
         slug: data.slug,
         type: data.type,
         description: data.description,
-        settings: data.settings,
+        settings: data.settings as Prisma.InputJsonValue,
         userId: user.id,
       },
       include: {

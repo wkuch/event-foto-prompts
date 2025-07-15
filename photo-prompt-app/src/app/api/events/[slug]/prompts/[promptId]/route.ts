@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { z } from 'zod'
 import { prisma } from '@/lib/db'
 import { authOptions } from '@/lib/auth'
+import { type Prisma } from '@/generated/prisma'
 
 const updatePromptSchema = z.object({
   text: z.string().min(1, 'Prompt text is required').max(500, 'Prompt text too long').optional(),
@@ -14,7 +15,7 @@ const updatePromptSchema = z.object({
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string; promptId: string } }
+  { params }: { params: Promise<{ slug: string; promptId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -72,7 +73,7 @@ export async function PUT(
         ...(data.order !== undefined && { order: data.order }),
         ...(data.isActive !== undefined && { isActive: data.isActive }),
         ...(data.maxUploads !== undefined && { maxUploads: data.maxUploads }),
-        ...(data.settings !== undefined && { settings: data.settings }),
+        ...(data.settings !== undefined && { settings: data.settings as Prisma.InputJsonValue }),
       }
     })
 
@@ -105,7 +106,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string; promptId: string } }
+  { params }: { params: Promise<{ slug: string; promptId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Plus, X, Loader2 } from 'lucide-react'
@@ -67,6 +67,7 @@ export default function CreateEventPage() {
   const [success, setSuccess] = useState(false)
   const [promptErrors, setPromptErrors] = useState<string[]>([])
 
+
   const generateSlug = (name: string) => {
     return name
       .toLowerCase()
@@ -86,7 +87,14 @@ export default function CreateEventPage() {
 
   const handleTypeChange = (type: string) => {
     setFormData(prev => ({ ...prev, type }))
-    setPrompts(DEFAULT_PROMPTS[type as keyof typeof DEFAULT_PROMPTS] || DEFAULT_PROMPTS.general)
+    // Only reset prompts if they are still the default prompts for the current type
+    const currentDefaults = DEFAULT_PROMPTS[formData.type as keyof typeof DEFAULT_PROMPTS] || DEFAULT_PROMPTS.general
+    const isStillDefaults = JSON.stringify(prompts) === JSON.stringify(currentDefaults)
+    
+    if (isStillDefaults) {
+      setPrompts(DEFAULT_PROMPTS[type as keyof typeof DEFAULT_PROMPTS] || DEFAULT_PROMPTS.general)
+    }
+    // If user has customized prompts, don't reset them
   }
 
   const addPrompt = () => {
@@ -107,13 +115,14 @@ export default function CreateEventPage() {
     setIsSubmitting(true)
 
     try {
-      // Create event
+      // Create event with prompts in single request
       const eventResponse = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           email: formData.email.trim(),
+          prompts: prompts, // Send prompts with the event creation
         }),
       })
 
@@ -124,26 +133,12 @@ export default function CreateEventPage() {
 
       const { event } = await eventResponse.json()
 
-      // Create prompts with better error handling
-      const failedPrompts: string[] = []
-      for (const promptText of prompts) {
-        try {
-          const promptResponse = await fetch(`/api/events/${event.slug}/prompts`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: promptText }),
-          })
-
-          if (!promptResponse.ok) {
-            failedPrompts.push(promptText)
-          }
-        } catch (promptErr) {
-          failedPrompts.push(promptText)
-        }
-      }
-
-      // Show any prompt creation warnings
-      if (failedPrompts.length > 0) {
+      // Check if all prompts were created successfully
+      const expectedPromptCount = prompts.length
+      const actualPromptCount = event.prompts?.length || 0
+      
+      if (actualPromptCount < expectedPromptCount) {
+        const failedPrompts = prompts.slice(actualPromptCount)
         setPromptErrors(failedPrompts)
       }
 
@@ -376,6 +371,7 @@ export default function CreateEventPage() {
             <h2 className="text-lg font-medium text-gray-900 mb-6">
               Foto-Aufgaben
             </h2>
+            
             
             <div className="space-y-4 mb-6">
               {prompts.map((prompt, index) => (

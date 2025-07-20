@@ -15,6 +15,7 @@ const createEventSchema = z.object({
   description: z.string().optional(),
   settings: z.record(z.string(), z.unknown()).optional(),
   email: z.string().email('Please enter a valid email address'),
+  prompts: z.array(z.string().min(1, 'Prompt text is required').max(500, 'Prompt text too long')).optional(),
 })
 
 export async function POST(request: NextRequest) {
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Create the event
+    // Create the event with prompts in a transaction
     const event = await prisma.event.create({
       data: {
         name: data.name,
@@ -57,6 +58,14 @@ export async function POST(request: NextRequest) {
         description: data.description,
         settings: data.settings as Prisma.InputJsonValue,
         userId: user.id,
+        // Create prompts along with the event
+        prompts: data.prompts && data.prompts.length > 0 ? {
+          create: data.prompts.map((promptText, index) => ({
+            text: promptText,
+            order: index,
+            isActive: true,
+          }))
+        } : undefined,
       },
       include: {
         prompts: true,

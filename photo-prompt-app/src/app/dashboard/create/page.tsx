@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Plus, X } from 'lucide-react'
+import { ArrowLeft, Plus, X, Loader2 } from 'lucide-react'
 
 const EVENT_TYPES = [
   { value: 'wedding', label: 'Hochzeit', description: 'Halte besondere Momente des großen Tages fest' },
@@ -65,6 +65,7 @@ export default function CreateEventPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [promptErrors, setPromptErrors] = useState<string[]>([])
 
   const generateSlug = (name: string) => {
     return name
@@ -123,26 +124,69 @@ export default function CreateEventPage() {
 
       const { event } = await eventResponse.json()
 
-      // Create prompts
+      // Create prompts with better error handling
+      const failedPrompts: string[] = []
       for (const promptText of prompts) {
-        const promptResponse = await fetch(`/api/events/${event.slug}/prompts`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text: promptText }),
-        })
+        try {
+          const promptResponse = await fetch(`/api/events/${event.slug}/prompts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: promptText }),
+          })
 
-        if (!promptResponse.ok) {
-          console.warn('Failed to create prompt:', promptText)
+          if (!promptResponse.ok) {
+            failedPrompts.push(promptText)
+          }
+        } catch (promptErr) {
+          failedPrompts.push(promptText)
         }
+      }
+
+      // Show any prompt creation warnings
+      if (failedPrompts.length > 0) {
+        setPromptErrors(failedPrompts)
       }
 
       // Show success message
       setSuccess(true)
       
-      // Redirect after a short delay to let the session cookie be set
-      setTimeout(() => {
-        router.push('/dashboard')
-      }, 1500)
+      // Redirect after ensuring session is properly set, with fallback for mobile
+      const redirectToUrl = `/dashboard/events/${event.slug}`
+      
+      // Check if we can access the dashboard first, with multiple attempts for mobile
+      let redirectAttempts = 0
+      const maxAttempts = 3
+      
+      const attemptRedirect = async () => {
+        redirectAttempts++
+        
+        try {
+          // Test if the session is working by checking dashboard access
+          const testResponse = await fetch('/api/events', {
+            method: 'GET',
+            credentials: 'include'
+          })
+          
+          if (testResponse.ok) {
+            router.push(redirectToUrl)
+          } else if (redirectAttempts < maxAttempts) {
+            // Session not ready yet, wait longer and try again
+            setTimeout(attemptRedirect, 1500)
+          } else {
+            // Fall back to regular dashboard if all attempts failed
+            router.push('/dashboard')
+          }
+        } catch (err) {
+          if (redirectAttempts < maxAttempts) {
+            setTimeout(attemptRedirect, 1500)
+          } else {
+            router.push('/dashboard')
+          }
+        }
+      }
+      
+      // Start the redirect process after initial delay
+      setTimeout(attemptRedirect, 1000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create event')
     } finally {
@@ -166,6 +210,22 @@ export default function CreateEventPage() {
             Dein Event ist bereit! Du kannst es jetzt von diesem Gerät aus verwalten. 
             Nutze deine E-Mail, um von anderen Geräten darauf zuzugreifen.
           </p>
+
+          {promptErrors.length > 0 && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+              <p className="text-sm text-yellow-800 font-medium mb-2">
+                ⚠️ Einige Foto-Aufgaben konnten nicht erstellt werden:
+              </p>
+              <ul className="text-xs text-yellow-700 space-y-1">
+                {promptErrors.map((prompt, index) => (
+                  <li key={index}>• {prompt}</li>
+                ))}
+              </ul>
+              <p className="text-xs text-yellow-700 mt-2">
+                Du kannst sie später im Event-Dashboard manuell hinzufügen.
+              </p>
+            </div>
+          )}
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-sm text-blue-800">
@@ -232,11 +292,11 @@ export default function CreateEventPage() {
 
               <div>
                 <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
-                  URL-Slug *
+                  Event-Link *
                 </label>
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    /event/
+                    {typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/event/
                   </span>
                   <input
                     type="text"
@@ -249,6 +309,9 @@ export default function CreateEventPage() {
                   />
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
+                  Dies wird die Web-Adresse für dein Event. Gäste können sie direkt aufrufen oder über QR-Code scannen.
+                </p>
+                <p className="mt-1 text-xs text-gray-400">
                   Darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten
                 </p>
               </div>
@@ -362,8 +425,9 @@ export default function CreateEventPage() {
             <button
               type="submit"
               disabled={isSubmitting || !formData.name || !formData.slug || !formData.email}
-              className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
+              {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               {isSubmitting ? 'Erstelle...' : 'Event erstellen'}
             </button>
           </div>

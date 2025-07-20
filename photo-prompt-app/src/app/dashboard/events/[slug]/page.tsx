@@ -176,7 +176,6 @@ export default function EventManagePage() {
   }
 
   const totalUploads = event._count.uploads
-  const activePrompts = event.prompts.filter(p => p.isActive).length
   const recentUploads = event.uploads
 
   return (
@@ -232,7 +231,7 @@ export default function EventManagePage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="flex-shrink-0">
@@ -259,10 +258,10 @@ export default function EventManagePage() {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Aktive Aufgaben
+                    Aufgaben insgesamt
                   </dt>
                   <dd className="text-lg font-medium text-gray-900">
-                    {activePrompts} of {event.prompts.length}
+                    {event.prompts.length}
                   </dd>
                 </dl>
               </div>
@@ -281,24 +280,6 @@ export default function EventManagePage() {
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 capitalize">
                     {event.type}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Clock className="h-8 w-8 text-orange-600" />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Erstellt
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {new Date(event.createdAt).toLocaleDateString()}
                   </dd>
                 </dl>
               </div>
@@ -413,13 +394,6 @@ export default function EventManagePage() {
                     </p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      prompt.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {prompt.isActive ? 'Aktiv' : 'Inaktiv'}
-                    </span>
                     <button 
                       onClick={() => deletePrompt(prompt.id)}
                       className="text-gray-400 hover:text-red-600"

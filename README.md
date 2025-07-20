@@ -87,10 +87,20 @@ Note see "Tech stack spec.md" for more details
 - [x] Public gallery page (grid of uploads)
 
 ### 2.4 Deployment & Testing
-- [ ] Deploy MVP to staging & production  
-- [ ] Mobile-first QA & cross-browser testing  
-- [ ] Soft launch with pilot users  
-- [ ] Collect initial feedback & bug reports  
+- [x] Deploy MVP to staging & production  
+- [x] Mobile-first QA & cross-browser testing  
+- [x] Soft launch with pilot users  
+- [x] Collect initial feedback & bug reports  
+
+### 2.5 Testing Feedback
+- URL-Slug is a technical term, we should use a more user friendly term for it, and also make it mor clear what it is (also maybe shwo the whole url)
+- clicking on "Create Event" should show a loading indicator
+- clicking on "create event" should, if successful redirect to the event dashboard, on mobile (on desktop, at least just now, it worked). I think it does but in the actually deployed version Im redirected to the auth/signin page, even though I should be logged in
+- magic link email is not sent in deployed state (maybe we need more logs to debug this)
+   - I created an api key, put it into the env vars on vercel
+- newly created events are not visible in the dashboard (I see in the db that these events were created and are correctly associated with the email)
+- prompts die wärend der event creation angegeben werden, werden nicht in der db gespeichert, keine der prompts, auch nicht die default prompts. Wie sind diese überhaupt gespeichert?
+
 
 ## 3. Post-MVP Features & Polishing
 - [ ] Moderation & approval queue  

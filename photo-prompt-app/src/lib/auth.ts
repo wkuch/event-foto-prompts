@@ -43,7 +43,12 @@ export const authOptions: NextAuthOptions = {
 
         // Production mode - send via Resend
         try {
-          await resend.emails.send({
+          console.log(`📧 Attempting to send magic link email to: ${email}`)
+          console.log(`🔗 Magic link URL: ${url}`)
+          console.log(`🔑 Resend API key configured: ${!!process.env.RESEND_API_KEY}`)
+          console.log(`📮 From email: ${provider.from}`)
+          
+          const emailResult = await resend.emails.send({
             from: provider.from,
             to: email,
             subject: 'Anmelden bei Event Photo Prompts',
@@ -66,9 +71,31 @@ export const authOptions: NextAuthOptions = {
               </div>
             `,
           })
+          
+          console.log(`✅ Email sent successfully! Email ID: ${emailResult.data?.id}`)
+          
         } catch (error) {
-          console.error('Failed to send email:', error)
-          throw new Error('Failed to send verification email')
+          console.error('❌ Failed to send email - Full error details:', {
+            error: error instanceof Error ? error.message : error,
+            stack: error instanceof Error ? error.stack : undefined,
+            email,
+            fromEmail: provider.from,
+            hasApiKey: !!process.env.RESEND_API_KEY,
+            apiKeyPrefix: process.env.RESEND_API_KEY?.substring(0, 10) + '...',
+          })
+          
+          // More specific error messages
+          if (error instanceof Error) {
+            if (error.message.includes('API key')) {
+              console.error('🔑 API key issue - check RESEND_API_KEY environment variable')
+            } else if (error.message.includes('domain')) {
+              console.error('🌐 Domain issue - check if sender domain is verified in Resend')
+            } else if (error.message.includes('rate limit')) {
+              console.error('⏰ Rate limit exceeded - too many emails sent')
+            }
+          }
+          
+          throw new Error(`Failed to send verification email: ${error instanceof Error ? error.message : 'Unknown error'}`)
         }
       },
     }),

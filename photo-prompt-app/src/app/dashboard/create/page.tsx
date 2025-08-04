@@ -6,48 +6,51 @@ import Link from 'next/link'
 import { ArrowLeft, Plus, X, Loader2 } from 'lucide-react'
 
 const EVENT_TYPES = [
-  { value: 'wedding', label: 'Hochzeit', description: 'Halte besondere Momente des großen Tages fest' },
-  { value: 'birthday', label: 'Geburtstagsfeier', description: 'Spaßige Feier-Fotos' },
-  { value: 'corporate', label: 'Firmenevent', description: 'Professionelles Networking und Teambuilding' },
-  { value: 'conference', label: 'Konferenz', description: 'Bildungs- und Networking-Event' },
-  { value: 'general', label: 'Allgemeines Event', description: 'Jede andere Art von Veranstaltung' },
+  { value: 'wedding', label: 'Traumhochzeit', description: 'Haltet die schönsten Momente eures großen Tages für die Ewigkeit fest' },
+  { value: 'engagement', label: 'Verlobungsfeier', description: 'Feiert euren Antrag und die Vorfreude auf die Hochzeit' },
+  { value: 'anniversary', label: 'Hochzeitstag', description: 'Lasst eure Liebe weiterstrahlen - Jahr für Jahr' },
+  { value: 'rehearsal', label: 'Polterabend', description: 'Die Generalprobe für den schönsten Tag eures Lebens' },
+  { value: 'general', label: 'Andere Feier', description: 'Jede andere romantische Feier oder besondere Gelegenheit' },
 ]
 
 const DEFAULT_PROMPTS = {
   wedding: [
-    'Mache ein Foto mit jemandem in deiner Lieblingsfarbe',
-    'Halte einen spontanen Lachmoment fest',
-    'Foto mit dem glücklichen Paar',
-    'Bild von eurem Tisch beim Spaß haben',
-    'Schnapp den besten Tanzschritt des Abends'
+    'Macht ein Foto mit dem Brautpaar - fangt ihre Freude ein',
+    'Haltet den ersten Tanz oder einen romantischen Tanzmoment fest',
+    'Fotografiert euch mit jemandem, den ihr heute zum ersten Mal getroffen habt',
+    'Macht ein Bild von den schönsten Blumen oder der Dekoration',
+    'Fangt einen Moment der Freudentränen ein',
+    'Fotografiert das Brautpaar beim Kuchenanschnitt',
+    'Macht ein Selfie mit eurer schönsten Hochzeitsoutfit-Details',
+    'Haltet einen Moment beim Gratulieren oder Anstoßen fest'
   ],
-  birthday: [
-    'Foto mit dem Geburtstagskind',
-    'Halte jemanden beim Wünschen fest',
-    'Bild vom besten Party-Outfit',
-    'Schnapp ein Gruppen-Selfie',
-    'Foto vom Kuchen oder den Leckereien'
+  engagement: [
+    'Fotografiert den wunderschönen Verlobungsring',
+    'Macht ein Foto beim Anstoßen auf die Verlobung',
+    'Haltet die Reaktion der Familie beim Verkünden fest',
+    'Fotografiert das glückliche Paar beim Kuscheln',
+    'Macht ein Bild von den Glückwunschkarten oder Geschenken'
   ],
-  corporate: [
-    'Professionelles Porträt mit einem Kollegen',
-    'Bild von deinem Arbeitsplatz oder Setup',
-    'Foto, das Teamwork zeigt',
-    'Halte einen Networking-Moment fest',
-    'Bild vom Event-Veranstaltungsort'
+  anniversary: [
+    'Fotografiert das Paar bei einem zärtlichen Moment',
+    'Macht ein Bild vom Hochzeitsfoto aus vergangenen Jahren',
+    'Haltet einen Toast auf die Liebe fest',
+    'Fotografiert romantische Details oder Erinnerungsstücke',
+    'Macht ein Gruppenfoto aller Anwesenden'
   ],
-  conference: [
-    'Foto mit einem Sprecher oder Referenten',
-    'Bild einer interessanten Präsentationsfolie',
-    'Networking-Foto mit neuen Kontakten',
-    'Halte einen Lernmoment fest',
-    'Foto von den Konferenz-Goodies oder Materialien'
+  rehearsal: [
+    'Fotografiert die Aufregung vor der Hochzeit',
+    'Macht ein lustiges Gruppenfoto mit den Trauzeugen',
+    'Haltet spontane Lachmomente fest',
+    'Fotografiert beim Proben der Zeremonie',
+    'Macht ein Bild vom gemeinsamen Anstoßen'
   ],
   general: [
-    'Mache ein Foto mit jemandem Neuem',
-    'Halte einen spontanen Moment fest',
-    'Bild vom Veranstaltungsort oder Setup',
-    'Schnapp ein Gruppenfoto',
-    'Foto, das die Event-Atmosphäre zeigt'
+    'Macht ein Foto mit jemandem Besonderen',
+    'Haltet einen unvergesslichen Moment fest',
+    'Fotografiert die schönste Dekoration oder Details',
+    'Macht ein Gruppenfoto mit euren Liebsten',
+    'Fangt die Atmosphäre der Feier ein'
   ]
 }
 
@@ -56,11 +59,11 @@ export default function CreateEventPage() {
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
-    type: 'general',
+    type: 'wedding',
     description: '',
     email: '',
   })
-  const [prompts, setPrompts] = useState<string[]>(DEFAULT_PROMPTS.general)
+  const [prompts, setPrompts] = useState<string[]>(DEFAULT_PROMPTS.wedding)
   const [newPrompt, setNewPrompt] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
@@ -198,12 +201,12 @@ export default function CreateEventPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Event erfolgreich erstellt! 🎉
+            Hochzeits-Foto-Aufgaben erfolgreich erstellt! 💕
           </h1>
           
           <p className="text-gray-600 mb-6">
-            Dein Event ist bereit! Du kannst es jetzt von diesem Gerät aus verwalten. 
-            Nutze deine E-Mail, um von anderen Geräten darauf zuzugreifen.
+            Eure Foto-Aufgaben sind bereit! Ihr könnt sie jetzt von diesem Gerät aus verwalten. 
+            Nutzt eure E-Mail, um von anderen Geräten darauf zuzugreifen.
           </p>
 
           {promptErrors.length > 0 && (
@@ -245,10 +248,10 @@ export default function CreateEventPage() {
             </Link>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Neues Event erstellen
+                Hochzeits-Foto-Aufgaben erstellen
               </h1>
               <p className="mt-1 text-sm text-gray-600">
-                Richte ein neues Foto-Aufgaben-Event für deine Gäste ein
+                Erstellt unvergessliche Foto-Aufgaben für eure Hochzeitsgäste
               </p>
             </div>
           </div>
@@ -266,13 +269,13 @@ export default function CreateEventPage() {
           {/* Basic Info */}
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-6">
-              Event-Informationen
+              Hochzeits-Informationen
             </h2>
             
             <div className="grid grid-cols-1 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Event-Name *
+                  Hochzeits-Name *
                 </label>
                 <input
                   type="text"
@@ -280,14 +283,14 @@ export default function CreateEventPage() {
                   required
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Mein tolles Event"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
+                  placeholder="Anna & Ben's Traumhochzeit"
                 />
               </div>
 
               <div>
                 <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
-                  Event-Link *
+                  Hochzeits-Link *
                 </label>
                 <div className="mt-1 flex rounded-md shadow-sm">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -299,12 +302,12 @@ export default function CreateEventPage() {
                     required
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    className="flex-1 block w-full border-gray-300 rounded-none rounded-r-md focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    placeholder="mein-tolles-event"
+                    className="flex-1 block w-full border-gray-300 rounded-none rounded-r-md focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
+                    placeholder="anna-ben-traumhochzeit"
                   />
                 </div>
                 <p className="mt-1 text-xs text-gray-500">
-                  Dies wird die Web-Adresse für dein Event. Gäste können sie direkt aufrufen oder über QR-Code scannen.
+                  Dies wird die Web-Adresse für eure Hochzeit. Gäste können sie direkt aufrufen oder über QR-Code scannen.
                 </p>
                 <p className="mt-1 text-xs text-gray-400">
                   Darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten
@@ -313,13 +316,13 @@ export default function CreateEventPage() {
 
               <div>
                 <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                  Event-Art
+                  Feier-Art
                 </label>
                 <select
                   id="type"
                   value={formData.type}
                   onChange={(e) => handleTypeChange(e.target.value)}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
                 >
                   {EVENT_TYPES.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -342,11 +345,11 @@ export default function CreateEventPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="deine@email.com"
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
+                  placeholder="anna@beispiel.com"
                 />
                 <p className="mt-1 text-xs text-gray-500">
-                  <strong>Wichtig:</strong> Speichere diese E-Mail! Du brauchst sie, um von anderen Geräten auf dein Event zuzugreifen.
+                  <strong>Wichtig:</strong> Speichert diese E-Mail! Ihr braucht sie, um von anderen Geräten auf eure Hochzeit zuzugreifen.
                 </p>
               </div>
 
@@ -359,8 +362,8 @@ export default function CreateEventPage() {
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                  placeholder="Erzähle deinen Gästen von diesem Event..."
+                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
+                  placeholder="Erzählt euren Gästen von eurer besonderen Feier..."
                 />
               </div>
             </div>
@@ -369,7 +372,7 @@ export default function CreateEventPage() {
           {/* Photo Prompts */}
           <div className="bg-white shadow rounded-lg p-6">
             <h2 className="text-lg font-medium text-gray-900 mb-6">
-              Foto-Aufgaben
+              Hochzeits-Fotomomente
             </h2>
             
             
@@ -397,13 +400,13 @@ export default function CreateEventPage() {
                 value={newPrompt}
                 onChange={(e) => setNewPrompt(e.target.value)}
                 placeholder="Neue Foto-Aufgabe hinzufügen..."
-                className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
                 onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addPrompt())}
               />
               <button
                 type="button"
                 onClick={addPrompt}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -414,17 +417,17 @@ export default function CreateEventPage() {
           <div className="flex justify-end space-x-3">
             <Link
               href="/"
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
             >
               Abbrechen
             </Link>
             <button
               type="submit"
               disabled={isSubmitting || !formData.name || !formData.slug || !formData.email}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {isSubmitting ? 'Erstelle...' : 'Event erstellen'}
+{isSubmitting ? 'Erstelle...' : 'Foto-Aufgaben erstellen'}
             </button>
           </div>
         </form>

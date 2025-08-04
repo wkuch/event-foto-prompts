@@ -107,10 +107,10 @@ export default function SignInClient() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-8 text-white text-center">
+        <div className="bg-gradient-to-r from-rose-500 to-amber-500 px-6 py-8 text-white text-center">
           <h1 className="text-2xl font-bold mb-2">Willkommen zurück</h1>
-          <p className="text-blue-100">
-            Melde dich an, um deine Events zu verwalten
+          <p className="text-rose-100">
+Meldet euch an, um eure Hochzeits-Foto-Aufgaben zu verwalten
           </p>
         </div>
 
@@ -125,10 +125,10 @@ export default function SignInClient() {
             </Link>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">
-                Zugang zu deinen Events
+                Zugang zu euren Foto-Aufgaben
               </h2>
               <p className="text-sm text-gray-600">
-                Gib deine E-Mail ein, um einen Magic Link zu erhalten
+                Gebt eure E-Mail ein, um einen Magic Link zu erhalten
               </p>
             </div>
           </div>
@@ -148,8 +148,8 @@ export default function SignInClient() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Gib die E-Mail ein, mit der du Events erstellt hast"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+placeholder="Gebt die E-Mail ein, mit der ihr eure Foto-Aufgaben erstellt habt"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -164,7 +164,7 @@ export default function SignInClient() {
             <button
               type="submit"
               disabled={isLoading || !email.trim()}
-              className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <>
@@ -182,9 +182,9 @@ export default function SignInClient() {
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-xs text-gray-500 text-center">
-              Noch kein Account?{' '}
-              <Link href="/dashboard/create" className="text-blue-600 hover:text-blue-500 font-medium">
-                Erstelle dein erstes Event
+              Noch keine Foto-Aufgaben erstellt?{' '}
+              <Link href="/dashboard/create" className="text-rose-600 hover:text-rose-500 font-medium">
+                Erstellt Hochzeits-Foto-Aufgaben
               </Link>
             </p>
           </div>

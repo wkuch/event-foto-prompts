@@ -3,7 +3,19 @@
 import { useState, useEffect } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Download, Eye, Filter, Grid, List, Loader, RefreshCw, X } from 'lucide-react'
+import {
+  ArrowLeft,
+  Download,
+  Eye,
+  Filter,
+  Grid,
+  List,
+  Loader,
+  RefreshCw,
+  X,
+  Sparkles,
+  Heart,
+} from 'lucide-react'
 
 interface Upload {
   id: string
@@ -28,7 +40,7 @@ interface Event {
 export default function GalleryPage() {
   const params = useParams()
   const uuid = params.uuid as string
-  
+
   const [event, setEvent] = useState<Event | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [filteredUploads, setFilteredUploads] = useState<Upload[]>([])
@@ -49,14 +61,16 @@ export default function GalleryPage() {
     if (selectedPromptId === 'all') {
       setFilteredUploads(uploads)
     } else {
-      setFilteredUploads(uploads.filter(upload => upload.prompt.id === selectedPromptId))
+      setFilteredUploads(
+        uploads.filter((upload) => upload.prompt.id === selectedPromptId)
+      )
     }
   }, [uploads, selectedPromptId])
 
   const fetchEventData = async () => {
     try {
       const response = await fetch(`/api/galleries/${uuid}`)
-      
+
       if (!response.ok) {
         throw new Error('Event nicht gefunden')
       }
@@ -73,7 +87,7 @@ export default function GalleryPage() {
   const fetchUploads = async () => {
     try {
       const response = await fetch(`/api/galleries/${uuid}/uploads`)
-      
+
       if (!response.ok) {
         throw new Error('Uploads konnten nicht abgerufen werden')
       }
@@ -90,7 +104,7 @@ export default function GalleryPage() {
   const fetchPrompts = async () => {
     try {
       const response = await fetch(`/api/galleries/${uuid}/prompts`)
-      
+
       if (!response.ok) {
         throw new Error('Aufgaben konnten nicht abgerufen werden')
       }
@@ -112,7 +126,7 @@ export default function GalleryPage() {
       month: '2-digit',
       year: 'numeric',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
   }
 
@@ -141,12 +155,25 @@ export default function GalleryPage() {
     }
   }
 
+  // Elegant wedding palette and soft glow background
+  const bgGradient =
+    'bg-[radial-gradient(1000px_600px_at_100%_-10%,rgba(244,114,182,0.15),transparent),radial-gradient(800px_500px_at_0%_-20%,rgba(251,191,36,0.10),transparent)]'
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#27374D' }}>
-        <div className="text-center p-8">
-          <Loader className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#DDE6ED' }} />
-          <p className="font-light" style={{ color: '#DDE6ED' }}>Galerie wird geladen...</p>
+      <div
+        className={`min-h-screen flex items-center justify-center ${bgGradient} bg-stone-50`}
+      >
+        <div className="relative w-full max-w-sm">
+          <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
+          <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl ring-1 ring-white/60">
+            <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+              <Loader className="w-6 h-6 animate-spin" />
+            </div>
+            <p className="text-center text-stone-700 font-medium tracking-wide">
+              Galerie wird vorbereitet ...
+            </p>
+          </div>
         </div>
       </div>
     )
@@ -154,165 +181,214 @@ export default function GalleryPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#27374D' }}>
-        <div className="max-w-md w-full rounded-lg p-8 text-center" style={{ backgroundColor: '#526D82' }}>
-          <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#9DB2BF' }}>
-            <RefreshCw className="w-6 h-6" style={{ color: '#27374D' }}/>
+      <div className={`min-h-screen ${bgGradient} bg-stone-50 p-6`}>
+        <div className="mx-auto max-w-lg">
+          <div className="relative">
+            <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
+            <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-8 shadow-2xl ring-1 ring-white/60 text-center">
+              <div className="mx-auto mb-5 h-14 w-14 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+                <RefreshCw className="w-7 h-7" />
+              </div>
+              <h2 className="text-xl font-semibold text-stone-800 tracking-tight">
+                Galerie konnte nicht geladen werden
+              </h2>
+              <p className="mt-2 text-stone-600">{error}</p>
+              <div className="mt-6">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Erneut versuchen
+                </button>
+              </div>
+            </div>
           </div>
-          <h2 className="text-lg font-light mb-3" style={{ color: '#DDE6ED' }}>
-            Galerie konnte nicht geladen werden
-          </h2>
-          <p className="mb-6 font-light" style={{ color: '#9DB2BF' }}>{error}</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:opacity-90 transition-colors"
-            style={{ borderColor: '#9DB2BF', color: '#DDE6ED' }}
-          >
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Erneut versuchen
-          </button>
+          <p className="mt-6 text-center text-xs text-stone-500">
+            Powered by Wedding Moments
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#27374D' }}>
-      {/* Header */}
-      <div style={{ backgroundColor: '#526D82' }}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-6">
-            <div className="flex items-center">
-              <Link
-                href={`/event/${event?.slug}`}
-                className="mr-4 p-2 rounded-md hover:bg-white/10 transition-colors"
-                style={{ color: '#DDE6ED' }}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-              <div>
-                <h1 className="text-2xl font-light tracking-wide" style={{ color: '#DDE6ED' }}>
-                  {event?.name} Galerie
-                </h1>
-                <p className="text-sm font-light" style={{ color: '#9DB2BF' }}>
-                  {filteredUploads.length} {filteredUploads.length === 1 ? 'Foto' : 'Fotos'}
-                  {selectedPromptId !== 'all' && ' für diese Aufgabe'}
-                </p>
-              </div>
+    <div className={`min-h-screen ${bgGradient} bg-stone-50`}>
+      {/* Hero Header */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute -top-10 -right-10 h-60 w-60 rounded-full bg-rose-200 blur-3xl" />
+          <div className="absolute -bottom-10 -left-10 h-60 w-60 rounded-full bg-amber-200 blur-3xl" />
+        </div>
+
+        <div className="mx-auto w-full max-w-6xl px-6 pt-10 pb-6">
+          <div className="flex items-center justify-center gap-2 text-rose-600">
+            <Sparkles className="w-5 h-5" />
+            <span className="uppercase tracking-widest text-xs font-semibold">
+              Wedding Moments
+            </span>
+            <Sparkles className="w-5 h-5" />
+          </div>
+          <h1 className="mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
+            Galerie der Herzensmomente
+          </h1>
+          <p className="mt-3 text-center text-stone-600 max-w-2xl mx-auto">
+            Stöbert durch alle hochgeladenen Fotos. Filtert nach Aufgaben oder
+            wählt eure Lieblingsansicht.
+          </p>
+
+          <div className="mt-6 flex justify-center">
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1.5 text-stone-700 ring-1 ring-stone-200 shadow-sm">
+              <Heart className="w-4 h-4 text-rose-500" />
+              <span className="text-xs">
+                Danke an alle Gäste fürs Mitmachen
+              </span>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <div className="flex rounded-md border" style={{ borderColor: '#9DB2BF' }}>
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`px-3 py-2 text-sm font-medium rounded-l-md transition-colors ${viewMode === 'grid' ? '' : 'hover:bg-white/10'}`}
-                  style={{ 
-                    backgroundColor: viewMode === 'grid' ? '#9DB2BF' : 'transparent',
-                    color: viewMode === 'grid' ? '#27374D' : '#DDE6ED'
-                  }}
+          </div>
+        </div>
+      </div>
+
+      {/* Toolbar Card */}
+      <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
+        <div className="relative mb-8">
+          <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
+          <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">
+            <div className="px-4 md:px-8 py-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <Link
+                  href={`/event/${event?.slug}`}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                  aria-label="Zurück"
                 >
-                  <Grid className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`px-3 py-2 text-sm font-medium rounded-r-md transition-colors border-l ${viewMode === 'list' ? '' : 'hover:bg-white/10'}`}
-                  style={{ 
-                    borderColor: '#9DB2BF',
-                    backgroundColor: viewMode === 'list' ? '#9DB2BF' : 'transparent',
-                    color: viewMode === 'list' ? '#27374D' : '#DDE6ED'
-                  }}
-                >
-                  <List className="w-4 h-4" />
-                </button>
+                  <ArrowLeft className="w-5 h-5" />
+                </Link>
+                <div>
+                  <h2 className="text-xl font-semibold tracking-tight text-stone-900">
+                    {event?.name} – Galerie
+                  </h2>
+                  <p className="text-sm text-stone-600">
+                    {filteredUploads.length}{' '}
+                    {filteredUploads.length === 1 ? 'Foto' : 'Fotos'}
+                    {selectedPromptId !== 'all' && ' für diese Aufgabe'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                {prompts.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 ring-1 ring-stone-200">
+                      <Filter className="w-4 h-4 text-stone-600" />
+                    </span>
+                    <select
+                      value={selectedPromptId}
+                      onChange={(e) => setSelectedPromptId(e.target.value)}
+                      className="h-10 rounded-xl border border-stone-200 bg-white/80 px-3 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                    >
+                      <option value="all">
+                        Alle Aufgaben ({uploads.length})
+                      </option>
+                      {prompts.map((prompt) => {
+                        const count = uploads.filter(
+                          (u) => u.prompt.id === prompt.id
+                        ).length
+                        return (
+                          <option key={prompt.id} value={prompt.id}>
+                            {prompt.text} ({count})
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </div>
+                )}
+
+                <div className="flex rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-white/80">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-4 py-2 text-sm font-medium transition ${
+                      viewMode === 'grid'
+                        ? 'bg-stone-900 text-white'
+                        : 'text-stone-700 hover:bg-stone-50'
+                    }`}
+                  >
+                    <Grid className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-4 py-2 text-sm font-medium transition border-l border-stone-200 ${
+                      viewMode === 'list'
+                        ? 'bg-stone-900 text-white'
+                        : 'text-stone-700 hover:bg-stone-50'
+                    }`}
+                  >
+                    <List className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Filters */}
-      {prompts.length > 0 && (
-        <div className="border-b" style={{ backgroundColor: '#526D82', borderColor: '#27374D' }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center space-x-4">
-              <Filter className="w-5 h-5" style={{ color: '#DDE6ED' }} />
-              <select
-                value={selectedPromptId}
-                onChange={(e) => setSelectedPromptId(e.target.value)}
-                className="border rounded-md shadow-sm focus:ring-1 focus:outline-none transition-colors font-medium"
-                style={{ 
-                  borderColor: '#9DB2BF', 
-                  color: '#27374D',
-                  backgroundColor: '#DDE6ED'
-                }}
-              >
-                <option value="all">Alle Aufgaben ({uploads.length})</option>
-                {prompts.map((prompt) => {
-                  const count = uploads.filter(u => u.prompt.id === prompt.id).length
-                  return (
-                    <option key={prompt.id} value={prompt.id}>
-                      {prompt.text} ({count})
-                    </option>
-                  )
-                })}
-              </select>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Gallery Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Gallery */}
+      <div className="mx-auto w-full max-w-6xl px-4 md:px-6 pb-12">
         {filteredUploads.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: '#526D82' }}>
-              <Eye className="w-10 h-10" style={{ color: '#DDE6ED' }} />
+          <div className="relative">
+            <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
+            <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">
+              <div className="px-6 md:px-10 py-14 text-center">
+                <div className="mx-auto mb-6 h-16 w-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+                  <Eye className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-semibold text-stone-900">
+                  Noch keine Fotos
+                </h3>
+                <p className="mt-2 text-stone-600">
+                  Fotos werden hier angezeigt, sobald Gäste sie hochladen.
+                </p>
+                <div className="mt-6">
+                  <Link
+                    href={`/event/${event?.slug}`}
+                    className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all"
+                  >
+                    Jetzt Foto hochladen
+                  </Link>
+                </div>
+              </div>
             </div>
-            <h3 className="text-xl font-light mb-3" style={{ color: '#DDE6ED' }}>
-              Noch keine Fotos
-            </h3>
-            <p className="mb-8 font-light" style={{ color: '#9DB2BF' }}>
-              Fotos werden hier angezeigt, sobald Gäste sie hochladen
-            </p>
-            <Link
-              href={`/event/${event?.slug}`}
-              className="inline-flex items-center px-6 py-3 border rounded-lg text-sm font-medium hover:opacity-90 transition-colors"
-              style={{ borderColor: '#9DB2BF', color: '#DDE6ED' }}
-            >
-              Mit dem Hochladen von Fotos beginnen
-            </Link>
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredUploads.map((upload) => (
               <div
                 key={upload.id}
-                className="rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden group cursor-pointer"
-                style={{ backgroundColor: '#526D82' }}
-                onClick={() => setSelectedImage(upload)}
+                className="group relative overflow-hidden rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
               >
-                <div className="aspect-square relative overflow-hidden" style={{ backgroundColor: '#27374D' }}>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: '#9DB2BF', borderTopColor: '#DDE6ED' }}></div>
-                  </div>
+                <div className="aspect-square relative">
                   <img
                     src={upload.r2Url}
                     alt={upload.caption || 'Event photo'}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 relative z-10"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
-                    style={{ opacity: 0, transition: 'opacity 0.5s ease-in-out' }}
-                    onLoad={(e) => (e.target as HTMLImageElement).style.opacity = '1'}
                   />
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all duration-300 flex items-center justify-center">
-                    <Eye className="w-8 h-8 text-white opacity-0 group-hover:opacity-90 transition-opacity duration-300" />
-                  </div>
+                  <button
+                    onClick={() => setSelectedImage(upload)}
+                    className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition"
+                    aria-label="Foto ansehen"
+                  >
+                    <Eye className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" />
+                  </button>
                 </div>
                 <div className="p-4">
-                  <p className="text-sm mb-1 truncate" style={{ color: '#9DB2BF' }}>{upload.prompt.text}</p>
+                  <p className="text-xs text-stone-500 mb-1 truncate">
+                    {upload.prompt.text}
+                  </p>
                   {upload.caption && (
-                    <p className="text-sm mb-2 line-clamp-2" style={{ color: '#DDE6ED' }}>{upload.caption}</p>
+                    <p className="text-sm text-stone-800 line-clamp-2 mb-2">
+                      {upload.caption}
+                    </p>
                   )}
-                  <div className="flex justify-between items-center text-xs" style={{ color: '#9DB2BF' }}>
+                  <div className="flex items-center justify-between text-xs text-stone-500">
                     <span>{upload.uploaderName || 'Anonym'}</span>
                     <span>{formatDate(upload.createdAt)}</span>
                   </div>
@@ -325,32 +401,39 @@ export default function GalleryPage() {
             {filteredUploads.map((upload) => (
               <div
                 key={upload.id}
-                className="rounded-lg shadow hover:shadow-md transition-shadow p-4 flex items-center space-x-6"
-                style={{ backgroundColor: '#526D82' }}
+                className="rounded-2xl border border-stone-200 bg-white/80 backdrop-blur p-4 shadow-sm hover:shadow-md transition flex items-center gap-5"
               >
-                <div className="w-24 h-24 rounded-md overflow-hidden relative flex-shrink-0" style={{ backgroundColor: '#27374D' }}>
+                <button
+                  className="relative w-28 h-28 overflow-hidden rounded-xl ring-1 ring-stone-200"
+                  onClick={() => setSelectedImage(upload)}
+                  aria-label="Foto ansehen"
+                >
                   <img
                     src={upload.r2Url}
                     alt={upload.caption || 'Event photo'}
-                    className="w-full h-full object-cover cursor-pointer"
+                    className="w-full h-full object-cover"
                     loading="lazy"
-                    onClick={() => setSelectedImage(upload)}
                   />
-                </div>
+                </button>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm truncate mb-1" style={{ color: '#9DB2BF' }}>{upload.prompt.text}</p>
+                  <p className="text-xs text-stone-500 mb-1 truncate">
+                    {upload.prompt.text}
+                  </p>
                   {upload.caption && (
-                    <p className="mb-2 truncate" style={{ color: '#DDE6ED' }}>{upload.caption}</p>
+                    <p className="text-stone-800 mb-2 truncate">
+                      {upload.caption}
+                    </p>
                   )}
-                  <div className="flex justify-between items-center text-sm" style={{ color: '#9DB2BF' }}>
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
                     <span>Von {upload.uploaderName || 'Anonym'}</span>
+                    <span className="opacity-50">•</span>
                     <span>{formatDate(upload.createdAt)}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => downloadImage(upload)}
-                  className="p-2 rounded-md hover:bg-white/10 transition-colors"
-                  style={{ color: '#DDE6ED' }}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                  aria-label="Herunterladen"
                 >
                   <Download className="w-5 h-5" />
                 </button>
@@ -363,45 +446,45 @@ export default function GalleryPage() {
       {/* Image Modal */}
       {selectedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
           onClick={() => setSelectedImage(null)}
         >
           <div
-            className="max-w-4xl w-full rounded-lg overflow-hidden"
-            style={{ backgroundColor: '#526D82' }}
+            className="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white/90 backdrop-blur ring-1 ring-white/60"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative" style={{ backgroundColor: '#27374D' }}>
+            <div className="relative bg-stone-900">
               <img
                 src={selectedImage.r2Url}
                 alt={selectedImage.caption || 'Event photo'}
-                className="w-full h-auto max-h-[80vh] object-contain"
+                className="w-full h-auto max-h-[75vh] object-contain bg-black/5"
               />
               <button
                 onClick={() => setSelectedImage(null)}
-                className="absolute top-4 right-4 p-2 rounded-full transition-colors"
-                style={{ backgroundColor: 'rgba(39, 55, 77, 0.7)', color: '#DDE6ED' }}
+                className="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 hover:bg-white transition shadow"
+                aria-label="Schließen"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-stone-700" />
               </button>
             </div>
-            <div className="p-6">
-              <p className="text-sm mb-2" style={{ color: '#9DB2BF' }}>{selectedImage.prompt.text}</p>
+            <div className="px-5 md:px-8 py-5">
+              <p className="text-xs text-stone-500 mb-1">
+                {selectedImage.prompt.text}
+              </p>
               {selectedImage.caption && (
-                <p className="mb-4" style={{ color: '#DDE6ED' }}>{selectedImage.caption}</p>
+                <p className="text-stone-800 mb-3">{selectedImage.caption}</p>
               )}
-              <div className="flex justify-between items-center">
-                <div className="text-sm" style={{ color: '#9DB2BF' }}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="text-sm text-stone-600">
                   <span>Von {selectedImage.uploaderName || 'Anonym'}</span>
-                  <span className="mx-2">•</span>
+                  <span className="mx-2 opacity-50">•</span>
                   <span>{formatDate(selectedImage.createdAt)}</span>
                 </div>
                 <button
                   onClick={() => downloadImage(selectedImage)}
-                  className="inline-flex items-center px-4 py-2 border rounded-md text-sm font-medium hover:opacity-90 transition-all"
-                  style={{ backgroundColor: '#27374D', borderColor: '#9DB2BF', color: '#DDE6ED' }}
+                  className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4" />
                   Herunterladen
                 </button>
               </div>
@@ -409,6 +492,13 @@ export default function GalleryPage() {
           </div>
         </div>
       )}
+
+      {/* Footer */}
+      <div className="mt-10 pb-10 text-center">
+        <p className="text-xs text-stone-500">
+          Mit Liebe gemacht • Powered by Wedding Moments
+        </p>
+      </div>
     </div>
   )
 }

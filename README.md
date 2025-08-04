@@ -1,52 +1,56 @@
-# Project Overview: Event Photo-Prompt Service
+# Project Overview: Wedding Moments - Hochzeits-Foto-Aufgaben Service
 
 ## 1. Vision  
-Build a lightweight web platform that turns event photography into an interactive game—encouraging guests to mingle, capture candid moments, and help organizers collect memorable photos effortlessly.
+Build a beautiful, romantic web platform specifically for weddings that transforms wedding photography into an interactive experience—encouraging guests to capture heartfelt moments, connect with each other, and help couples collect unforgettable memories effortlessly.
 
 ## 2. Problem Statement  
-• Guests at weddings, parties or conferences often stick to familiar faces or default to individual selfies.  
-• Organizers struggle to spark spontaneous interactions and end up with scattered, unorganized photo collections.
+• Wedding guests often stick to familiar faces or take generic photos, missing opportunities to capture unique perspectives.  
+• Couples struggle to collect all the special moments from their wedding day and end up with scattered photo collections from different guests.  
+• Traditional wedding photography focuses on formal shots, missing candid interactions and guest perspectives.
 
 ## 3. Proposed Solution  
-• Generate stable, human-readable URLs (printed as QR codes) for each event.  
-• Present guests with fun, predefined photo “prompts” (e.g. “Take a picture with someone in your favorite color”).  
-• Allow instant mobile uploads against each prompt.  
-• Provide hosts a unified gallery to review, share and download all photos.
+• Generate elegant, shareable URLs (printed as QR codes) for wedding photo challenges.  
+• Present guests with romantic, wedding-specific photo prompts (e.g. "Capture the couple's first dance" or "Photo with someone you just met").  
+• Allow instant mobile uploads with personal captions and guest names.  
+• Provide couples with a beautiful, unified gallery to cherish and share all their wedding memories.
 
 ## 4. Unique Value  
-• Ice-breaker mechanics: nudges guests to approach new people.  
-• Seamless, mobile-first flow—no app install required.  
-• Customizable prompts tailored to any occasion.  
-• One central gallery: no more chasing down scattered image files.
+• **Romance-focused**: Every interaction is designed for the wedding experience with elegant, loving language.  
+• **Guest engagement**: Transforms shy guests into active participants in the couple's love story.  
+• **Seamless experience**: Mobile-first flow with no app installation—perfect for all wedding guests.  
+• **Curated memories**: Pre-designed wedding-specific prompts capture moments professional photographers might miss.  
+• **Unified love album**: One beautiful gallery containing every guest's perspective of the special day.
 
 ## 5. Key Features (High Level)  
-- Event setup: choose a short URL slug and select or edit a set of prompts.  
-- QR-code generation: print-ready codes for table cards or wristbands.  
-- Prompt delivery: guests scan → see one prompt at a time → upload photo + optional caption.  
-- Photo management: hosts view collected images in a single, shareable gallery.  
-- Privacy options: anonymous vs. named uploads; public vs. invite-only galleries.
+- **Wedding setup**: Create romantic photo challenges with wedding-specific prompts.  
+- **Elegant QR codes**: Print-ready codes for table cards, wedding programs, or signage.  
+- **Romantic prompts**: Guests scan → see heartfelt photo challenges → upload with love.  
+- **Beautiful gallery**: Couples view all wedding photos in an elegant, shareable album.  
+- **Personal touches**: Guest names, captions, and romantic messaging throughout.
 
 ## 6. User Roles & Flows  
-1. Organizer  
-   - Create event link  
-   - Customize prompt list  
-   - Distribute QR codes  
-   - Review and share final photo gallery  
-2. Guest  
-   - Scan QR code  
-   - Read prompt, snap/upload photo  
-   - Optionally add name/caption and move to next prompt  
+1. **Couple (Wedding Hosts)**  
+   - Create wedding photo challenge  
+   - Customize romantic prompt list  
+   - Distribute QR codes to guests  
+   - Enjoy beautiful gallery of all wedding memories  
+2. **Wedding Guest**  
+   - Scan QR code at reception  
+   - Read romantic photo prompt  
+   - Capture moment, upload with optional caption and name  
+   - Become part of the couple's love story  
 
 ## 7. Success Metrics  
-- Number of events created  
-- Guest participation rate (% of scans resulting in uploads)  
-- Average photos per guest  
-- Host satisfaction and reuse rate  
+- Number of weddings using the service  
+- Guest participation rate (% of guests who upload photos)  
+- Average photos per wedding  
+- Couple satisfaction and referral rate  
+- Repeat usage for anniversaries/related celebrations
 
 ## 8. High-Level Phases  
-1. **MVP** – core flows: event creation, QR code, prompt display, photo upload, simple gallery  
-2. **Enhancements** – moderation queue, analytics dashboard, bulk exports  
-3. **Polish & Growth** – gamification (badges, leaderboards), branding options, multi-language support  
+1. **MVP** – core wedding flows: photo challenge creation, QR codes, romantic prompts, uploads, elegant gallery  
+2. **Wedding Enhancements** – anniversary reminders, guest book integration, professional photographer collaboration  
+3. **Love & Growth** – wedding vendor partnerships, anniversary celebrations, family event expansion  
 
 
 # 📋 Project TODOs: Event Photo-Prompt Service
@@ -99,8 +103,6 @@ Note see "Tech stack spec.md" for more details
 - magic link email is not sent in deployed state (maybe we need more logs to debug this)
    - I created an api key, put it into the env vars on vercel
 - newly created events are not visible in the dashboard (I see in the db that these events were created and are correctly associated with the email)
-- prompts die wärend der event creation angegeben werden, werden nicht in der db gespeichert, keine der prompts, auch nicht die default prompts. Wie sind diese überhaupt gespeichert?
-
 
 ## 3. Post-MVP Features & Polishing
 - [ ] Moderation & approval queue  

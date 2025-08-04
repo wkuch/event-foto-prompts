@@ -205,7 +205,7 @@ export default function EventManagePage() {
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-gray-600">
-                  Event-Verwaltung und Statistiken
+                  Hochzeits-Verwaltung und Statistiken
                 </p>
               </div>
             </div>
@@ -219,10 +219,10 @@ export default function EventManagePage() {
               </Link>
               <Link
                 href={`/event/${event.slug}`}
-                className="inline-flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                className="inline-flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-rose-600 hover:bg-rose-700"
               >
                 <Eye className="w-4 h-4 mr-2" />
-                Event anzeigen
+                Hochzeit anzeigen
               </Link>
             </div>
           </div>
@@ -276,10 +276,14 @@ export default function EventManagePage() {
               <div className="ml-5 w-0 flex-1">
                 <dl>
                   <dt className="text-sm font-medium text-gray-500 truncate">
-                    Event-Art
+                    Feier-Art
                   </dt>
                   <dd className="text-lg font-medium text-gray-900 capitalize">
-                    {event.type}
+                    {event.type === 'wedding' ? 'Traumhochzeit' : 
+                     event.type === 'engagement' ? 'Verlobung' :
+                     event.type === 'anniversary' ? 'Hochzeitstag' :
+                     event.type === 'rehearsal' ? 'Polterabend' :
+                     'Andere Feier'}
                   </dd>
                 </dl>
               </div>
@@ -291,12 +295,12 @@ export default function EventManagePage() {
           {/* Event Settings */}
           <div className="bg-white rounded-lg shadow">
             <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Event-Einstellungen</h2>
+              <h2 className="text-lg font-medium text-gray-900">Hochzeits-Einstellungen</h2>
             </div>
             <div className="p-6 space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Event-URL
+                  Hochzeits-URL
                 </label>
                 <div className="flex rounded-md shadow-sm">
                   <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
@@ -324,9 +328,9 @@ export default function EventManagePage() {
 
               <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Event-Status</h3>
+                  <h3 className="text-sm font-medium text-gray-900">Hochzeits-Status</h3>
                   <p className="text-sm text-gray-500">
-                    {event.isActive ? 'Gäste können Fotos hochladen' : 'Event ist für neue Uploads geschlossen'}
+                    {event.isActive ? 'Gäste können Fotos hochladen' : 'Hochzeit ist für neue Uploads geschlossen'}
                   </p>
                 </div>
                 <button
@@ -354,7 +358,7 @@ export default function EventManagePage() {
                 <QrCode className="w-16 h-16 text-gray-400" />
               </div>
               <p className="text-sm text-gray-600 mb-4">
-                Teile diesen QR-Code mit Gästen, damit sie an deiner Foto-Challenge teilnehmen können.
+                Teilt diesen QR-Code mit euren Gästen, damit sie an eurer Hochzeits-Foto-Challenge teilnehmen können.
               </p>
               <div className="space-y-2">
                 <Link
@@ -377,7 +381,7 @@ export default function EventManagePage() {
         {/* Prompts Management */}
         <div className="mt-8 bg-white rounded-lg shadow">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Foto-Aufgaben</h2>
+            <h2 className="text-lg font-medium text-gray-900">Hochzeits-Fotomomente</h2>
           </div>
           <div className="p-6">
             <div className="space-y-4">

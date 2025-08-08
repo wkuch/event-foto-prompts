@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db'
 import archiver from 'archiver'
 import pLimit from 'p-limit'
 import { Readable } from 'stream'
+import { ReadableStream as NodeReadableStream } from 'stream/web'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -144,7 +145,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
               return
             }
             // Convert web stream body to Node stream for archiver
-            const nodeStream = Readable.fromWeb(resp.body as unknown as ReadableStream)
+            const nodeStream = Readable.fromWeb(resp.body as unknown as NodeReadableStream)
 
             // Wait until the source stream finishes to respect concurrency/backpressure
             await new Promise<void>((resolve, reject) => {

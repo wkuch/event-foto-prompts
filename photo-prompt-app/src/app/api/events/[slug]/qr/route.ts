@@ -91,7 +91,10 @@ export async function GET(
         type: 'png'
       })
 
-      return new NextResponse(pngBuffer, {
+      // Use Uint8Array (ArrayBufferView) which is a valid BodyInit
+      const uint8 = new Uint8Array(pngBuffer)
+
+      return new NextResponse(uint8, {
         headers: {
           'Content-Type': 'image/png',
           'Cache-Control': 'public, max-age=3600', // Cache for 1 hour

@@ -145,10 +145,10 @@ export default function EventManagePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Event wird geladen...</p>
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
+        <div className="glass-card text-center">
+          <div className="w-8 h-8 border-4 border-stone-900 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+          <p className="text-stone-700">Event wird geladen …</p>
         </div>
       </div>
     )
@@ -156,17 +156,15 @@ export default function EventManagePage() {
 
   if (error || !event) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <X className="w-8 h-8 text-red-600" />
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full glass-card text-center">
+          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <X className="w-8 h-8 text-rose-600" />
           </div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            {error || 'Event not found'}
-          </h2>
+          <h2 className="text-xl font-serif font-semibold text-stone-900 mb-2">{error || 'Event nicht gefunden'}</h2>
           <Link
             href="/dashboard"
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center justify-center rounded-xl px-4 py-2.5 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
           >
             Zurück zum Dashboard
           </Link>
@@ -179,48 +177,29 @@ export default function EventManagePage() {
   const recentUploads = event.uploads
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <div className="bg-white shadow">
+      <div className="sticky top-0 z-10 backdrop-blur-xl bg-white/70 border-b border-stone-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
+          <div className="py-5">
             <div className="flex items-center mb-4">
-              <Link
-                href="/dashboard"
-                className="mr-4 p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-              >
+              <Link href="/dashboard" className="mr-3 p-2 rounded-md text-stone-500 hover:text-stone-800 hover:bg-white/70 ring-1 ring-transparent hover:ring-stone-200">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex-1 min-w-0">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-3">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">
-                    {event.name}
-                  </h1>
-                  <span className={`mt-1 sm:mt-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium w-fit ${
-                    event.isActive 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
-                    {event.isActive ? 'Aktiv' : 'Inaktiv'}
-                  </span>
+                  <h1 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900 truncate">{event.name}</h1>
+                  <span className={`mt-1 sm:mt-0 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium w-fit ${event.isActive ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200' : 'bg-stone-100 text-stone-700'}`}>{event.isActive ? 'Aktiv' : 'Inaktiv'}</span>
                 </div>
-                <p className="mt-1 text-sm text-gray-600">
-                  Hochzeits-Verwaltung und Statistiken
-                </p>
+                <p className="mt-1 text-sm text-stone-700">Verwaltung und Übersicht eures Hochzeits‑Events</p>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
-              <Link
-                href={`/gallery/${event.id}`}
-                className="inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Link href={`/gallery/${event.id}`} className="inline-flex items-center justify-center rounded-xl px-3 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white">
                 <Image className="w-4 h-4 mr-2" />
                 Galerie
               </Link>
-              <Link
-                href={`/event/${event.slug}`}
-                className="inline-flex items-center justify-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-rose-600 hover:bg-rose-700"
-              >
+              <Link href={`/event/${event.slug}`} className="inline-flex items-center justify-center rounded-xl px-3 py-2 bg-stone-900 text-white hover:bg-stone-800">
                 <Eye className="w-4 h-4 mr-2" />
                 Hochzeit anzeigen
               </Link>
@@ -232,60 +211,38 @@ export default function EventManagePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Image className="h-8 w-8 text-blue-600" />
+          <div className="glass-card">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center">
+                <Image className="h-5 w-5 text-stone-800" />
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Fotos insgesamt
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {totalUploads}
-                  </dd>
-                </dl>
+              <div>
+                <p className="text-xs text-stone-600">Fotos insgesamt</p>
+                <p className="text-lg font-semibold text-stone-900">{totalUploads}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Settings className="h-8 w-8 text-green-600" />
+          <div className="glass-card">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center">
+                <Settings className="h-5 w-5 text-stone-800" />
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Aufgaben insgesamt
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900">
-                    {event.prompts.length}
-                  </dd>
-                </dl>
+              <div>
+                <p className="text-xs text-stone-600">Aufgaben insgesamt</p>
+                <p className="text-lg font-semibold text-stone-900">{event.prompts.length}</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <Users className="h-8 w-8 text-purple-600" />
+          <div className="glass-card">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center">
+                <Users className="h-5 w-5 text-stone-800" />
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-500 truncate">
-                    Feier-Art
-                  </dt>
-                  <dd className="text-lg font-medium text-gray-900 capitalize">
-                    {event.type === 'wedding' ? 'Traumhochzeit' : 
-                     event.type === 'engagement' ? 'Verlobung' :
-                     event.type === 'anniversary' ? 'Hochzeitstag' :
-                     event.type === 'rehearsal' ? 'Polterabend' :
-                     'Andere Feier'}
-                  </dd>
-                </dl>
+              <div>
+                <p className="text-xs text-stone-600">Feier‑Art</p>
+                <p className="text-lg font-semibold text-stone-900 capitalize">{event.type === 'wedding' ? 'Hochzeit' : event.type === 'engagement' ? 'Verlobung' : event.type === 'anniversary' ? 'Jahrestag' : event.type === 'rehearsal' ? 'Polterabend' : 'Andere Feier'}</p>
               </div>
             </div>
           </div>
@@ -293,158 +250,115 @@ export default function EventManagePage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Event Settings */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">Hochzeits-Einstellungen</h2>
+          <div className="glass-card p-0">
+            <div className="px-6 py-4 border-b border-stone-200/70">
+              <h2 className="text-lg font-semibold text-stone-900">Event‑Einstellungen</h2>
             </div>
             <div className="p-6 space-y-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hochzeits-URL
-                </label>
-                <div className="flex rounded-md shadow-sm">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    /event/
-                  </span>
-                  <input
-                    type="text"
-                    value={event.slug}
-                    readOnly
-                    className="flex-1 block w-full border-gray-300 rounded-none rounded-r-md bg-gray-50 text-gray-500 sm:text-sm"
-                  />
+                <label className="block text-sm font-medium text-stone-800 mb-2">Event‑Link</label>
+                <div className="flex items-center rounded-xl ring-1 ring-stone-200 bg-white/80 overflow-hidden">
+                  <span className="inline-flex items-center px-3 text-stone-600 text-sm">/event/</span>
+                  <input readOnly value={event.slug} className="flex-1 block w-full px-3 py-2 bg-transparent text-stone-700" />
                 </div>
               </div>
 
               {event.description && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Beschreibung
-                  </label>
-                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">
-                    {event.description}
-                  </p>
+                  <label className="block text-sm font-medium text-stone-800 mb-2">Beschreibung</label>
+                  <p className="text-sm text-stone-700 bg-white/70 ring-1 ring-stone-200 p-3 rounded-xl">{event.description}</p>
                 </div>
               )}
 
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-md">
+              <div className="flex items-center justify-between p-4 bg-white/70 ring-1 ring-stone-200 rounded-xl">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-900">Hochzeits-Status</h3>
-                  <p className="text-sm text-gray-500">
-                    {event.isActive ? 'Gäste können Fotos hochladen' : 'Hochzeit ist für neue Uploads geschlossen'}
-                  </p>
+                  <h3 className="text-sm font-medium text-stone-900">Status</h3>
+                  <p className="text-sm text-stone-600">{event.isActive ? 'Gäste können Fotos hochladen' : 'Für neue Uploads geschlossen'}</p>
                 </div>
                 <button
-                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                    event.isActive ? 'bg-blue-600' : 'bg-gray-200'
-                  }`}
+                  onClick={async () => {
+                    try {
+                      const res = await fetch(`/api/events/${slug}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ isActive: !event.isActive })
+                      })
+                      if (!res.ok) throw new Error('Update fehlgeschlagen')
+                      const data = await res.json()
+                      setEvent(prev => prev ? { ...prev, isActive: data.event.isActive } : prev)
+                    } catch (e) {
+                      setError('Status konnte nicht aktualisiert werden')
+                    }
+                  }}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${event.isActive ? 'bg-stone-900' : 'bg-stone-300'}`}
+                  aria-pressed={event.isActive}
+                  aria-label="Event-Status umschalten"
                 >
-                  <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      event.isActive ? 'translate-x-5' : 'translate-x-0'
-                    }`}
-                  />
+                  <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${event.isActive ? 'translate-x-5' : 'translate-x-0'}`} />
                 </button>
               </div>
             </div>
           </div>
 
           {/* QR Code */}
-          <div className="bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-medium text-gray-900">QR-Code</h2>
+          <div className="glass-card p-0 text-center">
+            <div className="px-6 py-4 border-b border-stone-200/70 text-left">
+              <h2 className="text-lg font-semibold text-stone-900">QR‑Code</h2>
             </div>
-            <div className="p-6 text-center">
-              <div className="inline-flex items-center justify-center w-32 h-32 bg-gray-100 rounded-lg mb-4">
-                <QrCode className="w-16 h-16 text-gray-400" />
+            <div className="p-6">
+              <div className="inline-flex items-center justify-center w-32 h-32 bg-white/70 ring-1 ring-stone-200 rounded-2xl mb-4">
+                <QrCode className="w-16 h-16 text-stone-600" />
               </div>
-              <p className="text-sm text-gray-600 mb-4">
-                Teilt diesen QR-Code mit euren Gästen, damit sie an eurer Hochzeits-Foto-Challenge teilnehmen können.
-              </p>
-              <div className="space-y-2">
-                <Link
-                  href={`/api/events/${event.slug}/qr?format=png&download=true`}
-                  className="block w-full px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                >
-                  PNG herunterladen
-                </Link>
-                <Link
-                  href={`/api/events/${event.slug}/qr?format=svg&download=true`}
-                  className="block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-                >
-                  SVG herunterladen
-                </Link>
+              <p className="text-sm text-stone-700 mb-4">Teilt diesen QR‑Code mit euren Gästen, um Foto‑Aufgaben und Uploads zu starten.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Link href={`/api/events/${event.slug}/qr?format=png&download=true`} className="rounded-xl px-4 py-2 bg-stone-900 text-white hover:bg-stone-800">PNG herunterladen</Link>
+                <Link href={`/api/events/${event.slug}/qr?format=svg&download=true`} className="rounded-xl px-4 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white">SVG herunterladen</Link>
               </div>
             </div>
           </div>
         </div>
 
         {/* Prompts Management */}
-        <div className="mt-8 bg-white rounded-lg shadow">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-medium text-gray-900">Hochzeits-Fotomomente</h2>
+        <div className="mt-8 glass-card p-0">
+          <div className="px-6 py-4 border-b border-stone-200/70">
+            <h2 className="text-lg font-semibold text-stone-900">Foto‑Aufgaben</h2>
           </div>
           <div className="p-6">
-            <div className="space-y-4">
+            <div className="space-y-3">
               {event.prompts.map((prompt, index) => (
-                <div key={prompt.id} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                  <span className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                    {index + 1}
-                  </span>
+                <div key={prompt.id} className="flex items-center gap-3 p-3 rounded-xl ring-1 ring-stone-200 bg-white/80">
+                  <span className="flex-shrink-0 w-7 h-7 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xs font-semibold">{index + 1}</span>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{prompt.text}</p>
-                    <p className="text-xs text-gray-500">
-                      {prompt._count.uploads} Fotos hochgeladen
-                      {prompt.maxUploads && ` • Max: ${prompt.maxUploads}`}
-                    </p>
+                    <p className="text-sm font-medium text-stone-900">{prompt.text}</p>
+                    <p className="text-xs text-stone-600">{prompt._count.uploads} Fotos hochgeladen{prompt.maxUploads && ` • Max: ${prompt.maxUploads}`}</p>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <button 
-                      onClick={() => deletePrompt(prompt.id)}
-                      className="text-gray-400 hover:text-red-600"
-                      title="Aufgabe löschen"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+                  <button onClick={() => deletePrompt(prompt.id)} className="p-1 text-stone-500 hover:text-rose-600" title="Aufgabe löschen">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               ))}
-              
-              {/* Always visible inline Add Prompt Form */}
-              <div className="flex items-center space-x-4 p-4 bg-blue-50 rounded-lg border-2 border-blue-200">
-                <span className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
-                  {event.prompts.length + 1}
-                </span>
+
+              {/* Inline Add Prompt */}
+              <div className="flex items-center gap-3 p-3 ring-1 ring-rose-200 bg-rose-50 rounded-xl">
+                <span className="flex-shrink-0 w-7 h-7 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xs font-semibold">{event.prompts.length + 1}</span>
                 <div className="flex-1">
                   <textarea
                     value={newPromptText}
                     onChange={(e) => setNewPromptText(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
-                    placeholder="z.B. Mache ein Foto mit jemandem in Blau"
+                    className="w-full px-3 py-2.5 leading-6 ring-1 ring-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-300 bg-white/80 resize-none text-sm"
+                    placeholder="Zum Beispiel: Ein Foto mit jemandem, den ihr heute kennengelernt habt"
                     rows={2}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault()
-                        addPrompt()
+                        e.preventDefault();
+                        addPrompt();
                       }
                     }}
                   />
                 </div>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={addPrompt}
-                    disabled={!newPromptText.trim() || isAddingPrompt}
-                    className="px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isAddingPrompt ? 'Wird hinzugefügt...' : 'Hinzufügen'}
-                  </button>
-                  {newPromptText.trim() && (
-                    <button
-                      onClick={() => setNewPromptText('')}
-                      className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
-                    >
-                      Löschen
-                    </button>
-                  )}
+                <div className="flex items-center gap-2">
+                  <button onClick={addPrompt} disabled={!newPromptText.trim() || isAddingPrompt} className="rounded-xl px-3 py-2 bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed">{isAddingPrompt ? 'Wird hinzugefügt …' : 'Hinzufügen'}</button>
+                  {newPromptText.trim() && <button onClick={() => setNewPromptText('')} className="rounded-xl px-3 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white">Löschen</button>}
                 </div>
               </div>
             </div>
@@ -453,26 +367,19 @@ export default function EventManagePage() {
 
         {/* Recent Uploads */}
         {recentUploads.length > 0 && (
-          <div className="mt-8 bg-white rounded-lg shadow">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 className="text-lg font-medium text-gray-900">Neueste Uploads</h2>
-              <Link
-                href={`/gallery/${event.id}`}
-                className="text-sm text-blue-600 hover:text-blue-500"
-              >
-                Alle anzeigen →
-              </Link>
+          <div className="mt-8 glass-card p-0">
+            <div className="px-6 py-4 border-b border-stone-200/70 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-stone-900">Neueste Uploads</h2>
+              <Link href={`/gallery/${event.id}`} className="text-sm text-rose-700 hover:text-rose-600">Alle anzeigen →</Link>
             </div>
             <div className="p-6">
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                 {recentUploads.map((upload) => (
                   <div key={upload.id} className="relative">
-                    <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden relative">
-                      {/* Loading placeholder */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                        <div className="w-6 h-6 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+                    <div className="aspect-square bg-white/70 ring-1 ring-stone-200 rounded-2xl overflow-hidden relative">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-6 h-6 border-2 border-stone-300 border-t-stone-900 rounded-full animate-spin"></div>
                       </div>
-                      
                       <img
                         src={upload.r2Url}
                         alt={upload.caption || 'Upload'}
@@ -481,7 +388,6 @@ export default function EventManagePage() {
                         onLoad={(e) => {
                           const target = e.target as HTMLImageElement
                           target.style.opacity = '1'
-                          // Hide loading spinner
                           const parent = target.parentElement
                           const spinner = parent?.querySelector('.animate-spin')?.parentElement
                           if (spinner) {
@@ -493,21 +399,15 @@ export default function EventManagePage() {
                           target.style.display = 'none'
                           const parent = target.parentElement
                           if (parent) {
-                            parent.innerHTML = '<div class="w-full h-full flex items-center justify-center bg-gray-200"><span class="text-gray-500 text-xs">Kein Bild</span></div>'
+                            parent.innerHTML = '<div class=\"w-full h-full flex items-center justify-center bg-stone-100\"><span class=\"text-stone-500 text-xs\">Kein Bild</span></div>'
                           }
                         }}
                         style={{ opacity: 0, transition: 'opacity 0.3s ease-in-out' }}
                       />
                     </div>
                     <div className="mt-2">
-                      <p className="text-xs text-gray-600 truncate">
-                        {upload.prompt?.text}
-                      </p>
-                      {upload.uploaderName && (
-                        <p className="text-xs text-gray-500 truncate">
-                          von {upload.uploaderName}
-                        </p>
-                      )}
+                      <p className="text-xs text-stone-700 truncate">{upload.prompt?.text}</p>
+                      {upload.uploaderName && <p className="text-xs text-stone-500 truncate">von {upload.uploaderName}</p>}
                     </div>
                   </div>
                 ))}

@@ -32,24 +32,21 @@ export default async function DashboardPage() {
   const events = await getEvents(session.user.id)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
+    <div className="min-h-screen bg-stone-50">
+      {/* Header */}
+      <div className="sticky top-0 z-10 backdrop-blur-xl bg-white/70 border-b border-stone-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
+          <div className="flex justify-between items-center py-5">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Eure Hochzeits-Dashboard
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Verwaltet eure Hochzeits-Fotomomente
-              </p>
+              <h1 className="font-serif text-3xl font-bold tracking-tight text-stone-900">Euer Dashboard</h1>
+              <p className="mt-1 text-sm text-stone-700">Verwaltet eure Foto‑Aufgaben und Galerie</p>
             </div>
             <Link
               href="/dashboard/create"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+              className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
             >
-              <Plus className="w-4 h-4 mr-2" />
-Foto-Aufgaben erstellen
+              <Plus className="w-4 h-4" />
+              Foto‑Aufgaben erstellen
             </Link>
           </div>
         </div>
@@ -57,77 +54,68 @@ Foto-Aufgaben erstellen
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {events.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="w-24 h-24 mx-auto mb-4 bg-rose-100 rounded-full flex items-center justify-center">
-              <Plus className="w-12 h-12 text-rose-600" />
+          <div className="max-w-2xl mx-auto text-center">
+            <div className="glass-card">
+              <div className="w-16 h-16 mx-auto mb-4 bg-rose-100 rounded-full flex items-center justify-center">
+                <Plus className="w-7 h-7 text-rose-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-stone-900">Noch keine Foto‑Aufgaben</h3>
+              <p className="text-stone-700 mt-2">Startet eure erste Sammlung und macht eure Hochzeit interaktiv.</p>
+              <div className="mt-6">
+                <Link
+                  href="/dashboard/create"
+                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                >
+                  <Plus className="w-4 h-4" />
+                  Hochzeits‑Event erstellen
+                </Link>
+              </div>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">
-              Noch keine Foto-Aufgaben erstellt
-            </h3>
-            <p className="text-gray-600 mb-6">
-              Erstellt eure ersten Hochzeits-Foto-Aufgaben und sammelt unvergessliche Momente mit euren Gästen
-            </p>
-            <Link
-              href="/dashboard/create"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-Hochzeits-Foto-Aufgaben erstellen
-            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {events.map((event) => (
-              <div
-                key={event.id}
-                className="bg-white rounded-lg shadow hover:shadow-md transition-shadow border border-gray-200"
-              >
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <h3 className="text-lg font-medium text-gray-900 truncate">
-                        {event.name}
-                      </h3>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        event.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {event.isActive ? 'Aktiv' : 'Inaktiv'}
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {event.description && (
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                      {event.description}
-                    </p>
-                  )}
+              <div key={event.id} className="glass-card">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-stone-900 truncate">{event.name}</h3>
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      event.isActive
+                        ? 'bg-rose-50 text-rose-700 ring-1 ring-rose-200'
+                        : 'bg-stone-100 text-stone-700'
+                    }`}
+                  >
+                    {event.isActive ? 'Aktiv' : 'Inaktiv'}
+                  </span>
+                </div>
 
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <span>Slug: {event.slug}</span>
-                    <span className="capitalize">{event.type}</span>
-                  </div>
+                {event.description && (
+                  <p className="text-sm text-stone-700 mb-4 line-clamp-2">{event.description}</p>
+                )}
 
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-6">
-                    <span>{event._count.prompts} Aufgaben</span>
-                    <span>{event._count.uploads} Fotos</span>
-                  </div>
+                <div className="flex items-center justify-between text-sm text-stone-600 mb-3">
+                  <span>Link: /event/{event.slug}</span>
+                  <span className="capitalize">{event.type}</span>
+                </div>
 
-                  <div className="grid gap-2 grid-cols-1 sm:grid-cols-2 sm:gap-3">
-                    <Link
-                      href={`/dashboard/events/${event.slug}`}
-                      className="text-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
-                    >
-                      Verwalten
-                    </Link>
-                    <Link
-                      href={`/event/${event.slug}`}
-                      className="text-center px-3 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
-                    >
-                      Hochzeit anzeigen
-                    </Link>
-                  </div>
+                <div className="flex items-center justify-between text-sm text-stone-600 mb-5">
+                  <span>{event._count.prompts} Aufgaben</span>
+                  <span>{event._count.uploads} Fotos</span>
+                </div>
+
+                <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
+                  <Link
+                    href={`/dashboard/events/${event.slug}`}
+                    className="text-center px-3 py-2 rounded-xl ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  >
+                    Verwalten
+                  </Link>
+                  <Link
+                    href={`/event/${event.slug}`}
+                    className="text-center px-3 py-2 rounded-xl bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  >
+                    Hochzeit anzeigen
+                  </Link>
                 </div>
               </div>
             ))}

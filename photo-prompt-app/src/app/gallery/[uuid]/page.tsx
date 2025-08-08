@@ -48,6 +48,8 @@ export default function GalleryPage() {
   const [selectedPromptId, setSelectedPromptId] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [isLoading, setIsLoading] = useState(true)
+  const [isDownloadingAll, setIsDownloadingAll] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
   const [error, setError] = useState('')
   const [selectedImage, setSelectedImage] = useState<Upload | null>(null)
 
@@ -120,6 +122,13 @@ export default function GalleryPage() {
     }
   }
 
+  useEffect(() => {
+    const updateIsMobile = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640)
+    updateIsMobile()
+    window.addEventListener('resize', updateIsMobile)
+    return () => window.removeEventListener('resize', updateIsMobile)
+  }, [])
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('de-DE', {
       day: '2-digit',
@@ -153,6 +162,21 @@ export default function GalleryPage() {
         window.open(upload.r2Url, '_blank')
       }
     }
+  }
+
+  const handleDownloadAll = () => {
+    if (filteredUploads.length === 0) return
+    // Optional warn for very large sets
+    if (filteredUploads.length > 500) {
+      const proceed = confirm('Große Datei – Download kann länger dauern. Fortfahren?')
+      if (!proceed) return
+    }
+    setIsDownloadingAll(true)
+    const url = `/api/galleries/${uuid}/download-all${selectedPromptId !== 'all' ? `?promptId=${selectedPromptId}` : ''}`
+    // Use location change so browser shows download dialog
+    window.location.href = url
+    // Re-enable after a short time window; the stream continues independently
+    setTimeout(() => setIsDownloadingAll(false), 8000)
   }
 
   // Elegant wedding palette and soft glow background
@@ -324,7 +348,34 @@ export default function GalleryPage() {
                     <List className="w-4 h-4" />
                   </button>
                 </div>
+
+                <button
+                  onClick={handleDownloadAll}
+                  disabled={filteredUploads.length === 0 || isDownloadingAll}
+                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 ring-1 transition ${
+                    filteredUploads.length === 0 || isDownloadingAll
+                      ? 'bg-stone-100 text-stone-400 ring-stone-200 cursor-not-allowed'
+                      : 'bg-rose-50 text-rose-700 ring-rose-200 hover:bg-rose-100'
+                  }`}
+                >
+                  {isDownloadingAll ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Wird vorbereitet …
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      Alle herunterladen
+                    </>
+                  )}
+                </button>
               </div>
+              {isMobile && filteredUploads.length > 500 && (
+                <p className="mt-1 text-xs text-stone-500 text-right">
+                  Große Datei – Download kann länger dauern.
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -362,22 +413,44 @@ export default function GalleryPage() {
             {filteredUploads.map((upload) => (
               <div
                 key={upload.id}
-                className="group relative overflow-hidden rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
+                className="group relative rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
               >
-                <div className="aspect-square relative">
+                <div className="aspect-square relative overflow-hidden">
                   <img
                     src={upload.r2Url}
                     alt={upload.caption || 'Event photo'}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="block w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 select-none"
                     loading="lazy"
                   />
-                  <button
+                  {/* Hover overlay */}
+                  <div
                     onClick={() => setSelectedImage(upload)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/30 transition"
-                    aria-label="Foto ansehen"
-                  >
-                    <Eye className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition" />
-                  </button>
+                    className="pointer-events-none absolute inset-0 z-10 bg-black/0 group-hover:bg-black/30 transition"
+                    aria-hidden
+                  />
+                  {/* Action buttons layer */}
+                  <div className="absolute inset-0 z-20">
+                    {/* Top-right preview button */}
+                    <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedImage(upload) }}
+                        aria-label="Bild ansehen"
+                        className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                      >
+                        <Eye className="h-5 w-5 text-stone-900" />
+                      </button>
+                    </div>
+                    {/* Bottom-left download button */}
+                    <div className="absolute left-3 bottom-3 opacity-0 group-hover:opacity-100 transition">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); downloadImage(upload) }}
+                        className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 px-3 py-1 text-xs ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                        Herunterladen
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div className="p-4">
                   <p className="text-xs text-stone-500 mb-1 truncate">
@@ -411,7 +484,7 @@ export default function GalleryPage() {
                   <img
                     src={upload.r2Url}
                     alt={upload.caption || 'Event photo'}
-                    className="w-full h-full object-cover"
+                    className="block w-full h-full object-cover"
                     loading="lazy"
                   />
                 </button>

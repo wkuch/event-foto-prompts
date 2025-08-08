@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playfair_Display } from "next/font/google";
 import { Providers } from "@/components/providers";
 import "./globals.css";
 
@@ -13,9 +13,22 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const playfair = Playfair_Display({
+  variable: "--font-wedding-serif",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Event Photo Prompts",
-  description: "Turn event photography into an interactive game - encouraging guests to mingle and capture memorable moments",
+  title: "Wedding Moments – Romantische Foto‑Aufgaben für eure Hochzeit",
+  description:
+    "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
+  openGraph: {
+    title: "Wedding Moments – Romantische Foto‑Aufgaben für eure Hochzeit",
+    description:
+      "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -24,9 +37,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="de">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
       >
         <Providers>
           {children}

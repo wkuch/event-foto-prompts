@@ -120,3 +120,12 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .glass-card {
+    @apply rounded-3xl ring-1 ring-stone-200 bg-white/70 backdrop-blur-xl shadow-sm p-5;
+  }
+  .font-serif {
+    font-family: var(--font-wedding-serif), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  }
+}

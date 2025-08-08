@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
+
+export const runtime = 'nodejs'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
 import { r2, R2_BUCKET_NAME } from '@/lib/r2'
 
@@ -37,6 +39,11 @@ export async function GET(
     
     const buffer = Buffer.concat(chunks)
     
+    // Optional forced download
+    const { searchParams } = new URL(request.url)
+    const shouldDownload = searchParams.get('download') === '1'
+    const fileName = r2Key.split('/').pop() || 'image.jpg'
+
     // Return image with appropriate headers
     return new NextResponse(buffer, {
       status: 200,
@@ -45,6 +52,7 @@ export async function GET(
         'Content-Length': response.ContentLength?.toString() || buffer.length.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
         'ETag': response.ETag || '',
+        ...(shouldDownload ? { 'Content-Disposition': `attachment; filename="${fileName}"` } : {}),
       }
     })
     

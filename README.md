@@ -53,7 +53,7 @@ Build a beautiful, romantic web platform specifically for weddings that transfor
 3. **Love & Growth** – wedding vendor partnerships, anniversary celebrations, family event expansion  
 
 
-# 📋 Project TODOs: Event Photo-Prompt Service
+# 📋 Project TODOs: Wedding Moments Service
 
 ## 1. Determine Tech Stack
 Goal: Get to a good MVP fast, with a tech stack that is easy to maintain and scale. Choose cheap and well tested options. Choose tools that are well understood by AI so that AI can help us with the development.

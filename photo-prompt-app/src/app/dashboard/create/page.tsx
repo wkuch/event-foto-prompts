@@ -1,16 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Plus, X, Loader2 } from 'lucide-react'
+import { ArrowLeft, Plus, X, Loader2, Heart, Sparkles, Camera } from 'lucide-react'
 
 const EVENT_TYPES = [
-  { value: 'wedding', label: 'Traumhochzeit', description: 'Haltet die schönsten Momente eures großen Tages für die Ewigkeit fest' },
-  { value: 'engagement', label: 'Verlobungsfeier', description: 'Feiert euren Antrag und die Vorfreude auf die Hochzeit' },
-  { value: 'anniversary', label: 'Hochzeitstag', description: 'Lasst eure Liebe weiterstrahlen - Jahr für Jahr' },
-  { value: 'rehearsal', label: 'Polterabend', description: 'Die Generalprobe für den schönsten Tag eures Lebens' },
-  { value: 'general', label: 'Andere Feier', description: 'Jede andere romantische Feier oder besondere Gelegenheit' },
+  { value: 'wedding', label: 'Hochzeit', description: 'Euer großer Tag – romantische Aufgaben für unvergessliche Momente' },
+  { value: 'engagement', label: 'Verlobung', description: 'Feiert den Antrag und die Vorfreude' },
+  { value: 'anniversary', label: 'Jahrestag', description: 'Erinnerungen neu aufleben lassen' },
+  { value: 'rehearsal', label: 'Polterabend', description: 'Locker und fröhlich – die Generalprobe' },
+  { value: 'general', label: 'Andere Feier', description: 'Passend für jede besondere Gelegenheit' },
 ]
 
 const DEFAULT_PROMPTS = {
@@ -69,6 +69,11 @@ export default function CreateEventPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [promptErrors, setPromptErrors] = useState<string[]>([])
+
+  // Derived validation state
+  const slugValid = useMemo(() => /^[a-z0-9-]+$/.test(formData.slug) && formData.slug.length >= 3, [formData.slug])
+  const emailValid = useMemo(() => /.+@.+\..+/.test(formData.email), [formData.email])
+  const nameValid = useMemo(() => formData.name.trim().length >= 3, [formData.name])
 
 
   const generateSlug = (name: string) => {
@@ -194,40 +199,39 @@ export default function CreateEventPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Plus className="w-8 h-8 text-green-600" />
+      <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full glass-card rounded-2xl p-8 text-center">
+          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Heart className="w-8 h-8 text-rose-600" />
           </div>
-          
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Hochzeits-Foto-Aufgaben erfolgreich erstellt! 💕
+
+          <h1 className="text-2xl font-serif font-semibold text-stone-900 mb-3">
+            Foto‑Aufgaben erfolgreich erstellt 💕
           </h1>
-          
-          <p className="text-gray-600 mb-6">
-            Eure Foto-Aufgaben sind bereit! Ihr könnt sie jetzt von diesem Gerät aus verwalten. 
-            Nutzt eure E-Mail, um von anderen Geräten darauf zuzugreifen.
+
+          <p className="text-stone-700 mb-6">
+            Eure Foto‑Aufgaben sind bereit. Ihr könnt sie jetzt verwalten – auf diesem Gerät oder mit eurer E‑Mail auch von anderen Geräten.
           </p>
 
           {promptErrors.length > 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-yellow-800 font-medium mb-2">
-                ⚠️ Einige Foto-Aufgaben konnten nicht erstellt werden:
+            <div className="bg-amber-50 ring-1 ring-amber-200 rounded-xl p-4 mb-6 text-left">
+              <p className="text-sm text-amber-800 font-medium mb-2">
+                Einige Foto‑Aufgaben konnten nicht erstellt werden:
               </p>
-              <ul className="text-xs text-yellow-700 space-y-1">
+              <ul className="text-xs text-amber-800 space-y-1">
                 {promptErrors.map((prompt, index) => (
                   <li key={index}>• {prompt}</li>
                 ))}
               </ul>
-              <p className="text-xs text-yellow-700 mt-2">
-                Du kannst sie später im Event-Dashboard manuell hinzufügen.
+              <p className="text-xs text-amber-800 mt-2">
+                Ihr könnt sie später im Event‑Dashboard manuell hinzufügen.
               </p>
             </div>
           )}
-          
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              <strong>Weiterleitung zu deinem Dashboard...</strong>
+
+          <div className="bg-stone-50 ring-1 ring-stone-200 rounded-xl p-4">
+            <p className="text-sm text-stone-800">
+              <strong>Weiterleitung zum Dashboard …</strong>
             </p>
           </div>
         </div>
@@ -236,65 +240,65 @@ export default function CreateEventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center py-6">
-            <Link
-              href="/"
-              className="mr-4 p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-            >
+    <div className="min-h-screen bg-stone-50">
+      {/* Top bar */}
+      <div className="sticky top-0 z-10 backdrop-blur-xl bg-white/70 border-b border-stone-200/60">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center py-4 gap-3">
+            <Link href="/" className="p-2 rounded-md text-stone-500 hover:text-stone-800 hover:bg-white/70 ring-1 ring-transparent hover:ring-stone-200">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Hochzeits-Foto-Aufgaben erstellen
-              </h1>
-              <p className="mt-1 text-sm text-gray-600">
-                Erstellt unvergessliche Foto-Aufgaben für eure Hochzeitsgäste
-              </p>
+            <div className="flex items-center gap-2 text-rose-600">
+              <Sparkles className="w-5 h-5" />
+              <span className="text-xs font-semibold uppercase tracking-widest">Wedding Moments</span>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-3xl mb-8">
+          <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-stone-900">
+            Foto‑Aufgaben für euer Hochzeits‑Event
+          </h1>
+          <p className="mt-2 text-stone-700">
+            Erstellt euren Link, wählt die Feier und startet mit liebevollen Foto‑Aufgaben.
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-md p-4">
-              <p className="text-sm text-red-600">{error}</p>
+            <div className="ring-1 ring-red-200 bg-red-50 rounded-xl p-4">
+              <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
 
           {/* Basic Info */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-6">
-              Hochzeits-Informationen
-            </h2>
-            
-            <div className="grid grid-cols-1 gap-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Hochzeits-Name *
-                </label>
+          <div className="glass-card rounded-2xl p-6">
+            <h2 className="text-lg font-semibold text-stone-900 mb-6">Eventdetails</h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="md:col-span-2">
+                <label htmlFor="name" className="block text-sm font-medium text-stone-800">Event‑Name *</label>
                 <input
                   type="text"
                   id="name"
                   required
                   value={formData.name}
                   onChange={(e) => handleNameChange(e.target.value)}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                  placeholder="Anna & Ben's Traumhochzeit"
+                  className="mt-1 block w-full rounded-xl border-stone-300 focus:ring-rose-300 focus:border-rose-400 bg-white/80 px-3 py-2.5 leading-6 appearance-none"
+                  placeholder="Anna & Ben – Hochzeit"
                 />
+                {!nameValid && (
+                  <p className="mt-1 text-xs text-red-600">Bitte gebt mindestens 3 Zeichen ein.</p>
+                )}
               </div>
 
-              <div>
-                <label htmlFor="slug" className="block text-sm font-medium text-gray-700">
-                  Hochzeits-Link *
-                </label>
-                <div className="mt-1 flex rounded-md shadow-sm">
-                  <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                    {typeof window !== 'undefined' ? window.location.origin : 'https://your-domain.com'}/event/
+              <div className="md:col-span-2">
+                <label htmlFor="slug" className="block text-sm font-medium text-stone-800">Hochzeits‑Link *</label>
+                <div className="mt-1 flex items-center rounded-xl ring-1 ring-stone-200 bg-white/80">
+                  <span className="inline-flex items-center px-3 text-stone-600 text-sm whitespace-nowrap">
+                    {typeof window !== 'undefined' ? window.location.origin : 'https://eure-domain.de'}/event/
                   </span>
                   <input
                     type="text"
@@ -302,91 +306,112 @@ export default function CreateEventPage() {
                     required
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    className="flex-1 block w-full border-gray-300 rounded-none rounded-r-md focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                    placeholder="anna-ben-traumhochzeit"
+                    className="flex-1 block w-full focus:outline-none px-3 py-2.5 leading-6 bg-transparent appearance-none min-h-[44px]"
+                    placeholder="anna-ben-hochzeit"
+                    aria-invalid={!slugValid}
                   />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">
-                  Dies wird die Web-Adresse für eure Hochzeit. Gäste können sie direkt aufrufen oder über QR-Code scannen.
-                </p>
-                <p className="mt-1 text-xs text-gray-400">
-                  Darf nur Kleinbuchstaben, Zahlen und Bindestriche enthalten
-                </p>
+                <div className="mt-1 flex items-center justify-between">
+                  <p className="text-xs text-stone-600">Gäste rufen den Link direkt auf oder scannen euren QR‑Code.</p>
+                  {!slugValid && (
+                    <p className="text-xs text-red-600">Nur Kleinbuchstaben, Zahlen und Bindestriche, mind. 3 Zeichen.</p>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="type" className="block text-sm font-medium text-gray-700">
-                  Feier-Art
-                </label>
-                <select
-                  id="type"
-                  value={formData.type}
-                  onChange={(e) => handleTypeChange(e.target.value)}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                >
-                  {EVENT_TYPES.map((type) => (
-                    <option key={type.value} value={type.value}>
-                      {type.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="mt-1 text-xs text-gray-500">
-                  {EVENT_TYPES.find(t => t.value === formData.type)?.description}
-                </p>
+              <div className="md:col-span-2">
+                <p className="block text-sm font-medium text-stone-800 mb-2">Feier auswählen</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {EVENT_TYPES.map((type) => {
+                    const isActive = formData.type === type.value
+                    return (
+                      <button
+                        type="button"
+                        key={type.value}
+                        onClick={() => handleTypeChange(type.value)}
+                        className={`text-left rounded-xl ring-1 p-4 transition ${
+                          isActive
+                            ? 'ring-rose-300 bg-rose-50'
+                            : 'ring-stone-200 bg-white/80 hover:bg-white'
+                        }`}
+                        aria-pressed={isActive}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className={`w-9 h-9 rounded-full flex items-center justify-center ${isActive ? 'bg-rose-100' : 'bg-stone-100'}`}>
+                            {type.value === 'wedding' ? (
+                              <Heart className={`w-5 h-5 ${isActive ? 'text-rose-600' : 'text-stone-700'}`} />
+                            ) : type.value === 'engagement' ? (
+                              <Sparkles className={`w-5 h-5 ${isActive ? 'text-rose-600' : 'text-stone-700'}`} />
+                            ) : type.value === 'rehearsal' ? (
+                              <Camera className={`w-5 h-5 ${isActive ? 'text-rose-600' : 'text-stone-700'}`} />
+                            ) : (
+                              <Sparkles className={`w-5 h-5 ${isActive ? 'text-rose-600' : 'text-stone-700'}`} />
+                            )}
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-stone-900">{type.label}</p>
+                            <p className="text-xs text-stone-600">{type.description}</p>
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                  Deine E-Mail-Adresse *
-                </label>
+              <div className="md:col-span-2">
+                <label htmlFor="email" className="block text-sm font-medium text-stone-800">E‑Mail‑Adresse *</label>
                 <input
                   type="email"
                   id="email"
                   required
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                  placeholder="anna@beispiel.com"
+                  className="mt-1 block w-full rounded-xl border-stone-300 focus:ring-rose-300 focus:border-rose-400 bg-white/80 px-3 py-2.5 leading-6 appearance-none"
+                  placeholder="anna@beispiel.de"
+                  aria-invalid={!emailValid}
                 />
-                <p className="mt-1 text-xs text-gray-500">
-                  <strong>Wichtig:</strong> Speichert diese E-Mail! Ihr braucht sie, um von anderen Geräten auf eure Hochzeit zuzugreifen.
-                </p>
+                <div className="mt-1 flex items-center justify-between">
+                  <p className="text-xs text-stone-600">Merkt euch diese E‑Mail‑Adresse – damit könnt ihr später auch von anderen Geräten auf euer Event zugreifen.</p>
+                  {!emailValid && <p className="text-xs text-red-600">Bitte gebt eine gültige E‑Mail ein.</p>}
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                  Beschreibung (Optional)
-                </label>
+              <div className="md:col-span-2">
+                <label htmlFor="description" className="block text-sm font-medium text-stone-800">Beschreibung (optional)</label>
                 <textarea
                   id="description"
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                  placeholder="Erzählt euren Gästen von eurer besonderen Feier..."
+                  className="mt-1 block w-full rounded-xl border-stone-300 focus:ring-rose-300 focus:border-rose-400 bg-white/80 px-3 py-2.5 leading-6 appearance-none"
+                  placeholder="Ein Satz zu eurer Feier …"
                 />
               </div>
             </div>
           </div>
 
-          {/* Photo Prompts */}
-          <div className="bg-white shadow rounded-lg p-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-6">
-              Hochzeits-Fotomomente
-            </h2>
-            
-            
-            <div className="space-y-4 mb-6">
+          {/* Foto‑Aufgaben */}
+          <div className="glass-card rounded-2xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-stone-900">Foto‑Aufgaben</h2>
+              <p className="text-xs text-stone-600">{prompts.length} Aufgaben</p>
+            </div>
+
+            <p className="text-sm text-stone-700 mb-4">Startet mit Vorschlägen passend zu eurer Feier. Ihr könnt jederzeit anpassen.</p>
+
+            <div className="space-y-3 mb-6">
               {prompts.map((prompt, index) => (
-                <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-md">
-                  <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-medium">
+                <div key={index} className="flex items-center gap-3 p-3 rounded-xl ring-1 ring-stone-200 bg-white/80">
+                  <span className="flex-shrink-0 w-6 h-6 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xs font-semibold">
                     {index + 1}
                   </span>
-                  <span className="flex-1 text-sm text-gray-900">{prompt}</span>
+                  <span className="flex-1 text-sm text-stone-900">{prompt}</span>
                   <button
                     type="button"
                     onClick={() => removePrompt(index)}
-                    className="flex-shrink-0 p-1 text-gray-400 hover:text-red-500"
+                    className="flex-shrink-0 p-1 text-stone-500 hover:text-rose-600"
+                    aria-label="Aufgabe entfernen"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -394,40 +419,41 @@ export default function CreateEventPage() {
               ))}
             </div>
 
-            <div className="flex space-x-3">
+            <div className="flex gap-3">
               <input
                 type="text"
                 value={newPrompt}
                 onChange={(e) => setNewPrompt(e.target.value)}
-                placeholder="Neue Foto-Aufgabe hinzufügen..."
-                className="flex-1 border-gray-300 rounded-md shadow-sm focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addPrompt())}
+                placeholder="Neue Foto‑Aufgabe hinzufügen …"
+                className="flex-1 rounded-xl ring-1 ring-stone-200 bg-white/80 px-3 py-2.5 leading-6 focus:outline-none focus:ring-2 focus:ring-rose-300 appearance-none"
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addPrompt())}
               />
               <button
                 type="button"
                 onClick={addPrompt}
-                className="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
               >
                 <Plus className="w-4 h-4" />
+                Hinzufügen
               </button>
             </div>
           </div>
 
           {/* Submit */}
-          <div className="flex justify-end space-x-3">
+          <div className="flex justify-end gap-3">
             <Link
               href="/"
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
+              className="px-4 py-2 rounded-xl ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white focus:outline-none focus:ring-2 focus:ring-rose-300"
             >
               Abbrechen
             </Link>
             <button
               type="submit"
-              disabled={isSubmitting || !formData.name || !formData.slug || !formData.email}
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting || !nameValid || !slugValid || !emailValid}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white bg-stone-900 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isSubmitting && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-{isSubmitting ? 'Erstelle...' : 'Foto-Aufgaben erstellen'}
+              {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isSubmitting ? 'Erstelle …' : 'Foto‑Aufgaben erstellen'}
             </button>
           </div>
         </form>

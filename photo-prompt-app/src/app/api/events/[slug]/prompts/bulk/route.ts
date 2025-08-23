@@ -51,65 +51,29 @@ export async function POST(
       orderBy: { order: 'desc' },
       select: { order: true }
     })
-    
-    let nextOrder = (lastPrompt?.order ?? -1) + 1
 
-    // Create all prompts in a transaction
-    const results = await prisma.$transaction(async (tx) => {
-      const createdPrompts = []
-      const errors = []
+    const nextOrder = (lastPrompt?.order ?? -1) + 1
 
-      for (let i = 0; i < data.prompts.length; i++) {
-        const promptText = data.prompts[i].trim()
-        
-        try {
-          // Validate each prompt text individually
-          if (promptText.length === 0) {
-            errors.push({
-              index: i,
-              text: promptText,
-              error: 'Prompt text is required'
-            })
-            continue
-          }
+    // Prepare clean inputs (trim, enforce length constraints already validated by zod)
+    const toCreate = data.prompts
+      .map((text, i) => ({
+        text: text.trim(),
+        order: nextOrder + i,
+        eventId: event.id
+      }))
+      .filter(p => p.text.length > 0 && p.text.length <= 500)
 
-          if (promptText.length > 500) {
-            errors.push({
-              index: i,
-              text: promptText,
-              error: 'Prompt text too long (max 500 characters)'
-            })
-            continue
-          }
-
-          const prompt = await tx.prompt.create({
-            data: {
-              text: promptText,
-              order: nextOrder + i,
-              eventId: event.id,
-            }
-          })
-
-          createdPrompts.push(prompt)
-        } catch (error) {
-          console.error(`Error creating prompt ${i}:`, error)
-          errors.push({
-            index: i,
-            text: promptText,
-            error: 'Failed to create prompt'
-          })
-        }
-      }
-
-      return { createdPrompts, errors }
+    // Use createMany to avoid long interactive transactions on serverless
+    const createResult = await prisma.prompt.createMany({
+      data: toCreate
     })
 
     return NextResponse.json({
       success: true,
-      created: results.createdPrompts.length,
+      created: createResult.count,
       total: data.prompts.length,
-      prompts: results.createdPrompts,
-      errors: results.errors
+      prompts: [],
+      errors: []
     }, { status: 201 })
 
   } catch (error) {

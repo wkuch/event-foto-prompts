@@ -17,6 +17,8 @@
     "@aws-sdk/client-s3": "^3.844.0",
     "@aws-sdk/s3-request-presigner": "^3.844.0",
     "@prisma/client": "^6.11.1",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-slot": "^1.2.3",
     "@types/nodemailer": "^6.4.17",
     "archiver": "^7.0.1",
     "class-variance-authority": "^0.7.1",

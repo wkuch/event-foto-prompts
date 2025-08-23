@@ -1,4 +1,5 @@
 # Todo
-- The redirect after event creation to the event dashboard should not work, we should always require a login via magic link through email. Because otherwise someone can just input a email address of someone else and get access to that other persons events.
-- The magic link email sending via "resend" currently does not work when deployed on vercel, research alternatives, we already have a email server running via docker mailserver https://github.com/docker-mailserver/docker-mailserver docu: https://docker-mailserver.github.io/docker-mailserver/latest/ maybe this can be used
 - add a way to bulk add prompts in the dashboard, maybe simply via txt file where each prompt is a new line
+- wording all over the website "Hochzeit anzeigen" führt zur Seite wo ein zufälliger prompt angezeigt wird. das ist etwas verwirrend.
+- es gibt direkt auf der webseite noch keinen weg um sich zu bereits erstellten events einzuloggen
+

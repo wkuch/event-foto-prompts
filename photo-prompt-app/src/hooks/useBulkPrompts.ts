@@ -9,7 +9,13 @@ export interface BulkPromptResults {
     text: string
     error: string
   }>
+  // Back-compat combined list (existing + within-list)
   duplicates: string[]
+  // New fields for clearer UX
+  duplicatesExisting?: string[]
+  duplicatesWithin?: string[]
+  createdByServer?: number
+  skippedUnknown?: number
 }
 
 interface UseBulkPromptsProps {
@@ -51,28 +57,55 @@ export function useBulkPrompts({
 
     try {
       // Clean and validate prompts
-      const cleanedPrompts = prompts.map(sanitizePromptText).filter(p => p.length > 0)
-      
-      // Check for duplicates
-      const duplicates: string[] = []
+      const cleanedPrompts = prompts.map(sanitizePromptText)
+
+      const errors: BulkPromptResults["errors"] = []
+      const duplicatesExisting: string[] = []
+      const duplicatesWithin: string[] = []
       const newPrompts: string[] = []
-      
-      cleanedPrompts.forEach(prompt => {
-        if (existingPrompts.some(existing => existing.toLowerCase() === prompt.toLowerCase())) {
-          duplicates.push(prompt)
-        } else {
-          newPrompts.push(prompt)
+      const seenInBatch = new Set<string>()
+
+      cleanedPrompts.forEach((prompt, index) => {
+        const normalized = prompt.toLowerCase()
+
+        // Basic validations
+        if (normalized.length === 0) {
+          errors.push({ index, text: prompt, error: 'Leerzeile (keine Aufgabe)' })
+          return
         }
+        if (prompt.length > 500) {
+          errors.push({ index, text: prompt, error: 'Zu lang (max. 500 Zeichen)' })
+          return
+        }
+
+        // Check if already exists in existing prompts
+        if (existingPrompts.some(existing => sanitizePromptText(existing).toLowerCase() === normalized)) {
+          duplicatesExisting.push(prompt)
+          return
+        }
+
+        // Check duplicates within the submitted list
+        if (seenInBatch.has(normalized)) {
+          duplicatesWithin.push(prompt)
+          return
+        }
+
+        seenInBatch.add(normalized)
+        newPrompts.push(prompt)
       })
 
-      // Deduplicate new prompts
+      // Deduplicate new prompts just in case (should already be unique)
       const deduplicatedPrompts = deduplicatePrompts(newPrompts)
+
+      const combinedDuplicates = [...duplicatesExisting, ...duplicatesWithin]
 
       const results: BulkPromptResults = {
         added: deduplicatedPrompts.length,
         total: prompts.length,
-        errors: [],
-        duplicates
+        errors,
+        duplicates: combinedDuplicates,
+        duplicatesExisting,
+        duplicatesWithin
       }
 
       setResults(results)
@@ -81,8 +114,8 @@ export function useBulkPrompts({
         onPromptsAdded?.(deduplicatedPrompts)
       }
 
-      // Clear text if all prompts were added successfully
-      if (results.errors.length === 0 && duplicates.length === 0) {
+      // Clear text if everything added and no issues
+      if (errors.length === 0 && combinedDuplicates.length === 0) {
         setBulkText('')
       }
 
@@ -109,6 +142,24 @@ export function useBulkPrompts({
     resetDialog()
   }, [resetDialog])
 
+  const applyServerResults = useCallback((createdCount: number, serverDuplicatesExisting: string[] = []) => {
+    setResults(prev => {
+      if (!prev) return prev
+      const serverAdjustedAdded = createdCount
+      const serverDupCount = serverDuplicatesExisting.length
+      const clientPlannedAdds = prev.added
+      const unknownSkips = Math.max(0, clientPlannedAdds - serverAdjustedAdded - serverDupCount)
+      return {
+        ...prev,
+        added: serverAdjustedAdded,
+        createdByServer: createdCount,
+        duplicatesExisting: [...(prev.duplicatesExisting || []), ...serverDuplicatesExisting],
+        duplicates: [...prev.duplicates, ...serverDuplicatesExisting],
+        skippedUnknown: unknownSkips
+      }
+    })
+  }, [])
+
   return {
     // State
     isDialogOpen,
@@ -123,6 +174,7 @@ export function useBulkPrompts({
     processBulkPrompts,
     openDialog,
     closeDialog,
-    resetDialog
+    resetDialog,
+    applyServerResults
   }
 }

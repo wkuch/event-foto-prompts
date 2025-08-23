@@ -55,6 +55,8 @@ export default function EventManagePage() {
   const [error, setError] = useState('')
   const [newPromptText, setNewPromptText] = useState('')
   const [isAddingPrompt, setIsAddingPrompt] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
+  const [deletingPromptId, setDeletingPromptId] = useState<string | null>(null)
 
   // Bulk prompts hook
   const existingPrompts = event?.prompts?.map(p => p.text) || []
@@ -72,7 +74,13 @@ export default function EventManagePage() {
         if (!response.ok) {
           throw new Error('Bulk-Aufgaben konnten nicht hinzugefügt werden')
         }
-        
+        const result = await response.json()
+
+        // Merge server-side results (e.g., skipped due to server constraints)
+        if (result && typeof result.created === 'number') {
+          bulkPrompts.applyServerResults(result.created, result.duplicatesExisting || [])
+        }
+
         // Refresh the event data to show new prompts
         await fetchEventData()
         
@@ -152,23 +160,34 @@ export default function EventManagePage() {
     }
   }
 
-  const deletePrompt = async (promptId: string) => {
-    if (!confirm('Bist du sicher, dass du diese Aufgabe löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.')) {
-      return
-    }
+  const confirmDeletePrompt = async (promptId: string) => {
+    if (!event) return
+    setDeletingPromptId(promptId)
+    const previousEvent = event
+    // Optimistic update: remove prompt locally
+    setEvent(prev => prev ? {
+      ...prev,
+      prompts: prev.prompts.filter(p => p.id !== promptId),
+      _count: {
+        ...prev._count,
+        prompts: Math.max(0, prev._count.prompts - 1)
+      }
+    } : prev)
     
     try {
       const response = await fetch(`/api/events/${slug}/prompts/${promptId}`, {
         method: 'DELETE'
       })
-      
       if (!response.ok) {
         throw new Error('Aufgabe konnte nicht gelöscht werden')
       }
-      
-      await fetchEventData() // Refresh the data
     } catch (err) {
       setError('Aufgabe konnte nicht gelöscht werden')
+      // Revert optimistic update on error
+      setEvent(previousEvent)
+    } finally {
+      setConfirmDeleteId(null)
+      setDeletingPromptId(null)
     }
   }
 
@@ -374,9 +393,29 @@ export default function EventManagePage() {
                     <p className="text-sm font-medium text-stone-900 break-words">{prompt.text}</p>
                     <p className="text-xs text-stone-600">{prompt._count.uploads} Fotos hochgeladen{prompt.maxUploads && ` • Max: ${prompt.maxUploads}`}</p>
                   </div>
-                  <button onClick={() => deletePrompt(prompt.id)} className="p-1 text-stone-500 hover:text-rose-600" title="Aufgabe löschen">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {confirmDeleteId === prompt.id ? (
+                    <div className="flex items-center gap-2 ml-auto">
+                      <button
+                        onClick={() => setConfirmDeleteId(null)}
+                        className="rounded-xl px-2.5 py-1.5 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white text-xs"
+                        disabled={deletingPromptId === prompt.id}
+                      >
+                        Abbrechen
+                      </button>
+                      <button
+                        onClick={() => confirmDeletePrompt(prompt.id)}
+                        className="rounded-xl px-2.5 py-1.5 bg-rose-600 text-white hover:bg-rose-700 text-xs disabled:opacity-60"
+                        disabled={deletingPromptId === prompt.id}
+                        title="Löschen bestätigen"
+                      >
+                        {deletingPromptId === prompt.id ? 'Wird gelöscht …' : 'Löschen'}
+                      </button>
+                    </div>
+                  ) : (
+                    <button onClick={() => setConfirmDeleteId(prompt.id)} className="p-1 text-stone-500 hover:text-rose-600" title="Aufgabe löschen">
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               ))}
 

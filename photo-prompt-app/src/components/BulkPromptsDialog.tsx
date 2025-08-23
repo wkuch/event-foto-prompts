@@ -145,25 +145,48 @@ export function BulkPromptsDialog({
           {/* Results */}
           {results && (
             <div className={`p-3 rounded-xl ring-1 ${
-              results.errors.length > 0 || results.duplicates.length > 0 ? 'bg-amber-50 ring-amber-200' : 'bg-green-50 ring-green-200'
+              results.errors.length > 0 || (results.duplicates?.length || 0) > 0 ? 'bg-amber-50 ring-amber-200' : 'bg-green-50 ring-green-200'
             }`}>
-              <p className="text-sm font-medium mb-2 text-stone-900">
+              <p className="text-sm font-medium text-stone-900">
                 {results.added} von {results.total} Aufgaben erfolgreich hinzugefügt
               </p>
-              {results.duplicates.length > 0 && (
-                <div className="mb-2">
-                  <p className="text-xs text-amber-800 font-medium">
-                    {results.duplicates.length} bereits vorhandene Aufgaben übersprungen:
-                  </p>
+              {(results.duplicatesExisting?.length || results.duplicatesWithin?.length || results.skippedUnknown) ? (
+                <p className="text-xs text-stone-700 mt-0.5">
+                  Übersprungen: {(results.duplicatesExisting?.length || 0) + (results.duplicatesWithin?.length || 0) + (results.skippedUnknown || 0)}
+                  {results.duplicatesExisting && results.duplicatesExisting.length > 0 && ` (bereits vorhanden: ${results.duplicatesExisting.length})`}
+                  {results.duplicatesWithin && results.duplicatesWithin.length > 0 && ` (in dieser Liste doppelt: ${results.duplicatesWithin.length})`}
+                  {results.skippedUnknown ? ` (serverseitig übersprungen: ${results.skippedUnknown})` : ''}
+                </p>
+              ) : (results.duplicates && results.duplicates.length > 0 ? (
+                <p className="text-xs text-stone-700 mt-0.5">Übersprungen: {results.duplicates.length} Duplikate</p>
+              ) : null)}
+
+              {/* Existing duplicates (server state) */}
+              {results.duplicatesExisting && results.duplicatesExisting.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs text-amber-800 font-medium">Bereits vorhandene Aufgaben übersprungen:</p>
                   <div className="text-xs text-amber-700 space-y-1 mt-1">
-                    {results.duplicates.map((duplicate, index) => (
+                    {results.duplicatesExisting.map((duplicate, index) => (
                       <div key={index} className="truncate">• {duplicate}</div>
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* Within-list duplicates */}
+              {results.duplicatesWithin && results.duplicatesWithin.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs text-amber-800 font-medium">Doppelte Einträge in eurer Liste:</p>
+                  <div className="text-xs text-amber-700 space-y-1 mt-1">
+                    {results.duplicatesWithin.map((duplicate, index) => (
+                      <div key={index} className="truncate">• {duplicate}</div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {results.errors.length > 0 && (
-                <div className="space-y-1">
+                <div className="space-y-1 mt-2">
                   <p className="text-xs text-red-800 font-medium">Fehler:</p>
                   {results.errors.map((error, index) => (
                     <p key={index} className="text-xs text-red-700">
@@ -172,6 +195,12 @@ export function BulkPromptsDialog({
                   ))}
                 </div>
               )}
+
+              {results.skippedUnknown ? (
+                <p className="text-xs text-stone-700 mt-2">
+                  Hinweis: Einige Einträge wurden vom Server nicht übernommen. Versucht es erneut oder prüft die Eingaben.
+                </p>
+              ) : null}
             </div>
           )}
 

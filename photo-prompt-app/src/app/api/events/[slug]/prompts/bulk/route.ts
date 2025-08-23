@@ -52,28 +52,58 @@ export async function POST(
       select: { order: true }
     })
 
-    const nextOrder = (lastPrompt?.order ?? -1) + 1
+    const nextOrderStart = (lastPrompt?.order ?? -1) + 1
 
-    // Prepare clean inputs (trim, enforce length constraints already validated by zod)
-    const toCreate = data.prompts
+    // Normalize helper to match client-side sanitize + lowercase
+    const normalize = (s: string) => s.trim().replace(/\s+/g, ' ').toLowerCase()
+
+    // Fetch existing prompts to detect duplicates on server, case/space-insensitive
+    const existing = await prisma.prompt.findMany({
+      where: { eventId: event.id },
+      select: { text: true }
+    })
+    const existingSet = new Set(existing.map(p => normalize(p.text)))
+
+    // Prepare clean inputs and detect existing duplicates
+    const inputCleaned = data.prompts.map(s => s.trim().replace(/\s+/g, ' '))
+    const duplicatesExisting: string[] = []
+    const toCreateTexts: string[] = []
+    const seenInBatch = new Set<string>()
+    inputCleaned.forEach((text) => {
+      const norm = normalize(text)
+      if (existingSet.has(norm)) {
+        duplicatesExisting.push(text)
+        return
+      }
+      if (seenInBatch.has(norm)) {
+        // within-batch duplicates are already handled on client; skip here
+        return
+      }
+      seenInBatch.add(norm)
+      toCreateTexts.push(text)
+    })
+
+    // Build data with sequential order for new items only
+    const toCreate = toCreateTexts
       .map((text, i) => ({
-        text: text.trim(),
-        order: nextOrder + i,
+        text,
+        order: nextOrderStart + i,
         eventId: event.id
       }))
       .filter(p => p.text.length > 0 && p.text.length <= 500)
 
-    // Use createMany to avoid long interactive transactions on serverless
+    // Use createMany with skipDuplicates to avoid race-condition conflicts
     const createResult = await prisma.prompt.createMany({
-      data: toCreate
+      data: toCreate,
+      skipDuplicates: true
     })
 
     return NextResponse.json({
       success: true,
       created: createResult.count,
       total: data.prompts.length,
-      prompts: [],
-      errors: []
+      duplicatesExisting,
+      attempted: toCreateTexts.length
     }, { status: 201 })
 
   } catch (error) {

@@ -77,67 +77,20 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Create a session for the user (auto-login)
-    const sessionToken = crypto.randomUUID()
-    const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-
-    console.log('🔐 Creating session for user:', {
-      userId: user.id,
-      email: user.email,
-      sessionToken: sessionToken.substring(0, 8) + '...',
-      expires: expires.toISOString()
-    })
-
-    const newSession = await prisma.session.create({
-      data: {
-        sessionToken,
-        userId: user.id,
-        expires,
-      }
-    })
-
-    console.log('✅ Session created successfully:', {
-      sessionId: newSession.id,
+    // Return success with instructions to sign in via email
+    console.log('✅ Event created successfully:', {
       eventId: event.id,
-      eventSlug: event.slug
+      eventSlug: event.slug,
+      userEmail: user.email
     })
 
-    // Set the session cookie
-    const response = NextResponse.json({
+    return NextResponse.json({
       success: true,
       event,
-      message: 'Event created successfully! You can manage it from this device. Use your email to access from other devices.'
+      message: 'Event created successfully! Please check your email for a sign-in link to manage your event.',
+      requiresSignIn: true,
+      userEmail: user.email
     }, { status: 201 })
-
-    // Set secure session cookie with more robust settings for mobile compatibility
-    const cookieName = process.env.NODE_ENV === 'production' 
-      ? '__Secure-next-auth.session-token' 
-      : 'next-auth.session-token'
-    
-    response.cookies.set(cookieName, sessionToken, {
-      expires,
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      // Add domain for production if available
-      ...(process.env.NODE_ENV === 'production' && process.env.NEXTAUTH_URL && {
-        domain: new URL(process.env.NEXTAUTH_URL).hostname
-      })
-    })
-
-    // Also set the regular cookie name for better compatibility
-    if (process.env.NODE_ENV === 'production') {
-      response.cookies.set('next-auth.session-token', sessionToken, {
-        expires,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'lax',
-        path: '/',
-      })
-    }
-
-    return response
 
   } catch (error) {
     if (error instanceof z.ZodError) {

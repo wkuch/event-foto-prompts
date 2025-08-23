@@ -78,8 +78,12 @@ describe('Events API', () => {
         where: { email: testEvents.wedding.email }
       })
       
-      // Verify session was created for auto-login
-      expect(mockPrisma.session.create).toHaveBeenCalled()
+      // Verify session was NOT created (security fix - no auto-login)
+      expect(mockPrisma.session.create).not.toHaveBeenCalled()
+      
+      // Verify response indicates sign-in required
+      expect(data.requiresSignIn).toBe(true)
+      expect(data.userEmail).toBe(testUser.email)
     })
 
     it('should reject duplicate slugs', async () => {
@@ -195,7 +199,8 @@ describe('Events API', () => {
       expect(response.status).toBe(201)
       expect(data.success).toBe(true)
       expect(data.event.name).toBe('Test Event')
-      expect(data.message).toContain('You can manage it from this device')
+      expect(data.message).toContain('Please check your email for a sign-in link')
+      expect(data.requiresSignIn).toBe(true)
       
       // Verify user was created
       expect(mockPrisma.user.create).toHaveBeenCalledWith({
@@ -205,8 +210,8 @@ describe('Events API', () => {
         }
       })
       
-      // Verify session was created
-      expect(mockPrisma.session.create).toHaveBeenCalled()
+      // Verify session was NOT created (security fix - no auto-login)
+      expect(mockPrisma.session.create).not.toHaveBeenCalled()
     })
 
     it('should set default values correctly', async () => {

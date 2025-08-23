@@ -139,7 +139,7 @@ export default function CreateEventPage() {
         throw new Error(errorData.error || 'Failed to create event')
       }
 
-      const { event } = await eventResponse.json()
+      const { event, requiresSignIn } = await eventResponse.json()
 
       // Check if all prompts were created successfully
       const expectedPromptCount = prompts.length
@@ -153,43 +153,12 @@ export default function CreateEventPage() {
       // Show success message
       setSuccess(true)
       
-      // Redirect after ensuring session is properly set, with fallback for mobile
-      const redirectToUrl = `/dashboard/events/${event.slug}`
-      
-      // Check if we can access the dashboard first, with multiple attempts for mobile
-      let redirectAttempts = 0
-      const maxAttempts = 3
-      
-      const attemptRedirect = async () => {
-        redirectAttempts++
-        
-        try {
-          // Test if the session is working by checking dashboard access
-          const testResponse = await fetch('/api/events', {
-            method: 'GET',
-            credentials: 'include'
-          })
-          
-          if (testResponse.ok) {
-            router.push(redirectToUrl)
-          } else if (redirectAttempts < maxAttempts) {
-            // Session not ready yet, wait longer and try again
-            setTimeout(attemptRedirect, 1500)
-          } else {
-            // Fall back to regular dashboard if all attempts failed
-            router.push('/dashboard')
-          }
-        } catch (err) {
-          if (redirectAttempts < maxAttempts) {
-            setTimeout(attemptRedirect, 1500)
-          } else {
-            router.push('/dashboard')
-          }
-        }
+      // If authentication is required, don't attempt to redirect
+      if (requiresSignIn) {
+        // User needs to check email for sign-in link
+        console.log('Event created, user needs to sign in via email')
+        return
       }
-      
-      // Start the redirect process after initial delay
-      setTimeout(attemptRedirect, 1000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create event')
     } finally {
@@ -210,7 +179,7 @@ export default function CreateEventPage() {
           </h1>
 
           <p className="text-stone-700 mb-6">
-            Eure Foto‑Aufgaben sind bereit. Ihr könnt sie jetzt verwalten – auf diesem Gerät oder mit eurer E‑Mail auch von anderen Geräten.
+            Eure Foto‑Aufgaben sind bereit! <strong>Bitte prüft eure E‑Mails</strong> für den Anmelde‑Link, um eure Events zu verwalten.
           </p>
 
           {promptErrors.length > 0 && (
@@ -229,9 +198,12 @@ export default function CreateEventPage() {
             </div>
           )}
 
-          <div className="bg-stone-50 ring-1 ring-stone-200 rounded-xl p-4">
-            <p className="text-sm text-stone-800">
-              <strong>Weiterleitung zum Dashboard …</strong>
+          <div className="bg-rose-50 ring-1 ring-rose-200 rounded-xl p-4">
+            <p className="text-sm text-rose-800">
+              <strong>📧 E‑Mail mit Anmelde‑Link wurde versendet</strong>
+            </p>
+            <p className="text-xs text-rose-700 mt-1">
+              Klickt auf den Link in eurer E‑Mail, um euch anzumelden und eure Events zu verwalten.
             </p>
           </div>
         </div>

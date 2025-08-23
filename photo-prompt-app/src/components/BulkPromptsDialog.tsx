@@ -36,8 +36,8 @@ export function BulkPromptsDialog({
   results,
   onSubmit,
   triggerButton,
-  title = "Aufgaben in großer Menge hinzufügen",
-  description = "Laden Sie eine Textdatei hoch oder fügen Sie Text ein. Jede Zeile wird zu einer neuen Aufgabe."
+  title = "Mehrere Aufgaben auf einmal hinzufügen",
+  description = "Fügt Aufgaben per Text (eine Zeile = eine Aufgabe) oder ladet eine .txt‑Datei hoch."
 }: BulkPromptsDialogProps) {
   
   const handleSubmit = () => {
@@ -50,6 +50,19 @@ export function BulkPromptsDialog({
     onOpenChange(false)
   }
 
+  const handleDrop: React.DragEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault()
+    const file = event.dataTransfer.files?.[0]
+    if (file && file.type === 'text/plain') {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        const content = (e.target?.result as string) || ''
+        onBulkTextChange(content)
+      }
+      reader.readAsText(file)
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       {triggerButton && (
@@ -58,51 +71,70 @@ export function BulkPromptsDialog({
         </DialogTrigger>
       )}
       
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-lg w-[95vw]">
         <DialogHeader>
-          <DialogTitle>{title}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-rose-600" />
+            {title}
+          </DialogTitle>
           <DialogDescription>
             {description}
           </DialogDescription>
         </DialogHeader>
-        
-        <div className="space-y-4">
-          {/* File Upload */}
-          <div>
-            <label className="block text-sm font-medium text-stone-800 mb-2">
-              Textdatei hochladen (.txt)
+
+        <div className="space-y-5 max-h-[70vh] overflow-y-auto pr-1">
+          {/* Dropzone / File Upload */}
+          <div
+            className="relative rounded-xl border-2 border-dashed border-stone-200 bg-stone-50/60 hover:bg-stone-50 transition-colors"
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <label className="flex flex-col items-center justify-center text-center p-6 cursor-pointer">
+              <Upload className="w-6 h-6 text-stone-500 mb-2" />
+              <span className="text-sm font-medium text-stone-800">.txt‑Datei hierher ziehen oder klicken</span>
+              <span className="text-xs text-stone-600 mt-1">Jede Zeile wird zu einer Aufgabe</span>
+              <input
+                type="file"
+                accept=".txt"
+                onChange={onFileUpload}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                aria-label=".txt-Datei mit Aufgaben hochladen"
+              />
             </label>
-            <input
-              type="file"
-              accept=".txt"
-              onChange={onFileUpload}
-              className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-stone-50 file:text-stone-700 hover:file:bg-stone-100"
-            />
           </div>
-          
+
           {/* Text Input */}
           <div>
-            <label className="block text-sm font-medium text-stone-800 mb-2">
-              Oder Text direkt eingeben
-            </label>
+            <div className="flex items-baseline justify-between mb-2">
+              <label className="block text-sm font-medium text-stone-800">
+                Oder Text direkt einfügen
+              </label>
+              <span className="text-xs text-stone-500">
+                {parsedPrompts.length} erkannte Aufgaben
+              </span>
+            </div>
             <textarea
               value={bulkText}
               onChange={(e) => onBulkTextChange(e.target.value)}
-              placeholder="Eine Aufgabe pro Zeile&#10;Zum Beispiel:&#10;Ein Foto mit dem Brautpaar&#10;Ein Bild von der Torte&#10;Ein lustiges Gruppenfoto"
+              placeholder="Eine Aufgabe pro Zeile\nZum Beispiel:\nEin Foto mit dem Brautpaar\nEin Bild von der Torte\nEin lustiges Gruppenfoto"
               rows={8}
-              className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm"
+              className="w-full px-3 py-2 ring-1 ring-stone-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-300 focus:ring-offset-2 focus:ring-offset-white text-sm bg-white resize-y appearance-none"
+              aria-describedby="bulk-text-help"
             />
+            <p id="bulk-text-help" className="mt-1 text-xs text-stone-600">
+              Duplizierte oder leere Zeilen werden automatisch entfernt.
+            </p>
           </div>
 
           {/* Preview */}
           {bulkText.trim() && (
-            <div className="p-3 bg-stone-50 rounded-lg">
-              <p className="text-sm text-stone-700 mb-2">
-                <strong>{parsedPrompts.length} Aufgaben</strong> werden hinzugefügt:
+            <div className="p-3 bg-stone-50 rounded-xl ring-1 ring-stone-200/70">
+              <p className="text-sm text-stone-800 mb-2">
+                Vorschau ({parsedPrompts.length}):
               </p>
               <div className="max-h-32 overflow-y-auto space-y-1">
                 {parsedPrompts.map((prompt, index) => (
-                  <div key={index} className="text-xs text-stone-600 truncate">
+                  <div key={index} className="text-xs text-stone-700 truncate">
                     {index + 1}. {prompt}
                   </div>
                 ))}
@@ -112,13 +144,12 @@ export function BulkPromptsDialog({
 
           {/* Results */}
           {results && (
-            <div className={`p-3 rounded-lg ${
-              results.errors.length > 0 || results.duplicates.length > 0 ? 'bg-yellow-50' : 'bg-green-50'
+            <div className={`p-3 rounded-xl ring-1 ${
+              results.errors.length > 0 || results.duplicates.length > 0 ? 'bg-amber-50 ring-amber-200' : 'bg-green-50 ring-green-200'
             }`}>
-              <p className="text-sm font-medium mb-2">
+              <p className="text-sm font-medium mb-2 text-stone-900">
                 {results.added} von {results.total} Aufgaben erfolgreich hinzugefügt
               </p>
-              
               {results.duplicates.length > 0 && (
                 <div className="mb-2">
                   <p className="text-xs text-amber-800 font-medium">
@@ -131,12 +162,11 @@ export function BulkPromptsDialog({
                   </div>
                 </div>
               )}
-              
               {results.errors.length > 0 && (
                 <div className="space-y-1">
                   <p className="text-xs text-red-800 font-medium">Fehler:</p>
                   {results.errors.map((error, index) => (
-                    <p key={index} className="text-xs text-red-600">
+                    <p key={index} className="text-xs text-red-700">
                       Zeile {error.index + 1}: {error.error}
                     </p>
                   ))}

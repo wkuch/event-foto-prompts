@@ -1,5 +1,7 @@
 // app/page.tsx
 import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import {
   Camera,
   CheckCircle2,
@@ -11,7 +13,8 @@ import {
 } from "lucide-react";
 
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await getServerSession(authOptions);
   return (
     <div className="min-h-screen bg-stone-50 antialiased">
       {/* Background glow layers */}
@@ -54,6 +57,21 @@ export default function HomePage() {
             </a>
           </nav>
           <div className="flex items-center gap-2">
+            {session?.user?.id ? (
+              <Link
+                href="/dashboard"
+                className="rounded-full px-4 py-2 text-sm bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              >
+                Zum Dashboard
+              </Link>
+            ) : (
+              <Link
+                href="/auth/signin"
+                className="rounded-full px-4 py-2 text-sm bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              >
+                Anmelden
+              </Link>
+            )}
             <Link
               href="/dashboard/create"
               className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"

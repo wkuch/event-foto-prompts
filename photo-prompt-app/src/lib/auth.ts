@@ -17,6 +17,10 @@ declare module 'next-auth' {
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
+// Ensure a friendly display name is used while preserving the email address
+const rawFromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@localhost'
+const fromAddress = rawFromEmail.includes('<') ? rawFromEmail : `Traumtag Momente <${rawFromEmail}>`
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   session: {
@@ -27,7 +31,7 @@ export const authOptions: NextAuthOptions = {
   },
   providers: [
     EmailProvider({
-      from: process.env.RESEND_FROM_EMAIL || 'noreply@localhost',
+      from: fromAddress,
       sendVerificationRequest: async ({ identifier: email, url, provider }) => {
         // Development mode - log to console (only if no Resend API key)
         if (!resend) {
@@ -51,23 +55,48 @@ export const authOptions: NextAuthOptions = {
           const emailResult = await resend.emails.send({
             from: provider.from,
             to: email,
-            subject: 'Anmelden bei Event Photo Prompts',
+            subject: 'Dein Login-Link für Traumtag Momente',
             html: `
-              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-                <h1 style="color: #2563eb; margin-bottom: 24px;">Anmelden bei Event Photo Prompts</h1>
-                <p style="color: #374151; margin-bottom: 24px; font-size: 16px;">
-                  Klicken Sie auf den Link unten, um sich anzumelden und Ihre Events zu verwalten:
-                </p>
-                <a href="${url}" style="display: inline-block; background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">
-                  Jetzt anmelden
-                </a>
-                <p style="color: #6b7280; margin-top: 24px; font-size: 14px;">
-                  Dieser Link läuft in 24 Stunden ab. Falls Sie diese E-Mail nicht angefordert haben, können Sie sie ignorieren.
-                </p>
-                <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 32px 0;">
-                <p style="color: #9ca3af; font-size: 12px; text-align: center;">
-                  Event Photo Prompts - Events unvergesslicher machen, ein Foto nach dem anderen
-                </p>
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #fafaf9; padding: 24px;">
+                <div style="display:none;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">
+                  Mit einem Klick einloggen und euer Hochzeits‑Event verwalten.
+                </div>
+                <div style="max-width: 640px; margin: 0 auto; background: #ffffff; border: 1px solid #e7e5e4; border-radius: 16px; padding: 28px;">
+                  <div style="text-align: center; margin-bottom: 20px;">
+                    <div style="display: inline-flex; align-items: center; gap: 8px; color: #e11d48; font-weight: 700; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;">
+                      <span>Traumtag Momente</span>
+                    </div>
+                  </div>
+
+                  <h1 style="margin: 0 0 12px 0; color: #1c1917; font-size: 22px; line-height: 1.3;">
+                    Willkommen zurück
+                  </h1>
+                  <p style="margin: 0 0 20px 0; color: #44403c; font-size: 16px; line-height: 1.6;">
+                    Mit diesem sicheren Link kannst du dich bei <strong>Traumtag Momente</strong> anmelden und euer Hochzeits‑Event verwalten.
+                  </p>
+
+                  <div style="text-align: center; margin: 28px 0;">
+                    <a href="${url}" style="display: inline-block; background-color: #1f2937; color: #ffffff; padding: 12px 22px; text-decoration: none; border-radius: 9999px; font-weight: 600;">
+                      Jetzt einloggen
+                    </a>
+                  </div>
+
+                  <p style="margin: 0 0 8px 0; color: #57534e; font-size: 14px; line-height: 1.6;">
+                    Falls der Button nicht funktioniert, klicke oder kopiere diesen Link:
+                  </p>
+                  <p style="margin: 0 0 20px 0; color: #1c1917; font-size: 14px; line-height: 1.4; word-break: break-all;">
+                    <a href="${url}" style="color: #e11d48; text-decoration: underline;">${url}</a>
+                  </p>
+
+                  <p style="margin: 0; color: #78716c; font-size: 12px; line-height: 1.6;">
+                    Der Link läuft in 24 Stunden ab. Wenn du diese E‑Mail nicht angefordert hast, kannst du sie ignorieren.
+                  </p>
+
+                  <hr style="border: none; border-top: 1px solid #e7e5e4; margin: 24px 0;" />
+                  <p style="margin: 0; color: #a8a29e; font-size: 12px; line-height: 1.6; text-align: center;">
+                    Hochzeiten unvergesslicher machen – ein Herzensmoment nach dem anderen
+                  </p>
+                </div>
               </div>
             `,
           })

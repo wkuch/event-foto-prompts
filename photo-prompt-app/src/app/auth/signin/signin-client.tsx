@@ -53,49 +53,46 @@ export default function SignInClient() {
 
   if (emailSent) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">
-              Prüfe deine E-Mails
-            </h1>
-            
-            <p className="text-gray-600 mb-6">
-              Wir haben einen Magic Link an <strong>{email}</strong> gesendet
-            </p>
-            
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800">
-                {process.env.NODE_ENV === 'development' ? (
-                  <>
-                    <strong>Entwicklungsmodus:</strong> Schaue in dein Terminal/Konsole für den Magic Link anstatt in deine E-Mails.
-                  </>
-                ) : (
-                  <>
-                    Klicke den Link in der E-Mail zum Einloggen. Der Link läuft in 24 Stunden ab.
-                  </>
-                )}
-              </p>
-            </div>
+      <div className="min-h-screen bg-stone-50 antialiased flex items-center justify-center p-4">
+        <div className="max-w-md w-full">
+          <div className="relative">
+            <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
+            <div className="relative glass-card p-8">
+              <div className="text-center">
+                <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CheckCircle className="w-8 h-8 text-rose-600" />
+                </div>
 
-            <div className="space-y-3">
-              <button
-                onClick={() => setEmailSent(false)}
-                className="w-full px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-              >
-                Andere E-Mail versuchen
-              </button>
-              
-              <Link
-                href="/"
-                className="block w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 text-center"
-              >
-                Zurück zur Startseite
-              </Link>
+                <h1 className="font-serif text-2xl font-bold text-stone-900 mb-3">
+                  Prüfe dein Postfach
+                </h1>
+
+                <p className="text-stone-700 mb-4">
+                  Wir haben dir einen Login‑Link an <strong>{email}</strong> gesendet.
+                </p>
+
+                <div className="rounded-2xl ring-1 ring-stone-200 bg-white/80 p-4 mb-6">
+                  <p className="text-sm text-stone-700">
+                    Öffne die E‑Mail und klicke auf den Link, um dich anzumelden. Der Link läuft in 24 Stunden ab.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    onClick={() => setEmailSent(false)}
+                    className="inline-flex justify-center items-center rounded-full px-6 py-3 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  >
+                    Andere E‑Mail eingeben
+                  </button>
+
+                  <Link
+                    href="/"
+                    className="inline-flex justify-center items-center rounded-full px-6 py-3 bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  >
+                    Zur Startseite
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -6,16 +6,10 @@ import {
   Download,
   Eye,
   Heart,
-  Loader2,
-  RefreshCw,
   Sparkles,
   X,
 } from "lucide-react";
 
-// If you are using shadcn/ui, ensure your Tailwind config has the serif font
-// and container padding set as suggested in the style guide.
-// This landing page follows the provided visual system: glass surfaces,
-// rose accents, amber glow, serif headings, and accessible focus rings.
 
 export default function HomePage() {
   return (
@@ -246,43 +240,46 @@ export default function HomePage() {
               <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
               <div className="relative glass-card p-8">
                 <h3 className="font-serif text-2xl font-semibold text-stone-900">
-                  Bereit für unvergessliche Hochzeitsfotos?
+                  3 Schritte zu unvergesslichen Hochzeitsfotos
                 </h3>
                 <p className="mt-3 text-stone-700">
-                  Erstellt in wenigen Minuten liebevolle Foto-Aufgaben, ladet
-                  eure Gäste ein – und sammelt einzigartige Perspektiven eures
-                  großen Tages.
+                  So einfach geht's: Foto-Aufgaben erstellen, Gäste fotografieren lassen, automatische Galerie genießen.
                 </p>
-                <div className="mt-6">
-                  <Link
-                    href="/dashboard/create"
-                    className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
-                  >
-                    Foto-Aufgaben erstellen
-                    <Heart className="h-4 w-4" />
-                  </Link>
+
+                {/* Simple step flow */}
+                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="mx-auto w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mb-3">
+                      <span className="text-lg font-bold text-rose-600">1</span>
+                    </div>
+                    <h4 className="font-semibold text-stone-900 text-sm">Aufgaben erstellen</h4>
+                    <p className="text-xs text-stone-600 mt-1">In 2 Minuten fertig</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="mx-auto w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-3">
+                      <span className="text-lg font-bold text-amber-600">2</span>
+                    </div>
+                    <h4 className="font-semibold text-stone-900 text-sm">Gäste fotografieren</h4>
+                    <p className="text-xs text-stone-600 mt-1">QR-Code scannen & hochladen</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="mx-auto w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center mb-3">
+                      <span className="text-lg font-bold text-rose-600">3</span>
+                    </div>
+                    <h4 className="font-semibold text-stone-900 text-sm">Automatische Galerie</h4>
+                    <p className="text-xs text-stone-600 mt-1">Alle Fotos an einem Ort</p>
+                  </div>
                 </div>
 
-                {/* Loading / success micro states mock */}
-                <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <StatusCard
-                    icon={<Loader2 className="h-5 w-5 animate-spin" />}
-                    title="Wird vorbereitet …"
-                    subtitle="Einen Moment, wir bereiten die Magie vor …"
-                  />
-                  <StatusCard
-                    icon={
-                      <CheckCircle2 className="h-5 w-5 text-rose-600" />
-                    }
-                    title="Foto hochgeladen"
-                    subtitle="Danke! Weiter geht’s."
-                    tone="success"
-                  />
-                  <StatusCard
-                    icon={<RefreshCw className="h-5 w-5 text-stone-600" />}
-                    title="Galerie wird aktualisiert"
-                    subtitle="Bilder erscheinen gleich."
-                  />
+                <div className="mt-8 text-center">
+                  <Link
+                    href="/dashboard/create"
+                    className="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-lg"
+                  >
+                    Jetzt Hochzeits-Event starten
+                    <Heart className="h-5 w-5" />
+                  </Link>
+                  <p className="mt-2 text-xs text-stone-600">Kostenlos • Keine Anmeldung für Gäste</p>
                 </div>
               </div>
             </div>
@@ -451,30 +448,3 @@ function FeaturePoint({
   );
 }
 
-function StatusCard({
-  icon,
-  title,
-  subtitle,
-  tone,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  subtitle: string;
-  tone?: "success";
-}) {
-  return (
-    <div className="flex items-start gap-3 rounded-2xl ring-1 ring-stone-200 bg-white/80 p-4">
-      <div
-        className={`h-9 w-9 rounded-full flex items-center justify-center ${
-          tone === "success" ? "bg-rose-100" : "bg-stone-100"
-        }`}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-sm font-medium text-stone-900">{title}</p>
-        <p className="text-xs text-stone-600">{subtitle}</p>
-      </div>
-    </div>
-  );
-}

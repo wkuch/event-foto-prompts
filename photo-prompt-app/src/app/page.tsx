@@ -29,7 +29,7 @@ export default async function HomePage() {
 
       {/* Header / Nav */}
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-white/60 border-b border-stone-200/60">
-        <div className="container mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+        <div className="container mx-auto max-w-6xl px-4 py-3 flex flex-wrap items-center gap-3 justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-rose-600" />
             <span className="text-sm font-semibold uppercase tracking-widest text-rose-600">
@@ -56,7 +56,7 @@ export default async function HomePage() {
               Galerie
             </a>
           </nav>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
             {session?.user?.id ? (
               <Link
                 href="/dashboard"
@@ -74,7 +74,7 @@ export default async function HomePage() {
             )}
             <Link
               href="/dashboard/create"
-              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
+              className="inline-flex items-center gap-2 rounded-full px-4 sm:px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
             >
               Jetzt Hochzeits‑Event erstellen
               <Heart className="h-4 w-4" />
@@ -95,13 +95,13 @@ export default async function HomePage() {
                 </span>
                 <Sparkles className="w-6 h-6" />
               </div>
-              <h1 className="font-serif text-4xl md:text-6xl font-bold tracking-tight text-stone-900">
+              <h1 className="font-serif text-4xl leading-[1.1] md:text-6xl font-bold tracking-tight text-stone-900">
                 Romantische Foto-Aufgaben für eure Hochzeit –{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-400">
                   echte Momente, gemeinsam gesammelt
                 </span>
               </h1>
-              <p className="mt-6 text-lg md:text-xl text-stone-700 leading-relaxed">
+              <p className="mt-6 text-base md:text-xl text-stone-700 leading-relaxed">
                 Verwandelt eure Gäste in Geschichtenerzähler. Mit liebevollen
                 Foto‑Aufgaben, sofortigen Uploads und einer gemeinsamen, eleganten
                 Galerie für alle unvergesslichen Augenblicke.
@@ -114,7 +114,7 @@ export default async function HomePage() {
               </div>
 
               {/* CTA group */}
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
                 <Link
                   href="/dashboard/create"
                   className="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-[0_6px_20px_-6px_rgba(28,25,23,0.4)]"
@@ -124,7 +124,7 @@ export default async function HomePage() {
                 </Link>
                 <a
                   href="#wie-es-funktioniert"
-                  className="rounded-2xl ring-1 ring-stone-200 bg-white/80 hover:bg-white transition px-5 py-3 text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  className="rounded-2xl ring-1 ring-stone-200 bg-white/80 hover:bg-white transition px-5 py-3 text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300 w-full sm:w-auto text-center"
                 >
                   Mehr erfahren
                 </a>
@@ -135,7 +135,7 @@ export default async function HomePage() {
             <div className="relative mx-auto mt-16 max-w-2xl">
               <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
               <div className="relative glass-card">
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 flex-wrap">
                   <div className="h-12 w-12 rounded-full bg-rose-600 shadow-lg shadow-rose-600/20 flex items-center justify-center">
                     <Camera className="h-6 w-6 text-white" />
                   </div>

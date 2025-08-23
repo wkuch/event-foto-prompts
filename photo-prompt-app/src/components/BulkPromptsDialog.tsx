@@ -188,7 +188,7 @@ export function BulkPromptsTrigger({ onClick }: { onClick?: () => void }) {
       onClick={onClick}
     >
       <Upload className="w-4 h-4" />
-      Bulk hinzufügen
+      Mehrere Aufgaben hinzufügen
     </Button>
   )
 }

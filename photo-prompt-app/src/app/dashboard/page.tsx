@@ -36,7 +36,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 backdrop-blur-xl bg-white/70 border-b border-stone-200/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-5">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 py-5">
             <div>
               <h1 className="font-serif text-3xl font-bold tracking-tight text-stone-900">Euer Dashboard</h1>
               <p className="mt-1 text-sm text-stone-700">Verwaltet eure Foto‑Aufgaben und Galerie</p>

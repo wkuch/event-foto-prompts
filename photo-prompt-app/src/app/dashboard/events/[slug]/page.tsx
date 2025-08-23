@@ -354,7 +354,7 @@ export default function EventManagePage() {
             <h2 className="text-lg font-semibold text-stone-900">Foto‑Aufgaben</h2>
             <BulkPromptsDialog
               isOpen={bulkPrompts.isDialogOpen}
-              onOpenChange={bulkPrompts.closeDialog}
+              onOpenChange={(open) => open ? bulkPrompts.openDialog() : bulkPrompts.closeDialog()}
               bulkText={bulkPrompts.bulkText}
               onBulkTextChange={bulkPrompts.setBulkText}
               onFileUpload={bulkPrompts.handleFileUpload}
@@ -368,10 +368,10 @@ export default function EventManagePage() {
           <div className="p-6">
             <div className="space-y-3">
               {event.prompts.map((prompt, index) => (
-                <div key={prompt.id} className="flex items-center gap-3 p-3 rounded-xl ring-1 ring-stone-200 bg-white/80">
+                <div key={prompt.id} className="flex items-start md:items-center gap-3 p-3 rounded-xl ring-1 ring-stone-200 bg-white/80 flex-wrap">
                   <span className="flex-shrink-0 w-7 h-7 bg-rose-100 text-rose-700 rounded-full flex items-center justify-center text-xs font-semibold">{index + 1}</span>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-stone-900">{prompt.text}</p>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-stone-900 break-words">{prompt.text}</p>
                     <p className="text-xs text-stone-600">{prompt._count.uploads} Fotos hochgeladen{prompt.maxUploads && ` • Max: ${prompt.maxUploads}`}</p>
                   </div>
                   <button onClick={() => deletePrompt(prompt.id)} className="p-1 text-stone-500 hover:text-rose-600" title="Aufgabe löschen">

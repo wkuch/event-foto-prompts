@@ -290,8 +290,8 @@ export default function CreateEventPage() {
 
               <div className="md:col-span-2">
                 <label htmlFor="slug" className="block text-sm font-medium text-stone-800">Hochzeits‑Link *</label>
-                <div className="mt-1 flex items-center rounded-xl ring-1 ring-stone-200 bg-white/80">
-                  <span className="inline-flex items-center px-3 text-stone-600 text-sm whitespace-nowrap">
+                <div className="mt-1 flex items-center rounded-xl ring-1 ring-stone-200 bg-white/80 overflow-hidden">
+                  <span className="inline-flex items-center px-3 text-stone-600 text-sm whitespace-nowrap max-w-[50%] truncate">
                     {typeof window !== 'undefined' ? window.location.origin : 'https://traumtag-momente.de'}/event/
                   </span>
                   <input
@@ -300,7 +300,7 @@ export default function CreateEventPage() {
                     required
                     value={formData.slug}
                     onChange={(e) => setFormData(prev => ({ ...prev, slug: e.target.value }))}
-                    className="flex-1 block w-full focus:outline-none px-3 py-2.5 leading-6 bg-transparent appearance-none min-h-[44px]"
+                    className="flex-1 block w-full focus:outline-none px-3 py-2.5 leading-6 bg-transparent appearance-none min-h-[44px] min-w-0"
                     placeholder="anna-ben-hochzeit"
                     aria-invalid={!slugValid}
                   />

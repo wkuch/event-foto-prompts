@@ -184,11 +184,12 @@ export function BulkPromptsTrigger({ onClick }: { onClick?: () => void }) {
       type="button" 
       variant="outline" 
       size="sm" 
-      className="gap-2" 
+      className="gap-2 h-8 px-2 text-xs sm:h-9 sm:px-3 sm:text-sm max-w-full" 
       onClick={onClick}
+      aria-label="Mehrere Aufgaben hinzufügen"
     >
       <Upload className="w-4 h-4" />
-      Mehrere Aufgaben hinzufügen
+      <span className="hidden sm:inline">Mehrere Aufgaben hinzufügen</span>
     </Button>
   )
 }

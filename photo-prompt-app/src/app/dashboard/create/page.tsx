@@ -458,7 +458,7 @@ export default function CreateEventPage() {
         {/* Bulk Prompts Dialog */}
         <BulkPromptsDialog
           isOpen={bulkPrompts.isDialogOpen}
-          onOpenChange={bulkPrompts.closeDialog}
+          onOpenChange={(open) => open ? bulkPrompts.openDialog() : bulkPrompts.closeDialog()}
           bulkText={bulkPrompts.bulkText}
           onBulkTextChange={bulkPrompts.setBulkText}
           onFileUpload={bulkPrompts.handleFileUpload}

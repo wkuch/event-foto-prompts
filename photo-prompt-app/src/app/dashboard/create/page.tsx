@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { signIn } from 'next-auth/react'
 import { ArrowLeft, Plus, X, Loader2, Heart, Sparkles, Camera } from 'lucide-react'
 import { BulkPromptsDialog, BulkPromptsTrigger } from '@/components/BulkPromptsDialog'
 import { useBulkPrompts } from '@/hooks/useBulkPrompts'
@@ -164,10 +165,20 @@ export default function CreateEventPage() {
       // Show success message
       setSuccess(true)
       
-      // If authentication is required, don't attempt to redirect
+      // Auto-trigger NextAuth email signin (same as /auth/signin page)
       if (requiresSignIn) {
-        // User needs to check email for sign-in link
-        console.log('Event created, user needs to sign in via email')
+        console.log('Event created, auto-triggering email signin...')
+        try {
+          await signIn('email', {
+            email: formData.email.trim(),
+            redirect: false,
+            callbackUrl: '/dashboard',
+          })
+          console.log('✅ Magic link sent successfully')
+        } catch (signInError) {
+          console.error('Failed to send magic link:', signInError)
+          // Don't break the flow if signin fails
+        }
         return
       }
     } catch (err) {

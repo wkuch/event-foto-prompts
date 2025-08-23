@@ -4,6 +4,8 @@ import { useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft, Plus, X, Loader2, Heart, Sparkles, Camera } from 'lucide-react'
+import { BulkPromptsDialog, BulkPromptsTrigger } from '@/components/BulkPromptsDialog'
+import { useBulkPrompts } from '@/hooks/useBulkPrompts'
 
 const EVENT_TYPES = [
   { value: 'wedding', label: 'Hochzeit', description: 'Euer großer Tag – romantische Aufgaben für unvergessliche Momente' },
@@ -69,6 +71,15 @@ export default function CreateEventPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [promptErrors, setPromptErrors] = useState<string[]>([])
+
+  // Bulk prompts hook
+  const bulkPrompts = useBulkPrompts({
+    existingPrompts: prompts,
+    onPromptsAdded: (newPrompts) => {
+      setPrompts(prev => [...prev, ...newPrompts])
+    },
+    onError: setError
+  })
 
   // Derived validation state
   const slugValid = useMemo(() => /^[a-z0-9-]+$/.test(formData.slug) && formData.slug.length >= 3, [formData.slug])
@@ -367,7 +378,10 @@ export default function CreateEventPage() {
           <div className="glass-card rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-stone-900">Foto‑Aufgaben</h2>
-              <p className="text-xs text-stone-600">{prompts.length} Aufgaben</p>
+              <div className="flex items-center gap-3">
+                <p className="text-xs text-stone-600">{prompts.length} Aufgaben</p>
+                <BulkPromptsTrigger onClick={bulkPrompts.openDialog} />
+              </div>
             </div>
 
             <p className="text-sm text-stone-700 mb-4">Startet mit Vorschlägen passend zu eurer Feier. Ihr könnt jederzeit anpassen.</p>
@@ -429,6 +443,19 @@ export default function CreateEventPage() {
             </button>
           </div>
         </form>
+
+        {/* Bulk Prompts Dialog */}
+        <BulkPromptsDialog
+          isOpen={bulkPrompts.isDialogOpen}
+          onOpenChange={bulkPrompts.closeDialog}
+          bulkText={bulkPrompts.bulkText}
+          onBulkTextChange={bulkPrompts.setBulkText}
+          onFileUpload={bulkPrompts.handleFileUpload}
+          parsedPrompts={bulkPrompts.parsedPrompts}
+          isProcessing={bulkPrompts.isProcessing}
+          results={bulkPrompts.results}
+          onSubmit={bulkPrompts.processBulkPrompts}
+        />
       </div>
     </div>
   )

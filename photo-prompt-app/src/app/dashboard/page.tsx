@@ -114,7 +114,7 @@ export default async function DashboardPage() {
                     href={`/event/${event.slug}`}
                     className="text-center px-3 py-2 rounded-xl bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
                   >
-                    Hochzeit anzeigen
+                    Aufgaben-Seite
                   </Link>
                 </div>
               </div>

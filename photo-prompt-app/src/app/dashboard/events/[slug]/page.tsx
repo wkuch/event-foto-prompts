@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, QrCode, Eye, Image, Users, Clock, Settings, X, Trash2, Upload, FileText } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { ArrowLeft, QrCode, Eye, Image, Users, Clock, Settings, X, Trash2 } from 'lucide-react'
+import { BulkPromptsDialog, BulkPromptsTrigger } from '@/components/BulkPromptsDialog'
+import { useBulkPrompts } from '@/hooks/useBulkPrompts'
 
 interface Event {
   id: string
@@ -55,12 +55,33 @@ export default function EventManagePage() {
   const [error, setError] = useState('')
   const [newPromptText, setNewPromptText] = useState('')
   const [isAddingPrompt, setIsAddingPrompt] = useState(false)
-  
-  // Bulk upload state
-  const [isBulkDialogOpen, setIsBulkDialogOpen] = useState(false)
-  const [bulkPromptsText, setBulkPromptsText] = useState('')
-  const [isBulkUploading, setIsBulkUploading] = useState(false)
-  const [bulkUploadResults, setBulkUploadResults] = useState<{created: number, total: number, errors: any[]} | null>(null)
+
+  // Bulk prompts hook
+  const existingPrompts = event?.prompts?.map(p => p.text) || []
+  const bulkPrompts = useBulkPrompts({
+    existingPrompts,
+    onPromptsAdded: async (newPrompts) => {
+      // Use bulk API to add prompts
+      try {
+        const response = await fetch(`/api/events/${slug}/prompts/bulk`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompts: newPrompts })
+        })
+        
+        if (!response.ok) {
+          throw new Error('Bulk-Aufgaben konnten nicht hinzugefügt werden')
+        }
+        
+        // Refresh the event data to show new prompts
+        await fetchEventData()
+        
+      } catch (err) {
+        setError('Bulk-Aufgaben konnten nicht hinzugefügt werden')
+      }
+    },
+    onError: setError
+  })
 
   useEffect(() => {
     fetchEventData()
@@ -151,60 +172,6 @@ export default function EventManagePage() {
     }
   }
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (file && file.type === 'text/plain') {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const content = e.target?.result as string
-        setBulkPromptsText(content)
-      }
-      reader.readAsText(file)
-    }
-  }
-
-  const parseBulkPrompts = () => {
-    return bulkPromptsText
-      .split('\n')
-      .map(line => line.trim())
-      .filter(line => line.length > 0)
-  }
-
-  const bulkAddPrompts = async () => {
-    const prompts = parseBulkPrompts()
-    if (prompts.length === 0) return
-
-    setIsBulkUploading(true)
-    setBulkUploadResults(null)
-    
-    try {
-      const response = await fetch(`/api/events/${slug}/prompts/bulk`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ prompts })
-      })
-      
-      if (!response.ok) {
-        throw new Error('Bulk-Aufgaben konnten nicht hinzugefügt werden')
-      }
-      
-      const results = await response.json()
-      setBulkUploadResults(results)
-      
-      // Refresh the event data to show new prompts
-      await fetchEventData()
-      
-      // Clear the text if all were successful
-      if (results.errors.length === 0) {
-        setBulkPromptsText('')
-      }
-      
-    } catch (err) {
-      setError('Bulk-Aufgaben konnten nicht hinzugefügt werden')
-    } finally {
-      setIsBulkUploading(false)
-    }
-  }
 
   if (isLoading) {
     return (
@@ -264,7 +231,7 @@ export default function EventManagePage() {
               </Link>
               <Link href={`/event/${event.slug}`} className="inline-flex items-center justify-center rounded-xl px-3 py-2 bg-stone-900 text-white hover:bg-stone-800">
                 <Eye className="w-4 h-4 mr-2" />
-                Hochzeit anzeigen
+                Aufgaben-Seite
               </Link>
             </div>
           </div>
@@ -385,110 +352,18 @@ export default function EventManagePage() {
         <div className="mt-8 glass-card p-0">
           <div className="px-6 py-4 border-b border-stone-200/70 flex items-center justify-between">
             <h2 className="text-lg font-semibold text-stone-900">Foto‑Aufgaben</h2>
-            <Dialog open={isBulkDialogOpen} onOpenChange={setIsBulkDialogOpen}>
-              <DialogTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Upload className="w-4 h-4" />
-                  Bulk hinzufügen
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[500px]">
-                <DialogHeader>
-                  <DialogTitle>Aufgaben in großer Menge hinzufügen</DialogTitle>
-                  <DialogDescription>
-                    Laden Sie eine Textdatei hoch oder fügen Sie Text ein. Jede Zeile wird zu einer neuen Aufgabe.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-stone-800 mb-2">
-                      Textdatei hochladen (.txt)
-                    </label>
-                    <input
-                      type="file"
-                      accept=".txt"
-                      onChange={handleFileUpload}
-                      className="block w-full text-sm text-stone-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-stone-50 file:text-stone-700 hover:file:bg-stone-100"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="block text-sm font-medium text-stone-800 mb-2">
-                      Oder Text direkt eingeben
-                    </label>
-                    <textarea
-                      value={bulkPromptsText}
-                      onChange={(e) => setBulkPromptsText(e.target.value)}
-                      placeholder="Eine Aufgabe pro Zeile&#10;Zum Beispiel:&#10;Ein Foto mit dem Brautpaar&#10;Ein Bild von der Torte&#10;Ein lustiges Gruppenfoto"
-                      rows={8}
-                      className="w-full px-3 py-2 border border-stone-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-300 text-sm"
-                    />
-                  </div>
-
-                  {bulkPromptsText.trim() && (
-                    <div className="p-3 bg-stone-50 rounded-lg">
-                      <p className="text-sm text-stone-700 mb-2">
-                        <strong>{parseBulkPrompts().length} Aufgaben</strong> werden hinzugefügt:
-                      </p>
-                      <div className="max-h-32 overflow-y-auto space-y-1">
-                        {parseBulkPrompts().map((prompt, index) => (
-                          <div key={index} className="text-xs text-stone-600 truncate">
-                            {index + 1}. {prompt}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {bulkUploadResults && (
-                    <div className={`p-3 rounded-lg ${bulkUploadResults.errors.length > 0 ? 'bg-yellow-50' : 'bg-green-50'}`}>
-                      <p className="text-sm font-medium mb-2">
-                        {bulkUploadResults.created} von {bulkUploadResults.total} Aufgaben erfolgreich hinzugefügt
-                      </p>
-                      {bulkUploadResults.errors.length > 0 && (
-                        <div className="space-y-1">
-                          {bulkUploadResults.errors.map((error: any, index: number) => (
-                            <p key={index} className="text-xs text-red-600">
-                              Zeile {error.index + 1}: {error.error}
-                            </p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setIsBulkDialogOpen(false)
-                        setBulkPromptsText('')
-                        setBulkUploadResults(null)
-                      }}
-                    >
-                      Abbrechen
-                    </Button>
-                    <Button
-                      onClick={bulkAddPrompts}
-                      disabled={!bulkPromptsText.trim() || isBulkUploading}
-                      className="gap-2"
-                    >
-                      {isBulkUploading ? (
-                        <>
-                          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                          Wird hinzugefügt...
-                        </>
-                      ) : (
-                        <>
-                          <FileText className="w-4 h-4" />
-                          {parseBulkPrompts().length} Aufgaben hinzufügen
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <BulkPromptsDialog
+              isOpen={bulkPrompts.isDialogOpen}
+              onOpenChange={bulkPrompts.closeDialog}
+              bulkText={bulkPrompts.bulkText}
+              onBulkTextChange={bulkPrompts.setBulkText}
+              onFileUpload={bulkPrompts.handleFileUpload}
+              parsedPrompts={bulkPrompts.parsedPrompts}
+              isProcessing={bulkPrompts.isProcessing}
+              results={bulkPrompts.results}
+              onSubmit={bulkPrompts.processBulkPrompts}
+              triggerButton={<BulkPromptsTrigger onClick={bulkPrompts.openDialog} />}
+            />
           </div>
           <div className="p-6">
             <div className="space-y-3">

@@ -12,6 +12,7 @@ import {
   X,
   Sparkles,
   Heart,
+  List,
 } from 'lucide-react'
 
 interface Prompt {
@@ -45,9 +46,23 @@ export default function EventPage() {
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
 
+  // Browse prompts UI (mocked data)
+  const [isBrowseOpen, setIsBrowseOpen] = useState(false)
+  const [browseLoading, setBrowseLoading] = useState(false)
+  const [seenPromptIds, setSeenPromptIds] = useState<string[]>([])
+  const [browsePrompts, setBrowsePrompts] = useState<Prompt[]>([])
+
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    // Initialize seen prompts from local storage for this event
+    try {
+      const key = `seen_prompts_${slug}`
+      const raw = typeof window !== 'undefined' ? localStorage.getItem(key) : null
+      const parsed = raw ? (JSON.parse(raw) as string[]) : []
+      setSeenPromptIds(Array.isArray(parsed) ? parsed : [])
+    } catch {}
+
     fetchEventAndPrompt()
   }, [slug])
 
@@ -73,6 +88,8 @@ export default function EventPage() {
 
       if (data.success && data.prompt) {
         setCurrentPrompt(data.prompt)
+        // Mark prompt as seen locally
+        addSeenPromptId(data.prompt.id)
         setEvent({
           id: data.prompt.eventId,
           name: slug,
@@ -86,6 +103,44 @@ export default function EventPage() {
       setError('Verbindung zum Event fehlgeschlagen')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const addSeenPromptId = (id: string) => {
+    setSeenPromptIds((prev) => {
+      if (prev.includes(id)) return prev
+      const next = [...prev, id]
+      try {
+        const key = `seen_prompts_${slug}`
+        if (typeof window !== 'undefined') {
+          localStorage.setItem(key, JSON.stringify(next))
+        }
+      } catch {}
+      return next
+    })
+  }
+
+  const handleOpenBrowse = async () => {
+    setIsBrowseOpen(true)
+    setBrowseLoading(true)
+    try {
+      const response = await fetch(`/api/events/${slug}/prompts`)
+      if (!response.ok) throw new Error('Failed to load prompts')
+      const data = await response.json()
+      if (data.success && Array.isArray(data.prompts)) {
+        // Show only prompts that are in the local seen list, verifying against server
+        const seenSet = new Set(seenPromptIds)
+        const verifiedSeen: Prompt[] = data.prompts.filter((p: Prompt) =>
+          seenSet.has(p.id)
+        )
+        setBrowsePrompts(verifiedSeen)
+      } else {
+        setBrowsePrompts([])
+      }
+    } catch (e) {
+      setBrowsePrompts([])
+    } finally {
+      setBrowseLoading(false)
     }
   }
 
@@ -312,10 +367,7 @@ export default function EventPage() {
           <h1 className="mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
             Teile eure schönsten Augenblicke
           </h1>
-          <p className="mt-3 text-center text-stone-600 max-w-2xl mx-auto">
-            Lade Fotos zu liebevoll kuratierten Aufgaben hoch und helft uns,
-            ein einzigartiges Album voller Herzensmomente zu gestalten.
-          </p>
+          
 
           <div className="mt-6 flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1.5 text-stone-700 ring-1 ring-stone-200 shadow-sm">
@@ -345,6 +397,17 @@ export default function EventPage() {
                 <p className="mt-2 text-sm text-stone-600">
                   Lasst euch inspirieren und fangt den Moment ein.
                 </p>
+                {/* Browse prompts entry */}
+                <div className="mt-4">
+                  <button
+                    onClick={handleOpenBrowse}
+                    className="inline-flex items-center gap-2 rounded-full px-4 py-2 bg-white/80 backdrop-blur text-stone-700 ring-1 ring-stone-200 shadow-sm hover:bg-white"
+                    title="Öffnet die Liste aller Aufgaben"
+                  >
+                    <List className="w-4 h-4 text-rose-500" />
+                    Aufgabenliste öffnen
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -360,26 +423,27 @@ export default function EventPage() {
                     <p className="text-lg md:text-xl leading-relaxed text-stone-800 text-center font-medium">
                       {currentPrompt.text}
                     </p>
-                    {currentPrompt.maxUploads && (
-                      <p className="mt-4 text-center text-xs text-stone-500">
-                        {currentPrompt._count.uploads} von{' '}
-                        {currentPrompt.maxUploads} Fotos für diese Aufgabe
-                        hochgeladen
-                      </p>
-                    )}
+                    <p className="mt-4 text-center text-xs text-stone-500">
+                      {currentPrompt._count.uploads > 0 ? (
+                        <span>{currentPrompt._count.uploads} Fotos für diese Aufgabe hochgeladen</span>
+                      ) : (
+                        <span>Noch keine Fotos</span>
+                      )}
+                    </p>
                     {!selectedFile && (
                       <div className="mt-6 flex justify-center">
                         <button
                           onClick={fetchEventAndPrompt}
                           disabled={isLoading}
                           className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all disabled:opacity-50"
+                          title="Gibt dir eine neue zufällige Aufgabe"
                         >
                           <RefreshCw
                             className={`w-4 h-4 ${
                               isLoading ? 'animate-spin' : ''
                             }`}
                           />
-                          Neue Aufgabe
+                          Zufällige Aufgabe
                         </button>
                       </div>
                     )}
@@ -517,6 +581,102 @@ export default function EventPage() {
           </p>
         </div>
       </div>
+
+      {/* Browse Prompts Modal (mocked) */}
+      {isBrowseOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
+          <div
+            className="absolute inset-0 bg-stone-900/40"
+            onClick={() => setIsBrowseOpen(false)}
+          />
+          <div className="relative w-full max-w-lg rounded-2xl overflow-hidden bg-white shadow-2xl ring-1 ring-stone-200">
+            <div className="px-5 py-4 border-b border-stone-200 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-rose-600" />
+                <h3 className="text-sm font-semibold text-stone-800">Aufgaben durchsuchen</h3>
+              </div>
+              <button
+                onClick={() => setIsBrowseOpen(false)}
+                className="p-2 rounded-lg hover:bg-stone-100"
+                aria-label="Schließen"
+              >
+                <X className="w-4 h-4 text-stone-600" />
+              </button>
+            </div>
+            <div className="px-5 py-3 text-sm italic text-stone-700 bg-stone-50/60">
+              Diese Liste zeigt Aufgaben, die du bereits gesehen hast. Mit „Zufällige Aufgabe“ erhältst du eine neue Aufgabe.
+            </div>
+            <div className="max-h-[70vh] overflow-y-auto">
+              {browseLoading ? (
+                <div className="p-8 flex items-center justify-center text-stone-600 text-sm">
+                  <Loader className="w-4 h-4 animate-spin mr-2" />
+                  Lädt gesehene Aufgaben ...
+                </div>
+              ) : browsePrompts.length === 0 ? (
+                <div className="p-8 text-center text-stone-600 text-sm">
+                  Noch keine gesehenen Aufgaben.
+                </div>
+              ) : (
+              <ul className="divide-y divide-stone-100">
+                {browsePrompts.map((p) => {
+                  const isZero = p._count.uploads === 0
+                  return (
+                    <li key={p.id} className="p-4">
+                      <button
+                        onClick={() => {
+                          // Demo: set as current prompt locally and close
+                          setCurrentPrompt({
+                            id: p.id,
+                            text: p.text,
+                            order: p.order,
+                            maxUploads: p.maxUploads,
+                            _count: { uploads: p._count.uploads },
+                          })
+                          setIsBrowseOpen(false)
+                        }}
+                        className="w-full text-left"
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className="mt-1 h-8 w-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
+                            <Camera className="w-4 h-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-3">
+                              <p className="font-medium text-stone-800 line-clamp-3">
+                                {p.text}
+                              </p>
+                              {isZero && (
+                                <span className="shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs ring-1 bg-rose-50 text-rose-700 ring-rose-200">
+                                  <Sparkles className="w-3.5 h-3.5" />
+                                  Noch keine Fotos
+                                </span>
+                              )}
+                            </div>
+                            <div className="mt-1 text-xs text-stone-500">
+                              <span>
+                                {p._count.uploads} Fotos
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </button>
+                    </li>
+                  )
+                })}
+              </ul>
+              )}
+            </div>
+            <div className="px-5 py-4 border-t border-stone-200 flex items-center justify-end">
+              <button
+                onClick={() => setIsBrowseOpen(false)}
+                className="rounded-xl px-4 py-2.5 border border-stone-200 text-stone-700 bg-white hover:bg-stone-50"
+              >
+                Schließen
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

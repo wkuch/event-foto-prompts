@@ -7,7 +7,6 @@ import {
   ArrowLeft,
   Download,
   Eye,
-  Filter,
   Grid,
   List,
   Loader,
@@ -15,6 +14,7 @@ import {
   X,
   Sparkles,
   Heart,
+  Trash2,
 } from 'lucide-react'
 
 interface Upload {
@@ -44,30 +44,26 @@ export default function GalleryPage() {
   const [event, setEvent] = useState<Event | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [filteredUploads, setFilteredUploads] = useState<Upload[]>([])
-  const [prompts, setPrompts] = useState<any[]>([])
-  const [selectedPromptId, setSelectedPromptId] = useState<string>('all')
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [isLoading, setIsLoading] = useState(true)
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [error, setError] = useState('')
   const [selectedImage, setSelectedImage] = useState<Upload | null>(null)
+  const [isOwner, setIsOwner] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchEventData()
-    fetchUploads()
-    fetchPrompts()
+    const load = async () => {
+      await Promise.all([fetchEventData(), fetchUploads()])
+      setIsLoading(false)
+    }
+    load()
   }, [uuid])
 
   useEffect(() => {
-    if (selectedPromptId === 'all') {
-      setFilteredUploads(uploads)
-    } else {
-      setFilteredUploads(
-        uploads.filter((upload) => upload.prompt.id === selectedPromptId)
-      )
-    }
-  }, [uploads, selectedPromptId])
+    setFilteredUploads(uploads)
+  }, [uploads])
 
   const fetchEventData = async () => {
     try {
@@ -80,6 +76,7 @@ export default function GalleryPage() {
       const data = await response.json()
       if (data.success) {
         setEvent(data.event)
+        setIsOwner(!!data.isOwner)
       }
     } catch (err) {
       setError('Event-Informationen konnten nicht geladen werden')
@@ -100,25 +97,6 @@ export default function GalleryPage() {
       }
     } catch (err) {
       setError('Fotos konnten nicht geladen werden')
-    }
-  }
-
-  const fetchPrompts = async () => {
-    try {
-      const response = await fetch(`/api/galleries/${uuid}/prompts`)
-
-      if (!response.ok) {
-        throw new Error('Aufgaben konnten nicht abgerufen werden')
-      }
-
-      const data = await response.json()
-      if (data.success) {
-        setPrompts(data.prompts)
-      }
-    } catch (err) {
-      console.warn('Aufgaben für Filter konnten nicht geladen werden')
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -172,11 +150,32 @@ export default function GalleryPage() {
       if (!proceed) return
     }
     setIsDownloadingAll(true)
-    const url = `/api/galleries/${uuid}/download-all${selectedPromptId !== 'all' ? `?promptId=${selectedPromptId}` : ''}`
+    const url = `/api/galleries/${uuid}/download-all`
     // Use location change so browser shows download dialog
     window.location.href = url
     // Re-enable after a short time window; the stream continues independently
     setTimeout(() => setIsDownloadingAll(false), 8000)
+  }
+
+  const deleteUpload = async (upload: Upload) => {
+    if (!event) return
+    if (!confirm('Foto wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return
+    const previous = uploads
+    setDeletingId(upload.id)
+    // Optimistic remove
+    setUploads((prev) => prev.filter((u) => u.id !== upload.id))
+    setFilteredUploads((prev) => prev.filter((u) => u.id !== upload.id))
+    try {
+      const res = await fetch(`/api/events/${event.slug}/uploads/${upload.id}`, { method: 'DELETE' })
+      if (!res.ok) throw new Error('Delete failed')
+    } catch (e) {
+      // Revert on error
+      setUploads(previous)
+      setFilteredUploads(previous)
+      alert('Foto konnte nicht gelöscht werden')
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   // Elegant wedding palette and soft glow background
@@ -257,8 +256,7 @@ export default function GalleryPage() {
             Galerie der Herzensmomente
           </h1>
           <p className="mt-3 text-center text-stone-600 max-w-2xl mx-auto">
-            Stöbert durch alle hochgeladenen Fotos. Filtert nach Aufgaben oder
-            wählt eure Lieblingsansicht.
+            Stöbert durch alle hochgeladenen Fotos und wählt eure Lieblingsansicht.
           </p>
 
           <div className="mt-6 flex justify-center">
@@ -293,43 +291,15 @@ export default function GalleryPage() {
                   <p className="text-sm text-stone-600">
                     {filteredUploads.length}{' '}
                     {filteredUploads.length === 1 ? 'Foto' : 'Fotos'}
-                    {selectedPromptId !== 'all' && ' für diese Aufgabe'}
                   </p>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                {prompts.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/70 ring-1 ring-stone-200">
-                      <Filter className="w-4 h-4 text-stone-600" />
-                    </span>
-                    <select
-                      value={selectedPromptId}
-                      onChange={(e) => setSelectedPromptId(e.target.value)}
-                      className="h-10 rounded-xl border border-stone-200 bg-white/80 px-3 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
-                    >
-                      <option value="all">
-                        Alle Aufgaben ({uploads.length})
-                      </option>
-                      {prompts.map((prompt) => {
-                        const count = uploads.filter(
-                          (u) => u.prompt.id === prompt.id
-                        ).length
-                        return (
-                          <option key={prompt.id} value={prompt.id}>
-                            {prompt.text} ({count})
-                          </option>
-                        )
-                      })}
-                    </select>
-                  </div>
-                )}
-
-                <div className="flex rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-white/80">
+                <div className="flex w-full sm:w-auto rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-white/80 divide-x divide-stone-200">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`px-4 py-2 text-sm font-medium transition ${
+                    className={`px-4 h-10 text-sm font-medium transition flex-1 ${
                       viewMode === 'grid'
                         ? 'bg-stone-900 text-white'
                         : 'text-stone-700 hover:bg-stone-50'
@@ -339,7 +309,7 @@ export default function GalleryPage() {
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`px-4 py-2 text-sm font-medium transition border-l border-stone-200 ${
+                    className={`px-4 h-10 text-sm font-medium transition flex-1 ${
                       viewMode === 'list'
                         ? 'bg-stone-900 text-white'
                         : 'text-stone-700 hover:bg-stone-50'
@@ -430,8 +400,8 @@ export default function GalleryPage() {
                   />
                   {/* Action buttons layer */}
                   <div className="absolute inset-0 z-20">
-                    {/* Top-right preview button */}
-                    <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition">
+                    {/* Top-right actions */}
+                    <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition flex items-center gap-2">
                       <button
                         onClick={(e) => { e.stopPropagation(); setSelectedImage(upload) }}
                         aria-label="Bild ansehen"
@@ -439,6 +409,17 @@ export default function GalleryPage() {
                       >
                         <Eye className="h-5 w-5 text-stone-900" />
                       </button>
+                      {isOwner && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); deleteUpload(upload) }}
+                          aria-label="Löschen"
+                          title="Foto löschen"
+                          className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300 hover:bg-white"
+                          disabled={deletingId === upload.id}
+                        >
+                          <Trash2 className="h-5 w-5 text-rose-600" />
+                        </button>
+                      )}
                     </div>
                     {/* Bottom-left download button */}
                     <div className="absolute left-3 bottom-3 opacity-0 group-hover:opacity-100 transition">
@@ -503,13 +484,25 @@ export default function GalleryPage() {
                     <span>{formatDate(upload.createdAt)}</span>
                   </div>
                 </div>
-                <button
-                  onClick={() => downloadImage(upload)}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100 transition"
-                  aria-label="Herunterladen"
-                >
-                  <Download className="w-5 h-5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  {isOwner && (
+                    <button
+                      onClick={() => deleteUpload(upload)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-50 transition disabled:opacity-50"
+                      aria-label="Löschen"
+                      disabled={deletingId === upload.id}
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+                  <button
+                    onClick={() => downloadImage(upload)}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                    aria-label="Herunterladen"
+                  >
+                    <Download className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             ))}
           </div>

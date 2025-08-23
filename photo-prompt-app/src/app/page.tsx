@@ -30,7 +30,7 @@ export default function HomePage() {
           <div className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-rose-600" />
             <span className="text-sm font-semibold uppercase tracking-widest text-rose-600">
-              Wedding Moments
+              Traumtag Momente
             </span>
           </div>
           <nav className="hidden md:flex items-center gap-6 text-sm text-stone-700">
@@ -73,7 +73,7 @@ export default function HomePage() {
               <div className="flex items-center justify-center gap-2 text-rose-600 mb-5">
                 <Sparkles className="w-6 h-6" />
                 <span className="uppercase tracking-widest text-xs md:text-sm font-semibold">
-                  Wedding Moments
+                  Traumtag Momente
                 </span>
                 <Sparkles className="w-6 h-6" />
               </div>
@@ -207,7 +207,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Feature Split: Why Wedding Moments */}
+        {/* Feature Split: Why Traumtag Momente */}
         <section
           id="funktionen"
           className="container mx-auto max-w-6xl px-4 py-16 md:py-20"
@@ -216,7 +216,7 @@ export default function HomePage() {
             {/* Copy */}
             <div>
               <h2 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-stone-900">
-                Warum Wedding Moments?
+                Warum Traumtag Momente?
               </h2>
               <div className="mt-8 space-y-6">
                 <FeaturePoint
@@ -386,7 +386,7 @@ export default function HomePage() {
             <div className="flex items-center justify-center gap-2 text-rose-600">
               <Heart className="w-5 h-5" />
               <h3 className="text-base font-semibold text-stone-900">
-                Wedding Moments
+                Traumtag Momente
               </h3>
               <Heart className="w-5 h-5" />
             </div>

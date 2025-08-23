@@ -229,7 +229,7 @@ export default function GalleryPage() {
             </div>
           </div>
           <p className="mt-6 text-center text-xs text-stone-500">
-            Powered by Wedding Moments
+            Powered by Traumtag Momente
           </p>
         </div>
       </div>
@@ -249,7 +249,7 @@ export default function GalleryPage() {
           <div className="flex items-center justify-center gap-2 text-rose-600">
             <Sparkles className="w-5 h-5" />
             <span className="uppercase tracking-widest text-xs font-semibold">
-              Wedding Moments
+              Traumtag Momente
             </span>
             <Sparkles className="w-5 h-5" />
           </div>
@@ -569,7 +569,7 @@ export default function GalleryPage() {
       {/* Footer */}
       <div className="mt-10 pb-10 text-center">
         <p className="text-xs text-stone-500">
-          Mit Liebe gemacht • Powered by Wedding Moments
+          Mit Liebe gemacht • Powered by Traumtag Momente
         </p>
       </div>
     </div>

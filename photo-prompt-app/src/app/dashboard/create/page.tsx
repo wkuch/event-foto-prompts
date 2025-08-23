@@ -244,7 +244,7 @@ export default function CreateEventPage() {
             </Link>
             <div className="flex items-center gap-2 text-rose-600">
               <Sparkles className="w-5 h-5" />
-              <span className="text-xs font-semibold uppercase tracking-widest">Wedding Moments</span>
+              <span className="text-xs font-semibold uppercase tracking-widest">Traumtag Momente</span>
             </div>
           </div>
         </div>
@@ -292,7 +292,7 @@ export default function CreateEventPage() {
                 <label htmlFor="slug" className="block text-sm font-medium text-stone-800">Hochzeits‑Link *</label>
                 <div className="mt-1 flex items-center rounded-xl ring-1 ring-stone-200 bg-white/80">
                   <span className="inline-flex items-center px-3 text-stone-600 text-sm whitespace-nowrap">
-                    {typeof window !== 'undefined' ? window.location.origin : 'https://eure-domain.de'}/event/
+                    {typeof window !== 'undefined' ? window.location.origin : 'https://traumtag-momente.de'}/event/
                   </span>
                   <input
                     type="text"

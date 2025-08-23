@@ -1,4 +1,4 @@
-# Project Overview: Wedding Moments - Hochzeits-Foto-Aufgaben Service
+# Project Overview: Traumtag Momente – Hochzeits‑Foto‑Aufgaben Service
 
 ## 1. Vision  
 Build a beautiful, romantic web platform specifically for weddings that transforms wedding photography into an interactive experience—encouraging guests to capture heartfelt moments, connect with each other, and help couples collect unforgettable memories effortlessly.
@@ -53,7 +53,7 @@ Build a beautiful, romantic web platform specifically for weddings that transfor
 3. **Love & Growth** – wedding vendor partnerships, anniversary celebrations, family event expansion  
 
 
-# 📋 Project TODOs: Wedding Moments Service
+# 📋 Project TODOs: Traumtag Momente Service
 
 ## 1. Determine Tech Stack
 Goal: Get to a good MVP fast, with a tech stack that is easy to maintain and scale. Choose cheap and well tested options. Choose tools that are well understood by AI so that AI can help us with the development.

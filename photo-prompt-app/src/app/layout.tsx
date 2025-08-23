@@ -20,11 +20,12 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Wedding Moments – Romantische Foto‑Aufgaben für eure Hochzeit",
+  title: "Traumtag Momente – Romantische Foto‑Aufgaben für eure Hochzeit",
   description:
     "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
+  metadataBase: new URL("https://traumtag-momente.de"),
   openGraph: {
-    title: "Wedding Moments – Romantische Foto‑Aufgaben für eure Hochzeit",
+    title: "Traumtag Momente – Romantische Foto‑Aufgaben für eure Hochzeit",
     description:
       "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
     type: "website",

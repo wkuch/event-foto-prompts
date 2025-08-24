@@ -29,7 +29,28 @@ export const metadata: Metadata = {
     description:
       "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Traumtag Momente – Romantische Foto‑Aufgaben für eure Hochzeit",
+    description:
+      "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
+    images: ["/twitter-image.png"],
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon.ico", type: "image/x-icon" }
+    ],
+    apple: "/apple-touch-icon.png"
+  },
+  manifest: "/site.webmanifest",
 };
 
 export const viewport: Viewport = {

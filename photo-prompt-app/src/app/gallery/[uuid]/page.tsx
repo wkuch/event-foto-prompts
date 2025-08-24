@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -37,6 +37,9 @@ interface Event {
   isActive: boolean
 }
 
+type SortOrder = 'new' | 'old'
+type ViewMode = 'grid' | 'list'
+
 export default function GalleryPage() {
   const params = useParams()
   const uuid = params.uuid as string
@@ -44,14 +47,41 @@ export default function GalleryPage() {
   const [event, setEvent] = useState<Event | null>(null)
   const [uploads, setUploads] = useState<Upload[]>([])
   const [filteredUploads, setFilteredUploads] = useState<Upload[]>([])
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  const [viewMode, setViewMode] = useState('grid' as ViewMode)
   const [isLoading, setIsLoading] = useState(true)
   const [isDownloadingAll, setIsDownloadingAll] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [error, setError] = useState('')
   const [selectedImage, setSelectedImage] = useState<Upload | null>(null)
+  const [selectedIndex, setSelectedIndex] = useState<number>(-1)
   const [isOwner, setIsOwner] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [loadedIds, setLoadedIds] = useState<Set<string>>(new Set())
+  const [visibleCount, setVisibleCount] = useState<number>(24)
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
+
+  const markLoaded = (id: string) => {
+    setLoadedIds((prev) => new Set(prev).add(id))
+  }
+
+  // Infinite scroll
+  useEffect(() => {
+    const sentinel = document.getElementById('load-more-sentinel')
+    if (!sentinel) return
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setIsLoadingMore(true)
+          setTimeout(() => {
+            setVisibleCount((c) => Math.min(c + 24, filteredUploads.length))
+            setIsLoadingMore(false)
+          }, 150)
+        }
+      })
+    }, { rootMargin: '600px 0px' })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [filteredUploads.length])
 
   useEffect(() => {
     const load = async () => {
@@ -115,6 +145,66 @@ export default function GalleryPage() {
       hour: '2-digit',
       minute: '2-digit',
     })
+  }
+
+  // Lightbox helpers
+  const openAtIndex = (index: number) => {
+    if (index < 0 || index >= filteredUploads.length) return
+    setSelectedIndex(index)
+    setSelectedImage(filteredUploads[index])
+  }
+
+  const closeLightbox = () => {
+    setSelectedImage(null)
+    setSelectedIndex(-1)
+  }
+
+  const showNext = () => {
+    if (filteredUploads.length === 0) return
+    const next = (selectedIndex + 1) % filteredUploads.length
+    openAtIndex(next)
+  }
+
+  const showPrev = () => {
+    if (filteredUploads.length === 0) return
+    const prev = (selectedIndex - 1 + filteredUploads.length) % filteredUploads.length
+    openAtIndex(prev)
+  }
+
+  useEffect(() => {
+    if (!selectedImage) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox()
+      if (e.key === 'ArrowRight') showNext()
+      if (e.key === 'ArrowLeft') showPrev()
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [selectedImage, selectedIndex, filteredUploads])
+
+  // Touch swipe for lightbox
+  const touchStartX = useRef<number | null>(null)
+  const touchStartY = useRef<number | null>(null)
+  const handleTouchStart: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }
+  const handleTouchEnd: React.TouchEventHandler<HTMLDivElement> = (e) => {
+    if (touchStartX.current == null || touchStartY.current == null) return
+    const dx = e.changedTouches[0].clientX - touchStartX.current
+    const dy = e.changedTouches[0].clientY - touchStartY.current
+    const absDx = Math.abs(dx)
+    const absDy = Math.abs(dy)
+    // Horizontal swipe if dominant
+    if (absDx > 50 && absDx > absDy) {
+      if (dx < 0) showNext()
+      else showPrev()
+    } else if (absDy > 80 && absDy > absDx && dy > 0) {
+      // Swipe down to close
+      closeLightbox()
+    }
+    touchStartX.current = null
+    touchStartY.current = null
   }
 
   const downloadImage = async (upload: Upload) => {
@@ -181,6 +271,29 @@ export default function GalleryPage() {
   // Elegant wedding palette and soft glow background
   const bgGradient =
     'bg-[radial-gradient(1000px_600px_at_100%_-10%,rgba(244,114,182,0.15),transparent),radial-gradient(800px_500px_at_0%_-20%,rgba(251,191,36,0.10),transparent)]'
+
+  // Basic client-side filter/search/sort (UI only; data already in memory)
+  const [query, setQuery] = useState('')
+  const [sort, setSort] = useState('new' as SortOrder)
+
+  useEffect(() => {
+    const q = query.trim().toLowerCase()
+    let next = uploads
+    if (q.length > 0) {
+      next = uploads.filter((u) =>
+        (u.prompt?.text || '').toLowerCase().includes(q) ||
+        (u.caption || '').toLowerCase().includes(q) ||
+        (u.uploaderName || '').toLowerCase().includes(q)
+      )
+    }
+    next = [...next].sort((a, b) =>
+      sort === 'new'
+        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )
+    setFilteredUploads(next)
+    setVisibleCount(24)
+  }, [query, sort, uploads])
 
   if (isLoading) {
     return (
@@ -318,7 +431,33 @@ export default function GalleryPage() {
                     <List className="w-4 h-4" />
                   </button>
                 </div>
-
+                {/* Search input */}
+                <div className="relative flex-1 min-w-[200px]">
+                  <input
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Suchen (Aufgabe, Beschreibung, Name)"
+                    className="w-full h-10 rounded-2xl border border-stone-200 bg-white/80 px-3 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                    aria-label="Galerie durchsuchen"
+                  />
+                </div>
+                {/* Sort */}
+                <div className="flex rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-white/80 divide-x divide-stone-200">
+                  <button
+                    onClick={() => setSort('new')}
+                    className={`px-3 h-10 text-sm ${sort === 'new' ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-50'}`}
+                    aria-pressed={sort === 'new'}
+                  >
+                    Neueste
+                  </button>
+                  <button
+                    onClick={() => setSort('old')}
+                    className={`px-3 h-10 text-sm ${sort === 'old' ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-50'}`}
+                    aria-pressed={sort === 'old'}
+                  >
+                    Älteste
+                  </button>
+                </div>
                 <button
                   onClick={handleDownloadAll}
                   disabled={filteredUploads.length === 0 || isDownloadingAll}
@@ -379,77 +518,94 @@ export default function GalleryPage() {
             </div>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredUploads.map((upload) => (
-              <div
-                key={upload.id}
-                className="group relative rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
-              >
-                <div className="aspect-square relative overflow-hidden">
-                  <img
-                    src={upload.r2Url}
-                    alt={upload.caption || 'Event photo'}
-                    className="block w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 z-0 select-none"
-                    loading="lazy"
-                  />
-                  {/* Hover overlay */}
+          <>
+            <ul className="columns-2 sm:columns-3 lg:columns-4 gap-x-4 [column-gap:1rem]" role="list">
+              {filteredUploads.slice(0, visibleCount).map((upload) => (
+                <li
+                  key={upload.id}
+                  className="group relative mb-4 break-inside-avoid rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
+                  role="listitem"
+                >
                   <div
-                    onClick={() => setSelectedImage(upload)}
-                    className="pointer-events-none absolute inset-0 z-10 bg-black/0 group-hover:bg-black/30 transition"
-                    aria-hidden
-                  />
-                  {/* Action buttons layer */}
-                  <div className="absolute inset-0 z-20">
-                    {/* Top-right actions */}
-                    <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition flex items-center gap-2">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setSelectedImage(upload) }}
-                        aria-label="Bild ansehen"
-                        className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
-                      >
-                        <Eye className="h-5 w-5 text-stone-900" />
-                      </button>
-                      {isOwner && (
+                    className="relative overflow-hidden cursor-zoom-in"
+                    onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
+                    aria-label="Foto ansehen"
+                  >
+                    {/* Skeleton placeholder */}
+                    {!loadedIds.has(upload.id) && (
+                      <div className="w-full h-[200px] bg-stone-200 animate-pulse" />
+                    )}
+                    <img
+                      src={upload.r2Url}
+                      alt={upload.prompt.text || upload.caption || 'Event photo'}
+                      className={`block w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02] z-0 select-none ${loadedIds.has(upload.id) ? '' : 'invisible'}`}
+                      loading="lazy"
+                      decoding="async"
+                      onLoad={() => markLoaded(upload.id)}
+                    />
+                    {/* Overlay tint on hover (desktop) */}
+                    <div
+                      className="absolute inset-0 z-10 bg-black/0 sm:group-hover:bg-black/20 transition"
+                      aria-hidden
+                    />
+                    {/* Action buttons layer */}
+                    <div className="absolute inset-0 z-20">
+                      {/* Top-right actions */}
+                      <div className="absolute right-3 top-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition flex items-center gap-2">
                         <button
-                          onClick={(e) => { e.stopPropagation(); deleteUpload(upload) }}
-                          aria-label="Löschen"
-                          title="Foto löschen"
-                          className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300 hover:bg-white"
-                          disabled={deletingId === upload.id}
+                          onClick={(e) => { e.stopPropagation(); openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id)) }}
+                          aria-label="Bild ansehen"
+                          className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
                         >
-                          <Trash2 className="h-5 w-5 text-rose-600" />
+                          <Eye className="h-5 w-5 text-stone-900" />
                         </button>
-                      )}
-                    </div>
-                    {/* Bottom-left download button */}
-                    <div className="absolute left-3 bottom-3 opacity-0 group-hover:opacity-100 transition">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); downloadImage(upload) }}
-                        className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 px-3 py-1 text-xs ring-1 ring-rose-200 hover:bg-rose-100 transition"
-                      >
-                        <Download className="h-3.5 w-3.5" />
-                        Herunterladen
-                      </button>
+                        {isOwner && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); deleteUpload(upload) }}
+                            aria-label="Löschen"
+                            title="Foto löschen"
+                            className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300 hover:bg-white"
+                            disabled={deletingId === upload.id}
+                          >
+                            <Trash2 className="h-5 w-5 text-rose-600" />
+                          </button>
+                        )}
+                      </div>
+                      {/* Bottom-left download button */}
+                      <div className="absolute left-3 bottom-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); downloadImage(upload) }}
+                          className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 px-3 py-1 text-xs ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                        >
+                          <Download className="h-3.5 w-3.5" />
+                          Herunterladen
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="p-4">
-                  <p className="text-xs text-stone-500 mb-1 truncate">
-                    {upload.prompt.text}
-                  </p>
-                  {upload.caption && (
-                    <p className="text-sm text-stone-800 line-clamp-2 mb-2">
-                      {upload.caption}
+                  <div className="p-4">
+                    <p className="text-xs text-stone-500 mb-1 truncate">
+                      {upload.prompt.text}
                     </p>
-                  )}
-                  <div className="flex items-center justify-between text-xs text-stone-500">
-                    <span>{upload.uploaderName || 'Anonym'}</span>
-                    <span>{formatDate(upload.createdAt)}</span>
+                    {upload.caption && (
+                      <p className="text-sm text-stone-800 line-clamp-2 mb-2">
+                        {upload.caption}
+                      </p>
+                    )}
+                    <div className="flex items-center justify-between text-xs text-stone-500">
+                      <span>{upload.uploaderName || 'Anonym'}</span>
+                      <span>{formatDate(upload.createdAt)}</span>
+                    </div>
                   </div>
-                </div>
+                </li>
+              ))}
+            </ul>
+            {visibleCount < filteredUploads.length && (
+              <div className="flex justify-center py-6">
+                <div id="load-more-sentinel" className="h-8 w-8 rounded-full bg-stone-200 animate-pulse" aria-hidden />
               </div>
-            ))}
-          </div>
+            )}
+          </>
         ) : (
           <div className="space-y-4">
             {filteredUploads.map((upload) => (
@@ -459,14 +615,15 @@ export default function GalleryPage() {
               >
                 <button
                   className="relative w-28 h-28 overflow-hidden rounded-xl ring-1 ring-stone-200"
-                  onClick={() => setSelectedImage(upload)}
+                  onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
                   aria-label="Foto ansehen"
                 >
                   <img
                     src={upload.r2Url}
-                    alt={upload.caption || 'Event photo'}
-                    className="block w-full h-full object-cover"
+                    alt={upload.prompt.text || upload.caption || 'Event photo'}
+                    className="absolute inset-0 w-full h-full object-cover"
                     loading="lazy"
+                    decoding="async"
                   />
                 </button>
                 <div className="flex-1 min-w-0">
@@ -513,20 +670,43 @@ export default function GalleryPage() {
       {selectedImage && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
-          onClick={() => setSelectedImage(null)}
+          onClick={() => closeLightbox()}
         >
           <div
             className="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white/90 backdrop-blur ring-1 ring-white/60"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative bg-stone-900">
-              <img
-                src={selectedImage.r2Url}
-                alt={selectedImage.caption || 'Event photo'}
-                className="w-full h-auto max-h-[75vh] object-contain bg-black/5"
-              />
+            <div className="relative bg-stone-900" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+              <div className="relative h-[75vh] w-full bg-black/5">
+                <img
+                  src={selectedImage.r2Url}
+                  alt={selectedImage.prompt.text || selectedImage.caption || 'Event photo'}
+                  className="absolute inset-0 w-full h-full object-contain"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
+              {/* Lightbox nav */}
+              <div className="hidden sm:flex absolute inset-y-0 left-0 items-center">
+                <button
+                  onClick={showPrev}
+                  className="ml-2 rounded-full bg-white/80 hover:bg-white p-2 shadow"
+                  aria-label="Vorheriges Bild"
+                >
+                  <ArrowLeft className="w-5 h-5 text-stone-800" />
+                </button>
+              </div>
+              <div className="hidden sm:flex absolute inset-y-0 right-0 items-center">
+                <button
+                  onClick={showNext}
+                  className="mr-2 rounded-full bg-white/80 hover:bg-white p-2 shadow"
+                  aria-label="Nächstes Bild"
+                >
+                  <ArrowLeft className="w-5 h-5 rotate-180 text-stone-800" />
+                </button>
+              </div>
               <button
-                onClick={() => setSelectedImage(null)}
+                onClick={() => closeLightbox()}
                 className="absolute top-4 right-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/90 hover:bg-white transition shadow"
                 aria-label="Schließen"
               >

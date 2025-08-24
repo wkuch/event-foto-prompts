@@ -414,6 +414,24 @@ export default function EventPage() {
             {/* Content */}
             {currentPrompt && (
               <div className="px-4 md:px-10 py-8 md:py-10">
+                {!selectedFile && (
+                  <div className="sm:hidden mb-4">
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      className="group w-full inline-flex items-center justify-center gap-3 rounded-2xl px-6 py-4 bg-stone-900 text-white shadow-lg shadow-stone-900/20 hover:shadow-xl hover:shadow-stone-900/25 transition-all"
+                    >
+                      <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
+                        <Camera className="w-5 h-5" />
+                      </span>
+                      <div className="text-left">
+                        <div className="font-semibold">Foto auswählen</div>
+                        <div className="text-xs text-stone-300">
+                          JPG, PNG, WebP oder GIF bis 10MB
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+                )}
                 <div
                   className={`mx-auto max-w-2xl ${
                     selectedFile ? 'mb-6' : 'mb-10'
@@ -452,15 +470,15 @@ export default function EventPage() {
 
                 {/* Upload Section */}
                 <div className="mx-auto max-w-2xl">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
                   {!selectedFile ? (
-                    <div className="text-center py-6">
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileSelect}
-                        className="hidden"
-                      />
+                    <div className="text-center py-6 hidden sm:block">
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         className="group inline-flex items-center gap-3 rounded-2xl px-6 py-4 bg-stone-900 text-white shadow-lg shadow-stone-900/20 hover:shadow-xl hover:shadow-stone-900/25 transition-all"

@@ -12,7 +12,7 @@ const presignedUrlSchema = z.object({
   promptId: z.string().optional(),
 })
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']
 
 export async function POST(
   request: NextRequest,
@@ -46,7 +46,7 @@ export async function POST(
     // Validate file type
     if (!ALLOWED_TYPES.includes(data.fileType)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.' },
+        { error: 'Invalid file type. Only JPEG, PNG, WebP, GIF, HEIC, and HEIF are allowed.' },
         { status: 400 }
       )
     }

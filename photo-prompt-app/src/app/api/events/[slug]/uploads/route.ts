@@ -19,7 +19,7 @@ const s3Client = new S3Client({
   },
 })
 
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']
 const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
 
 export async function POST(
@@ -63,7 +63,7 @@ export async function POST(
     // Validate file type and size
     if (!ALLOWED_TYPES.includes(file.type)) {
       return NextResponse.json(
-        { error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF are allowed.' },
+        { error: 'Invalid file type. Only JPEG, PNG, WebP, GIF, HEIC, and HEIF are allowed.' },
         { status: 400 }
       )
     }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
 import { GetObjectCommand } from '@aws-sdk/client-s3'
+import sharp from 'sharp'
 import { r2, R2_BUCKET_NAME } from '@/lib/r2'
 
 export async function GET(
@@ -50,22 +51,41 @@ export async function GET(
       ext === 'png' ? 'image/png' :
       ext === 'webp' ? 'image/webp' :
       ext === 'gif' ? 'image/gif' :
+      ext === 'heic' || ext === 'heif' ? 'image/heic' :
       ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
       'image/jpeg'
-    const contentType = (response.ContentType && response.ContentType !== 'binary/octet-stream')
+    const originContentType = (response.ContentType && response.ContentType !== 'binary/octet-stream')
       ? response.ContentType
       : inferredType
 
+    const isHeic = originContentType === 'image/heic' || originContentType === 'image/heif'
+
+    // Transcode HEIC/HEIF to JPEG for broad browser compatibility
+    let outBuffer = buffer
+    let outType = originContentType
+    let outFileName = fileName
+    if (isHeic) {
+      try {
+        outBuffer = await sharp(buffer).jpeg({ quality: 90 }).toBuffer()
+        outType = 'image/jpeg'
+        // ensure .jpg extension for downloads
+        outFileName = fileName.replace(/\.(heic|heif)$/i, '.jpg')
+      } catch (e) {
+        // If conversion fails, fall back to original buffer and mark as octet-stream to force download
+        outType = 'application/octet-stream'
+      }
+    }
+
     // Return image with appropriate headers
-    return new NextResponse(buffer, {
+    return new NextResponse(outBuffer, {
       status: 200,
       headers: {
-        'Content-Type': contentType,
-        'Content-Length': response.ContentLength?.toString() || buffer.length.toString(),
+        'Content-Type': outType,
+        'Content-Length': outBuffer.length.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
         'ETag': response.ETag || '',
         'Accept-Ranges': 'bytes',
-        'Content-Disposition': shouldDownload ? `attachment; filename="${fileName}"` : 'inline',
+        'Content-Disposition': shouldDownload ? `attachment; filename="${outFileName}"` : 'inline',
       }
     })
     

@@ -134,3 +134,4 @@ const peppered = code + process.env.UNLOCK_CODE_PEPPER
 const codeHash = await bcrypt.hash(peppered, 12)
 // verify: await bcrypt.compare(input + process.env.UNLOCK_CODE_PEPPER, codeHash)
 ```
+

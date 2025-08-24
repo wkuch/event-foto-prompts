@@ -45,6 +45,8 @@ export default function EventPage() {
   const [uploadSuccess, setUploadSuccess] = useState(false)
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [nextPrompts, setNextPrompts] = useState<Prompt[]>([])
+  const [isPrefetching, setIsPrefetching] = useState(false)
 
   // Browse prompts UI (mocked data)
   const [isBrowseOpen, setIsBrowseOpen] = useState(false)
@@ -96,6 +98,7 @@ export default function EventPage() {
           slug,
           isActive: true,
         })
+        void prefetchNextPrompts(3)
       } else {
         setError('Keine Aufgaben für dieses Event verfügbar')
       }
@@ -118,6 +121,45 @@ export default function EventPage() {
       } catch {}
       return next
     })
+  }
+
+  const prefetchNextPrompts = async (desiredQueueSize: number = 3) => {
+    try {
+      const missing = Math.max(0, desiredQueueSize - nextPrompts.length)
+      if (missing === 0) return
+
+      setIsPrefetching(true)
+      const response = await fetch(`/api/events/${slug}/prompts`)
+      if (!response.ok) return
+      const data = await response.json()
+      if (!data.success || !Array.isArray(data.prompts)) return
+
+      const excludeIds = new Set<string>([
+        ...seenPromptIds,
+        ...(currentPrompt ? [currentPrompt.id] : []),
+        ...nextPrompts.map((p) => p.id),
+      ])
+
+      const available: Prompt[] = data.prompts.filter((p: Prompt) => {
+        const hasCapacity = !p.maxUploads || p._count.uploads < p.maxUploads
+        return hasCapacity && !excludeIds.has(p.id)
+      })
+
+      for (let i = available.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        const t = available[i]
+        available[i] = available[j]
+        available[j] = t
+      }
+
+      const toAdd = available.slice(0, missing)
+      if (toAdd.length > 0) {
+        setNextPrompts((prev) => [...prev, ...toAdd])
+      }
+    } catch {}
+    finally {
+      setIsPrefetching(false)
+    }
   }
 
   const handleOpenBrowse = async () => {
@@ -238,10 +280,17 @@ export default function EventPage() {
       setSelectedFile(null)
       setPreviewUrl(null)
       setCaption('')
-
+      const nextItem = nextPrompts[0]
+      if (nextItem) {
+        setNextPrompts((prev) => prev.slice(1))
+        setCurrentPrompt(nextItem)
+        addSeenPromptId(nextItem.id)
+        void prefetchNextPrompts(3)
+      } else {
+        void fetchEventAndPrompt()
+      }
       setTimeout(() => {
         setUploadSuccess(false)
-        fetchEventAndPrompt()
       }, 2000)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed')
@@ -264,7 +313,7 @@ export default function EventPage() {
   const bgGradient =
     'bg-[radial-gradient(1000px_600px_at_100%_-10%,rgba(244,114,182,0.15),transparent),radial-gradient(800px_500px_at_0%_-20%,rgba(251,191,36,0.10),transparent)]'
 
-  if (isLoading) {
+  if (isLoading && !currentPrompt) {
     return (
       <div
         className={`min-h-screen flex items-center justify-center ${bgGradient} bg-stone-50`}
@@ -317,35 +366,7 @@ export default function EventPage() {
     )
   }
 
-  if (uploadSuccess) {
-    return (
-      <div className={`min-h-screen ${bgGradient} bg-stone-50 p-6`}>
-        <div className="mx-auto max-w-lg">
-          <div className="relative">
-            <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
-            <div className="relative bg-white/80 backdrop-blur-xl rounded-3xl p-10 shadow-2xl ring-1 ring-white/60 text-center">
-              <div className="mx-auto mb-5 h-16 w-16 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
-                <CheckCircle className="w-9 h-9" />
-              </div>
-              <h2 className="text-2xl font-semibold text-stone-800 tracking-tight">
-                Foto hochgeladen – Danke!
-              </h2>
-              <p className="mt-2 text-stone-600">
-                Ihr habt einen Moment für die Ewigkeit geteilt.
-              </p>
-              <div className="mt-6 inline-flex items-center gap-2 rounded-full bg-rose-50 px-4 py-2 text-rose-700 ring-1 ring-rose-200">
-                <Loader className="w-4 h-4 animate-spin" />
-                Nächste Aufgabe wird geladen ...
-              </div>
-            </div>
-          </div>
-          <p className="mt-6 text-center text-xs text-stone-500">
-            Mit Liebe gesammelt
-          </p>
-        </div>
-      </div>
-    )
-  }
+  // uploadSuccess is now shown inline within the main card instead of full-screen
 
   return (
     <div className={`min-h-screen ${bgGradient} bg-stone-50`}>
@@ -414,6 +435,15 @@ export default function EventPage() {
             {/* Content */}
             {currentPrompt && (
               <div className="px-4 md:px-10 py-8 md:py-10">
+                {uploadSuccess && (
+                  <div className="mx-auto max-w-2xl mb-4">
+                    <div className="flex items-center justify-center gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-rose-700">
+                      <CheckCircle className="w-5 h-5" />
+                      <span>Foto hochgeladen – danke! Nächste Aufgabe ist bereit.</span>
+                      {isPrefetching && <Loader className="w-4 h-4 animate-spin" />}
+                    </div>
+                  </div>
+                )}
                 {!selectedFile && (
                   <div className="sm:hidden mb-4">
                     <button

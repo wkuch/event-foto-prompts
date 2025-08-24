@@ -15,6 +15,7 @@ import {
   Sparkles,
   Heart,
   Trash2,
+  Search,
 } from 'lucide-react'
 
 interface Upload {
@@ -450,16 +451,27 @@ export default function GalleryPage() {
                 </div>
                 {/* Search input */}
                 <div className="relative flex-1 min-w-[200px]">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" aria-hidden />
                   <input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Suchen (Aufgabe, Beschreibung, Name)"
-                    className="w-full h-10 rounded-2xl border border-stone-200 bg-white/80 px-3 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                    className="w-full h-10 rounded-2xl border border-stone-200 bg-white/80 pl-9 pr-9 text-sm text-stone-800 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-rose-300"
                     aria-label="Galerie durchsuchen"
                   />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-stone-100 text-stone-500"
+                      aria-label="Suche löschen"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
                 {/* Sort */}
-                <div className="flex rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-white/80 divide-x divide-stone-200">
+                <div className="hidden sm:flex rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-white/80 divide-x divide-stone-200">
                   <button
                     onClick={() => setSort('new')}
                     className={`px-3 h-10 text-sm ${sort === 'new' ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-50'}`}
@@ -475,10 +487,22 @@ export default function GalleryPage() {
                     Älteste
                   </button>
                 </div>
+                <div className="sm:hidden">
+                  <label className="sr-only" htmlFor="sort-select">Sortierung</label>
+                  <select
+                    id="sort-select"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value as SortOrder)}
+                    className="h-10 w-full rounded-2xl border border-stone-200 bg-white/80 px-3 text-sm text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  >
+                    <option value="new">Neueste</option>
+                    <option value="old">Älteste</option>
+                  </select>
+                </div>
                 <button
                   onClick={handleDownloadAll}
                   disabled={filteredUploads.length === 0 || isDownloadingAll}
-                  className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 ring-1 transition ${
+                  className={`w-full sm:w-auto sm:ml-auto inline-flex items-center justify-center gap-2 rounded-full px-4 py-2.5 ring-1 transition ${
                     filteredUploads.length === 0 || isDownloadingAll
                       ? 'bg-stone-100 text-stone-400 ring-stone-200 cursor-not-allowed'
                       : 'bg-rose-50 text-rose-700 ring-rose-200 hover:bg-rose-100'
@@ -509,14 +533,6 @@ export default function GalleryPage() {
 
       {/* Gallery */}
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6 pb-12">
-        {pendingVisibleCount > 0 && filteredUploads.length > 0 && (
-          <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mb-4">
-            <Loader className="w-4 h-4 animate-spin" />
-            <span>
-              Lade {pendingVisibleCount} {pendingVisibleCount === 1 ? 'Foto' : 'Fotos'} …
-            </span>
-          </div>
-        )}
         {filteredUploads.length === 0 ? (
           <div className="relative">
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
@@ -586,7 +602,7 @@ export default function GalleryPage() {
                         <button
                           onClick={(e) => { e.stopPropagation(); openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id)) }}
                           aria-label="Bild ansehen"
-                          className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                          className="hidden sm:inline-flex rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
                         >
                           <Eye className="h-5 w-5 text-stone-900" />
                         </button>
@@ -631,6 +647,12 @@ export default function GalleryPage() {
                 </li>)
               ))}
             </ul>
+            {pendingVisibleCount > 0 && (
+              <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mt-2">
+                <Loader className="w-4 h-4 animate-spin" />
+                <span>Fotos werden geladen …</span>
+              </div>
+            )}
             {visibleCount < filteredUploads.length && (
               <div className="flex justify-center py-6">
                 <div id="load-more-sentinel" className="h-8 w-8 rounded-full bg-stone-200 animate-pulse" aria-hidden />
@@ -694,6 +716,12 @@ export default function GalleryPage() {
                 </div>
               </div>)
             ))}
+            {pendingVisibleCount > 0 && (
+              <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mt-2">
+                <Loader className="w-4 h-4 animate-spin" />
+                <span>Fotos werden geladen …</span>
+              </div>
+            )}
           </div>
         )}
       </div>

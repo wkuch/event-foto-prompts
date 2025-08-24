@@ -95,6 +95,18 @@ export default function GalleryPage() {
     setFilteredUploads(uploads)
   }, [uploads])
 
+  // Preload images for currently visible items and mark as loaded before rendering cards
+  useEffect(() => {
+    const targets = filteredUploads.slice(0, visibleCount)
+    targets.forEach((u) => {
+      if (loadedIds.has(u.id)) return
+      const img = new Image()
+      img.onload = () => markLoaded(u.id)
+      img.onerror = () => markLoaded(u.id)
+      img.src = u.r2Url
+    })
+  }, [filteredUploads, visibleCount, loadedIds])
+
   const fetchEventData = async () => {
     try {
       const response = await fetch(`/api/galleries/${uuid}`)
@@ -295,6 +307,11 @@ export default function GalleryPage() {
     setVisibleCount(24)
   }, [query, sort, uploads])
 
+  // Count of images in the current visible window that are still loading
+  const pendingVisibleCount = filteredUploads
+    .slice(0, visibleCount)
+    .filter((u) => !loadedIds.has(u.id)).length
+
   if (isLoading) {
     return (
       <div
@@ -492,6 +509,14 @@ export default function GalleryPage() {
 
       {/* Gallery */}
       <div className="mx-auto w-full max-w-6xl px-4 md:px-6 pb-12">
+        {pendingVisibleCount > 0 && filteredUploads.length > 0 && (
+          <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mb-4">
+            <Loader className="w-4 h-4 animate-spin" />
+            <span>
+              Lade {pendingVisibleCount} {pendingVisibleCount === 1 ? 'Foto' : 'Fotos'} …
+            </span>
+          </div>
+        )}
         {filteredUploads.length === 0 ? (
           <div className="relative">
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
@@ -521,6 +546,7 @@ export default function GalleryPage() {
           <>
             <ul className="columns-2 sm:columns-3 lg:columns-4 gap-x-4 [column-gap:1rem]" role="list">
               {filteredUploads.slice(0, visibleCount).map((upload) => (
+                loadedIds.has(upload.id) && (
                 <li
                   key={upload.id}
                   className="group relative mb-4 break-inside-avoid rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
@@ -531,10 +557,6 @@ export default function GalleryPage() {
                     onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
                     aria-label="Foto ansehen"
                   >
-                    {/* Skeleton placeholder */}
-                    {!loadedIds.has(upload.id) && (
-                      <div className="w-full h-[200px] bg-stone-200 animate-pulse" />
-                    )}
                     <img
                       src={upload.r2Url}
                       alt={upload.prompt.text || upload.caption || 'Event photo'}
@@ -606,7 +628,7 @@ export default function GalleryPage() {
                       <span>{formatDate(upload.createdAt)}</span>
                     </div>
                   </div>
-                </li>
+                </li>)
               ))}
             </ul>
             {visibleCount < filteredUploads.length && (
@@ -618,6 +640,7 @@ export default function GalleryPage() {
         ) : (
           <div className="space-y-4">
             {filteredUploads.map((upload) => (
+              loadedIds.has(upload.id) && (
               <div
                 key={upload.id}
                 className="rounded-2xl border border-stone-200 bg-white/80 backdrop-blur p-4 shadow-sm hover:shadow-md transition flex items-center gap-5"
@@ -669,14 +692,14 @@ export default function GalleryPage() {
                     <Download className="w-5 h-5" />
                   </button>
                 </div>
-              </div>
+              </div>)
             ))}
           </div>
         )}
       </div>
 
       {/* Image Modal */}
-      {selectedImage && (
+      {selectedImage && loadedIds.has(selectedImage.id) && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
           onClick={() => closeLightbox()}

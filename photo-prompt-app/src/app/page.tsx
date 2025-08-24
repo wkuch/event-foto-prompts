@@ -412,18 +412,26 @@ export default async function HomePage() {
               Hochzeiten unvergesslicher machen – ein Herzensmoment nach dem
               anderen.
             </p>
-            <div className="mt-2 text-xs text-stone-500">
+            <div className="mt-2 text-xs text-stone-500 flex flex-wrap items-center justify-center gap-2">
               <a href="#funktionen" className="hover:text-stone-700">
                 Funktionen
-              </a>{" "}
-              •{" "}
+              </a>
+              <span>•</span>
               <a href="#wie-es-funktioniert" className="hover:text-stone-700">
                 Ablauf
-              </a>{" "}
-              •{" "}
+              </a>
+              <span>•</span>
               <a href="#galerie" className="hover:text-stone-700">
                 Galerie
               </a>
+              <span>•</span>
+              <Link href="/impressum" className="hover:text-stone-700">
+                Impressum
+              </Link>
+              <span>•</span>
+              <Link href="/datenschutz" className="hover:text-stone-700">
+                Datenschutz
+              </Link>
             </div>
           </div>
         </div>

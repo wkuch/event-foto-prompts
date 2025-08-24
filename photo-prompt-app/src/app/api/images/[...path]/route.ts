@@ -28,17 +28,27 @@ export async function GET(
       )
     }
     
-    // Convert stream to buffer
-    const chunks: Uint8Array[] = []
-    const reader = response.Body.transformToWebStream().getReader()
-    
-    while (true) {
-      const { done, value } = await reader.read()
-      if (done) break
-      chunks.push(value)
+    // Convert stream/body to a single Uint8Array
+    const bodyAny: any = response.Body as any
+    let u8: Uint8Array
+    if (bodyAny && typeof bodyAny.transformToByteArray === 'function') {
+      u8 = await bodyAny.transformToByteArray()
+    } else {
+      const chunks: Uint8Array[] = []
+      const reader = bodyAny.transformToWebStream().getReader()
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        chunks.push(value)
+      }
+      const total = chunks.reduce((sum, c) => sum + c.length, 0)
+      u8 = new Uint8Array(total)
+      let offset = 0
+      for (const c of chunks) {
+        u8.set(c, offset)
+        offset += c.length
+      }
     }
-    
-    const buffer = Buffer.concat(chunks)
     
     // Optional forced download
     const { searchParams } = new URL(request.url)
@@ -61,12 +71,12 @@ export async function GET(
     const isHeic = originContentType === 'image/heic' || originContentType === 'image/heif'
 
     // Transcode HEIC/HEIF to JPEG for broad browser compatibility
-    let outBuffer = buffer
+    let outBuffer: Uint8Array | Buffer = u8
     let outType = originContentType
     let outFileName = fileName
     if (isHeic) {
       try {
-        outBuffer = await sharp(buffer).jpeg({ quality: 90 }).toBuffer()
+        outBuffer = await sharp(u8).jpeg({ quality: 90 }).toBuffer()
         outType = 'image/jpeg'
         // ensure .jpg extension for downloads
         outFileName = fileName.replace(/\.(heic|heif)$/i, '.jpg')
@@ -76,12 +86,18 @@ export async function GET(
       }
     }
 
+    // Prepare ArrayBuffer body for Response API compatibility
+    const bodyBytes = outBuffer instanceof Uint8Array
+      ? outBuffer
+      : new Uint8Array(outBuffer as any)
+    const bodyArrayBuffer = bodyBytes.buffer.slice(bodyBytes.byteOffset, bodyBytes.byteOffset + bodyBytes.byteLength)
+
     // Return image with appropriate headers
-    return new NextResponse(outBuffer, {
+    return new NextResponse(bodyArrayBuffer, {
       status: 200,
       headers: {
         'Content-Type': outType,
-        'Content-Length': outBuffer.length.toString(),
+        'Content-Length': bodyBytes.byteLength.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
         'ETag': response.ETag || '',
         'Accept-Ranges': 'bytes',

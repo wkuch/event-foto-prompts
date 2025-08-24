@@ -538,7 +538,7 @@ export default function GalleryPage() {
                     <img
                       src={upload.r2Url}
                       alt={upload.prompt.text || upload.caption || 'Event photo'}
-                      className={`block w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02] z-0 select-none ${loadedIds.has(upload.id) ? '' : 'invisible'}`}
+                      className={`block w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02] z-0 select-none transition-opacity ${loadedIds.has(upload.id) ? 'opacity-100' : 'opacity-0'}`}
                       loading="lazy"
                       decoding="async"
                       onLoad={() => markLoaded(upload.id)}

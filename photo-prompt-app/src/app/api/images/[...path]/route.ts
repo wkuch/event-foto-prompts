@@ -44,15 +44,28 @@ export async function GET(
     const shouldDownload = searchParams.get('download') === '1'
     const fileName = r2Key.split('/').pop() || 'image.jpg'
 
+    // Infer a safe content type if missing or generic
+    const ext = (r2Key.split('.').pop() || '').toLowerCase()
+    const inferredType =
+      ext === 'png' ? 'image/png' :
+      ext === 'webp' ? 'image/webp' :
+      ext === 'gif' ? 'image/gif' :
+      ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' :
+      'image/jpeg'
+    const contentType = (response.ContentType && response.ContentType !== 'binary/octet-stream')
+      ? response.ContentType
+      : inferredType
+
     // Return image with appropriate headers
     return new NextResponse(buffer, {
       status: 200,
       headers: {
-        'Content-Type': response.ContentType || 'image/jpeg',
+        'Content-Type': contentType,
         'Content-Length': response.ContentLength?.toString() || buffer.length.toString(),
         'Cache-Control': 'public, max-age=31536000, immutable', // Cache for 1 year
         'ETag': response.ETag || '',
-        ...(shouldDownload ? { 'Content-Disposition': `attachment; filename="${fileName}"` } : {}),
+        'Accept-Ranges': 'bytes',
+        'Content-Disposition': shouldDownload ? `attachment; filename="${fileName}"` : 'inline',
       }
     })
     

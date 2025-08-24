@@ -542,6 +542,15 @@ export default function GalleryPage() {
                       loading="lazy"
                       decoding="async"
                       onLoad={() => markLoaded(upload.id)}
+                      onError={(e) => {
+                        const imgEl = e.currentTarget as HTMLImageElement
+                        if (!(imgEl as any)._retried) {
+                          ;(imgEl as any)._retried = true
+                          imgEl.src = `${upload.r2Url}?v=${Date.now()}`
+                          return
+                        }
+                        markLoaded(upload.id)
+                      }}
                     />
                     {/* Overlay tint on hover (desktop) */}
                     <div

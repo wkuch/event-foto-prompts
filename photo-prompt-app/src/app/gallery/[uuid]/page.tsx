@@ -102,7 +102,7 @@ export default function GalleryPage() {
       if (loadedIds.has(u.id)) return
       const img = new Image()
       img.onload = () => markLoaded(u.id)
-      img.onerror = () => markLoaded(u.id)
+      // Do not mark as loaded on error; keep card hidden if it fails
       img.src = u.r2Url
     })
   }, [filteredUploads, visibleCount, loadedIds])

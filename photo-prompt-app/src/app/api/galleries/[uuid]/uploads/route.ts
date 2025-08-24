@@ -53,16 +53,26 @@ export async function GET(
     // Get total count
     const total = await prisma.upload.count({ where })
 
+    // Build base URL for proxying images through our API (more compatible on mobile)
+    const baseUrl = `${request.nextUrl.protocol}//${request.nextUrl.host}`
+
     return NextResponse.json({
       success: true,
-      uploads: uploads.map(upload => ({
-        id: upload.id,
-        r2Url: upload.r2Url,
-        caption: upload.caption,
-        uploaderName: upload.uploaderName,
-        createdAt: upload.createdAt,
-        prompt: upload.prompt
-      })),
+      uploads: uploads.map(upload => {
+        const hasR2Key = (upload as any).r2Key
+        const storedUrl = upload.r2Url as string
+        const isAlreadyProxied = typeof storedUrl === 'string' && storedUrl.includes('/api/images/')
+        const proxiedUrl = hasR2Key ? `${baseUrl}/api/images/${(upload as any).r2Key}` : storedUrl
+        const finalUrl = isAlreadyProxied ? storedUrl : proxiedUrl
+        return {
+          id: upload.id,
+          r2Url: finalUrl,
+          caption: upload.caption,
+          uploaderName: upload.uploaderName,
+          createdAt: upload.createdAt,
+          prompt: upload.prompt
+        }
+      }),
       pagination: {
         total,
         limit,

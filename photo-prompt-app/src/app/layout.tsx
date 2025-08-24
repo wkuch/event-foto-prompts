@@ -29,9 +29,12 @@ export const metadata: Metadata = {
     description:
       "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
     type: "website",
+    siteName: "Traumtag Momente",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://traumtag-momente.de/og-image.png",
+        width: 1200,
+        height: 630,
       },
     ],
   },
@@ -40,7 +43,7 @@ export const metadata: Metadata = {
     title: "Traumtag Momente – Romantische Foto‑Aufgaben für eure Hochzeit",
     description:
       "Verwandelt eure Gäste in Geschichtenerzähler: liebevolle Foto‑Aufgaben, QR‑Codes und eine elegante gemeinsame Galerie.",
-    images: ["/twitter-image.png"],
+    images: ["https://traumtag-momente.de/twitter-image.png"],
   },
   icons: {
     icon: [

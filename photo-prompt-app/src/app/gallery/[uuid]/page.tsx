@@ -369,7 +369,7 @@ export default function GalleryPage() {
             Galerie der Herzensmomente
           </h1>
           <p className="mt-3 text-center text-stone-600 max-w-2xl mx-auto">
-            Stöbert durch alle hochgeladenen Fotos und wählt eure Lieblingsansicht.
+          Eure Erinnerungen, gesammelt an einem Ort – viel Freude beim Stöbern.
           </p>
 
           <div className="mt-6 flex justify-center">

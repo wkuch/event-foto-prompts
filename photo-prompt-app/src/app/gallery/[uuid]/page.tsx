@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -60,33 +60,22 @@ export default function GalleryPage() {
   const [loadedIds, setLoadedIds] = useState<Set<string>>(new Set())
   const [visibleCount, setVisibleCount] = useState<number>(24)
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false)
+  const PAGE_SIZE = 24
+  const [totalCount, setTotalCount] = useState<number>(0)
+  const [hasMore, setHasMore] = useState<boolean>(true)
+  const [offset, setOffset] = useState<number>(0)
+  const [isFetchingPage, setIsFetchingPage] = useState<boolean>(false)
 
   const markLoaded = (id: string) => {
     setLoadedIds((prev) => new Set(prev).add(id))
   }
 
-  // Infinite scroll
-  useEffect(() => {
-    const sentinel = document.getElementById('load-more-sentinel')
-    if (!sentinel) return
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          setIsLoadingMore(true)
-          setTimeout(() => {
-            setVisibleCount((c) => Math.min(c + 24, filteredUploads.length))
-            setIsLoadingMore(false)
-          }, 150)
-        }
-      })
-    }, { rootMargin: '600px 0px' })
-    observer.observe(sentinel)
-    return () => observer.disconnect()
-  }, [filteredUploads.length])
+  
 
   useEffect(() => {
     const load = async () => {
-      await Promise.all([fetchEventData(), fetchUploads()])
+      await fetchEventData()
+      await fetchUploadsPage(0)
       setIsLoading(false)
     }
     load()
@@ -126,9 +115,10 @@ export default function GalleryPage() {
     }
   }
 
-  const fetchUploads = async () => {
+  const fetchUploadsPage = useCallback(async (nextOffset: number) => {
     try {
-      const response = await fetch(`/api/galleries/${uuid}/uploads`)
+      setIsFetchingPage(true)
+      const response = await fetch(`/api/galleries/${uuid}/uploads?limit=${PAGE_SIZE}&offset=${nextOffset}`)
 
       if (!response.ok) {
         throw new Error('Uploads konnten nicht abgerufen werden')
@@ -136,12 +126,37 @@ export default function GalleryPage() {
 
       const data = await response.json()
       if (data.success) {
-        setUploads(data.uploads)
+        setUploads((prev) => nextOffset === 0 ? data.uploads : [...prev, ...data.uploads])
+        setTotalCount(data.pagination?.total ?? (nextOffset === 0 ? data.uploads.length : totalCount))
+        setHasMore(Boolean(data.pagination?.hasMore))
+        setOffset(nextOffset + (Array.isArray(data.uploads) ? data.uploads.length : 0))
       }
     } catch (err) {
       setError('Fotos konnten nicht geladen werden')
+    } finally {
+      setIsFetchingPage(false)
     }
-  }
+  }, [uuid, PAGE_SIZE, totalCount])
+
+  // Infinite scroll: reveal more locally and fetch next page when nearing end
+  useEffect(() => {
+    const sentinel = document.getElementById('load-more-sentinel')
+    if (!sentinel) return
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setIsLoadingMore(true)
+          setVisibleCount((c) => Math.min(c + PAGE_SIZE, filteredUploads.length))
+          if (!isFetchingPage && hasMore && (visibleCount + PAGE_SIZE >= filteredUploads.length)) {
+            fetchUploadsPage(offset)
+          }
+          setTimeout(() => setIsLoadingMore(false), 150)
+        }
+      })
+    }, { rootMargin: '600px 0px' })
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [filteredUploads.length, hasMore, isFetchingPage, offset, visibleCount, fetchUploadsPage])
 
   useEffect(() => {
     const updateIsMobile = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640)
@@ -289,6 +304,7 @@ export default function GalleryPage() {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState('new' as SortOrder)
 
+  // Recompute filtered list on query/sort changes and reset visibleCount
   useEffect(() => {
     const q = query.trim().toLowerCase()
     let next = uploads
@@ -305,8 +321,28 @@ export default function GalleryPage() {
         : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     )
     setFilteredUploads(next)
-    setVisibleCount(24)
-  }, [query, sort, uploads])
+    setVisibleCount(PAGE_SIZE)
+  }, [query, sort])
+
+  // When uploads change (e.g., next page), recompute filtered with current query/sort without resetting visibleCount
+  useEffect(() => {
+    const q = query.trim().toLowerCase()
+    let next = uploads
+    if (q.length > 0) {
+      next = uploads.filter((u) =>
+        (u.prompt?.text || '').toLowerCase().includes(q) ||
+        (u.caption || '').toLowerCase().includes(q) ||
+        (u.uploaderName || '').toLowerCase().includes(q)
+      )
+    }
+    next = [...next].sort((a, b) =>
+      sort === 'new'
+        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )
+    setFilteredUploads(next)
+    setVisibleCount((c) => Math.min(c, next.length))
+  }, [uploads])
 
   // Count of images in the current visible window that are still loading
   const pendingVisibleCount = filteredUploads
@@ -420,8 +456,8 @@ export default function GalleryPage() {
                     {event?.name} – Galerie
                   </h2>
                   <p className="text-sm text-stone-600">
-                    {filteredUploads.length}{' '}
-                    {filteredUploads.length === 1 ? 'Foto' : 'Fotos'}
+                    {totalCount}{' '}
+                    {totalCount === 1 ? 'Foto' : 'Fotos'}
                   </p>
                 </div>
               </div>
@@ -653,7 +689,7 @@ export default function GalleryPage() {
                 <span>Fotos werden geladen …</span>
               </div>
             )}
-            {visibleCount < filteredUploads.length && (
+            {(visibleCount < filteredUploads.length || hasMore) && (
               <div className="flex justify-center py-6">
                 <div id="load-more-sentinel" className="h-8 w-8 rounded-full bg-stone-200 animate-pulse" aria-hidden />
               </div>

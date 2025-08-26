@@ -58,14 +58,14 @@ export default function EventSharePage() {
     <div
       className={`relative min-h-screen ${bgGradient} bg-stone-50`}
       style={{
-        backgroundImage: "url('/background.png')",
+        backgroundImage: "url('/background.jpg')",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
       }}
     > 
-      <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] pointer-events-none" />
-      <div className="relative overflow-hidden">
+      <div className="absolute inset-0 z-0 bg-white/60 backdrop-blur-[1px] pointer-events-none" />
+      <div className="relative z-10 overflow-hidden">
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute -top-10 -right-10 h-60 w-60 rounded-full bg-rose-200 blur-3xl" />
           <div className="absolute -bottom-10 -left-10 h-60 w-60 rounded-full bg-amber-200 blur-3xl" />
@@ -89,7 +89,7 @@ export default function EventSharePage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-6xl px-4 md:px-6 pb-12">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 md:px-6 pb-12">
         <div className="relative">
           <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
           <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">
@@ -118,7 +118,7 @@ export default function EventSharePage() {
                     <div
                       className="absolute inset-0 -z-10"
                       style={{
-                        backgroundImage: "url('/background.png')",
+                        backgroundImage: "url('/background.jpg')",
                         backgroundSize: 'cover',
                         backgroundPosition: 'center',
                         filter: 'saturate(1.35) contrast(1.08) brightness(1.02)'
@@ -178,7 +178,7 @@ export default function EventSharePage() {
           </div>
         </div>
 
-        <div className="mt-10 text-center">
+        <div className="relative z-20 mt-10 text-center">
           <p className="text-xs text-stone-500">Mit Liebe gemacht • Powered by Traumtag Momente</p>
         </div>
       </div>

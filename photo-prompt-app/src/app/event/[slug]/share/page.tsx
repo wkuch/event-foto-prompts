@@ -136,9 +136,12 @@ export default function EventSharePage() {
                         </div>
                         <div className="mt-5 w-full text-center">
                           <p className="text-[11px] uppercase tracking-widest text-stone-500">Event‑Link</p>
-                          <p className="mt-1 text-xl md:text-2xl font-serif text-stone-900 break-words decoration-rose-300/50 underline decoration-from-font underline-offset-4">
+                          <a
+                            href={info?.eventUrl}
+                            className="mt-1 inline-block text-xl md:text-2xl font-serif text-stone-900 break-words decoration-rose-300/50 underline decoration-from-font underline-offset-4"
+                          >
                             {displayUrl}
-                          </p>
+                          </a>
                         </div>
                       </div>
                       <div className="md:pl-2">

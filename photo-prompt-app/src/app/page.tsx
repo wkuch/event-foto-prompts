@@ -175,10 +175,10 @@ export default async function HomePage() {
             </p>
           </div>
 
-            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-            <div className="relative group">
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
+            <div className="relative group h-full">
               <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/0 via-rose-400/0 to-amber-300/0 blur-xl group-hover:from-rose-300/30 group-hover:via-rose-400/30 group-hover:to-amber-300/30 transition" />
-              <div className="relative glass-card p-6">
+              <div className="relative glass-card p-6 h-full flex flex-col">
                 <div className="h-12 w-12 bg-rose-100 rounded-full flex items-center justify-center">
                   <Heart className="h-6 w-6 text-rose-600" />
                 </div>
@@ -192,9 +192,9 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="relative group">
+            <div className="relative group h-full">
               <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/0 via-rose-400/0 to-amber-300/0 blur-xl group-hover:from-rose-300/30 group-hover:via-rose-400/30 group-hover:to-amber-300/30 transition" />
-              <div className="relative glass-card p-6">
+              <div className="relative glass-card p-6 h-full flex flex-col">
                 <div className="h-12 w-12 bg-amber-100 rounded-full flex items-center justify-center">
                   <Camera className="h-6 w-6 text-amber-500" />
                 </div>
@@ -207,9 +207,9 @@ export default async function HomePage() {
               </div>
             </div>
 
-            <div className="relative group">
+            <div className="relative group h-full">
               <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/0 via-rose-400/0 to-amber-300/0 blur-xl group-hover:from-rose-300/30 group-hover:via-rose-400/30 group-hover:to-amber-300/30 transition" />
-              <div className="relative glass-card p-6">
+              <div className="relative glass-card p-6 h-full flex flex-col">
                 <div className="h-12 w-12 bg-rose-100 rounded-full flex items-center justify-center">
                   <CheckCircle2 className="h-6 w-6 text-rose-600" />
                 </div>

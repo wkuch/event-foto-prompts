@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { useParams } from 'next/navigation'
+import Link from 'next/link'
 import {
   Camera,
   Upload,
@@ -392,9 +393,9 @@ export default function EventPage() {
           <div className="mx-auto w-full max-w-4xl px-6 pt-10 pb-8">
             <div className="flex items-center justify-center gap-2 text-rose-600">
               <Sparkles className="w-5 h-5" />
-              <span className="uppercase tracking-widest text-xs font-semibold">
+              <Link href="/" className="uppercase tracking-widest text-xs font-semibold hover:text-stone-900 transition-colors">
                 Traumtag Momente
-              </span>
+              </Link>
               <Sparkles className="w-5 h-5" />
             </div>
             <h1 className="mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
@@ -637,7 +638,10 @@ export default function EventPage() {
           {/* Footer */}
           <div className="mt-10 text-center">
             <p className="text-xs text-stone-500">
-              Mit Liebe gemacht • Powered by Traumtag Momente
+              Mit Liebe gemacht • Powered by{' '}
+              <Link href="/" className="underline-offset-2 hover:underline text-stone-600">
+                Traumtag Momente
+              </Link>
             </p>
           </div>
         </div>

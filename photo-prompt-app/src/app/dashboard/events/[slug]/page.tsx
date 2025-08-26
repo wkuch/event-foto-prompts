@@ -252,6 +252,10 @@ export default function EventManagePage() {
                 <Eye className="w-4 h-4 mr-2" />
                 Aufgaben-Seite
               </Link>
+              <Link href={`/event/${event.slug}/share`} className="inline-flex items-center justify-center rounded-xl px-3 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white">
+                <QrCode className="w-4 h-4 mr-2" />
+                QR‑Poster
+              </Link>
             </div>
           </div>
         </div>

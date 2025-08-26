@@ -154,6 +154,7 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
+      eventName: event.name,
       eventUrl,
       qrCodes: {
         png: {

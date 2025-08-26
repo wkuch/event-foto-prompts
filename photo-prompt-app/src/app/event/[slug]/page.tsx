@@ -419,7 +419,7 @@ export default function EventPage() {
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
             <div className="relative bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">
               {/* Prompt Banner */}
-              <div className="px-6 md:px-10 py-8 md:py-12 bg-gradient-to-br from-rose-50/80 to-rose-100/80 border-b border-rose-100/80">
+              <div className="px-6 md:px-10 py-8 md:py-12">
                 <div className="flex flex-col items-center text-center">
                   <div className="mb-5 h-14 w-14 rounded-full bg-rose-600 text-rose-50 flex items-center justify-center shadow-lg shadow-rose-600/20">
                     <Camera className="w-7 h-7" />

@@ -56,28 +56,29 @@ export default async function HomePage() {
               Galerie
             </a>
           </nav>
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
             {session?.user?.id ? (
               <Link
                 href="/dashboard"
-                className="rounded-full px-4 py-2 text-sm bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                className="rounded-full px-4 py-2 text-sm bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300 w-full sm:w-auto text-center"
               >
                 Zum Dashboard
               </Link>
             ) : (
               <Link
                 href="/auth/signin"
-                className="rounded-full px-4 py-2 text-sm bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                className="rounded-full px-4 py-2 text-sm bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300 w-full sm:w-auto text-center"
               >
                 Anmelden
               </Link>
             )}
             <Link
               href="/dashboard/create"
-              className="inline-flex items-center gap-2 rounded-full px-4 sm:px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
+              className="inline-flex items-center gap-2 rounded-full px-4 sm:px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 w-full sm:w-auto justify-center"
             >
-              Jetzt Hochzeits‑Event erstellen
-              <Heart className="h-4 w-4" />
+              <span className="sm:hidden">Event erstellen</span>
+              <span className="hidden sm:inline">Jetzt Hochzeits‑Event erstellen</span>
+              <Heart className="h-4 w-4 hidden sm:inline" />
             </Link>
           </div>
         </div>

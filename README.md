@@ -1,3 +1,143 @@
+# Traumtag Momente – Wedding Photo Prompt Service
+
+A beautiful, romantic web platform that transforms wedding photography into an interactive experience—encouraging guests to capture heartfelt moments and help couples collect unforgettable memories.
+
+## 🌟 Features
+
+- **Wedding-Specific Photo Prompts**: Generate romantic, meaningful photo challenges for wedding guests
+- **QR Code Generation**: Beautiful, print-ready QR codes for table cards and wedding programs
+- **Mobile-First Experience**: Seamless photo upload experience without app installation
+- **Real-Time Gallery**: Elegant, unified gallery for couples to view all wedding memories
+- **Guest Engagement**: Transform shy guests into active participants in the love story
+- **Instant Sharing**: Share galleries and individual photos with friends and family
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js 18+ and npm
+- PostgreSQL database (we recommend [Neon](https://neon.tech))
+- Cloudflare R2 or S3-compatible storage
+- Email service (Resend recommended)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/your-username/event-foto-prompts.git
+   cd event-foto-prompts/photo-prompt-app
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.example .env.local
+   ```
+   Fill in your database URL, storage credentials, and email service configuration.
+
+4. **Initialize the database**
+   ```bash
+   npx prisma migrate deploy
+   npx prisma generate
+   ```
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+6. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
+
+## 🏗️ Tech Stack
+
+- **Frontend**: Next.js 15 with App Router, React 19, TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **Database**: PostgreSQL with Prisma ORM
+- **Authentication**: NextAuth.js with magic link support
+- **File Storage**: Cloudflare R2 (S3-compatible)
+- **Deployment**: Vercel
+- **Email**: Resend for transactional emails
+- **Testing**: Vitest for unit and integration tests
+
+## 📱 Usage
+
+### For Wedding Couples
+
+1. **Create an Event**: Sign up and create your wedding photo challenge
+2. **Customize Prompts**: Add romantic photo prompts for your guests
+3. **Generate QR Codes**: Download beautiful QR codes for your wedding materials
+4. **Share & Enjoy**: Watch as guests upload photos throughout your special day
+
+### For Wedding Guests
+
+1. **Scan QR Code**: Use any camera app to scan the QR code at the wedding
+2. **View Prompt**: See the romantic photo challenge
+3. **Upload Photo**: Take and upload your photo with an optional caption
+4. **Add Your Name**: Let the couple know who captured the moment
+
+## 🧪 Testing
+
+Run the test suite:
+```bash
+npm run test
+```
+
+Watch mode for development:
+```bash
+npm run test:watch
+```
+
+## 🚀 Deployment
+
+The application is designed to be deployed on Vercel with zero configuration:
+
+1. **Connect your repository** to Vercel
+2. **Set environment variables** in your Vercel dashboard
+3. **Deploy**: Vercel will automatically build and deploy your application
+
+## 📁 Project Structure
+
+```
+photo-prompt-app/
+├── src/
+│   ├── app/                 # Next.js App Router pages
+│   ├── components/          # Reusable UI components
+│   ├── lib/                 # Utility functions and configurations
+│   └── hooks/               # Custom React hooks
+├── prisma/
+│   ├── schema.prisma        # Database schema
+│   └── migrations/          # Database migrations
+└── public/                  # Static assets
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/) for the amazing React framework
+- [Prisma](https://prisma.io/) for the excellent database toolkit
+- [Tailwind CSS](https://tailwindcss.com/) for the utility-first CSS framework
+- [shadcn/ui](https://ui.shadcn.com/) for the beautiful component library
+
+---
+
 # Project Overview: Traumtag Momente – Hochzeits‑Foto‑Aufgaben Service
 
 ## 1. Vision  

@@ -14,6 +14,7 @@ import {
   Sparkles,
   Heart,
   List,
+  ChevronRight,
 } from 'lucide-react'
 
 interface Prompt {
@@ -432,16 +433,7 @@ export default function EventPage() {
                     Lasst euch inspirieren und fangt den Moment ein.
                   </p>
                   {/* Browse prompts entry */}
-                  <div className="mt-4">
-                    <button
-                      onClick={handleOpenBrowse}
-                      className="inline-flex items-center gap-2 rounded-full px-4 py-2 bg-white/80 backdrop-blur text-stone-700 ring-1 ring-stone-200 shadow-sm hover:bg-white"
-                      title="Öffnet die Liste aller Aufgaben"
-                    >
-                      <List className="w-4 h-4 text-rose-500" />
-                      Aufgabenliste öffnen
-                    </button>
-                  </div>
+                  
                 </div>
               </div>
 
@@ -457,27 +449,9 @@ export default function EventPage() {
                       </div>
                     </div>
                   )}
-                  {!selectedFile && (
-                    <div className="sm:hidden mb-4">
-                      <button
-                        onClick={() => fileInputRef.current?.click()}
-                        className="group w-full inline-flex items-center justify-center gap-3 rounded-2xl px-6 py-4 bg-stone-900 text-white shadow-lg shadow-stone-900/20 hover:shadow-xl hover:shadow-stone-900/25 transition-all"
-                      >
-                        <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                          <Camera className="w-5 h-5" />
-                        </span>
-                        <div className="text-left">
-                          <div className="font-semibold">Foto auswählen</div>
-                          <div className="text-xs text-stone-300">
-                            JPG, PNG, WebP oder GIF bis 10MB
-                          </div>
-                        </div>
-                      </button>
-                    </div>
-                  )}
                   <div
                     className={`mx-auto max-w-2xl ${
-                      selectedFile ? 'mb-6' : 'mb-10'
+                      selectedFile ? 'mb-5 md:mb-6' : 'mb-8 md:mb-10'
                     }`}
                   >
                     <div className="rounded-2xl border border-rose-200 bg-gradient-to-br from-white to-rose-50 p-6 md:p-8 shadow-sm">
@@ -521,22 +495,40 @@ export default function EventPage() {
                       className="hidden"
                     />
                     {!selectedFile ? (
-                      <div className="text-center py-6 hidden sm:block">
-                        <button
-                          onClick={() => fileInputRef.current?.click()}
-                          className="group inline-flex items-center gap-3 rounded-2xl px-6 py-4 bg-stone-900 text-white shadow-lg shadow-stone-900/20 hover:shadow-xl hover:shadow-stone-900/25 transition-all"
-                        >
-                          <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
-                            <Camera className="w-5 h-5" />
-                          </span>
-                          <div className="text-left">
-                            <div className="font-semibold">Foto auswählen</div>
-                            <div className="text-xs text-stone-300">
-                              JPG, PNG, WebP oder GIF bis 10MB
+                      <>
+                        <div className="block sm:hidden mt-4 mb-5">
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="group w-full inline-flex items-center justify-center gap-3 rounded-2xl px-6 py-4 bg-stone-900 text-white shadow-lg shadow-stone-900/20 hover:shadow-xl hover:shadow-stone-900/25 transition-all"
+                          >
+                            <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
+                              <Camera className="w-5 h-5" />
+                            </span>
+                            <div className="text-left">
+                              <div className="font-semibold">Foto auswählen</div>
+                              <div className="text-xs text-stone-300">
+                                JPG, PNG, WebP oder GIF bis 10MB
+                              </div>
                             </div>
-                          </div>
-                        </button>
-                      </div>
+                          </button>
+                        </div>
+                        <div className="text-center py-6 hidden sm:block">
+                          <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className="group inline-flex items-center gap-3 rounded-2xl px-6 py-4 bg-stone-900 text-white shadow-lg shadow-stone-900/20 hover:shadow-xl hover:shadow-stone-900/25 transition-all"
+                          >
+                            <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 ring-1 ring-white/20">
+                              <Camera className="w-5 h-5" />
+                            </span>
+                            <div className="text-left">
+                              <div className="font-semibold">Foto auswählen</div>
+                              <div className="text-xs text-stone-300">
+                                JPG, PNG, WebP oder GIF bis 10MB
+                              </div>
+                            </div>
+                          </button>
+                        </div>
+                      </>
                     ) : (
                       <div className="space-y-5">
                         {/* Image Preview */}
@@ -632,6 +624,22 @@ export default function EventPage() {
                   </div>
                 </div>
               )}
+              {/* Bottom actions: Seen prompts entry */}
+              <div className="px-6 md:px-10 pt-2 md:pt-4 pb-6">
+                <div className="max-w-2xl mx-auto text-center">
+                  <button
+                    onClick={handleOpenBrowse}
+                    className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-stone-700 ring-1 ring-stone-200 bg-white/60 hover:bg-white/70"
+                    title="Zu bereits gesehenen Aufgaben wechseln"
+                  >
+                    <List className="w-3.5 h-3.5 text-rose-500" />
+                    Vorherige Aufgaben öffnen
+                  </button>
+                  <p className="mt-2 text-xs text-stone-600">
+                    Zurück zu einer bereits gesehenen Aufgabe und ein Foto dafür hochladen.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -646,7 +654,7 @@ export default function EventPage() {
           </div>
         </div>
 
-        {/* Browse Prompts Modal (mocked) */}
+        {/* Browse Prompts Modal */}
         {isBrowseOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0">
             <div
@@ -668,7 +676,10 @@ export default function EventPage() {
                 </button>
               </div>
               <div className="px-5 py-3 text-sm italic text-stone-700 bg-stone-50/60">
-                Diese Liste zeigt Aufgaben, die du bereits gesehen hast. Mit „Zufällige Aufgabe“ erhältst du eine neue Aufgabe.
+                Diese Liste zeigt Aufgaben, die du bereits gesehen hast um Fotos dafür hochzuladen.  
+                </div>
+              <div className="px-5 py-3 text-sm italic text-stone-700 bg-stone-50/60">
+                Mit „Zufällige Aufgabe“ erhältst du eine neue Aufgabe.
               </div>
               <div className="max-h-[70vh] overflow-y-auto">
                 {browseLoading ? (
@@ -685,7 +696,7 @@ export default function EventPage() {
                   {browsePrompts.map((p) => {
                     const isZero = p._count.uploads === 0
                     return (
-                      <li key={p.id} className="p-4">
+                      <li key={p.id} className="p-2">
                         <button
                           onClick={() => {
                             // Demo: set as current prompt locally and close
@@ -698,7 +709,7 @@ export default function EventPage() {
                             })
                             setIsBrowseOpen(false)
                           }}
-                          className="w-full text-left"
+                          className="group w-full text-left rounded-xl ring-1 ring-stone-200 bg-white/70 hover:bg-white transition shadow-sm hover:shadow-md px-4 py-3"
                         >
                           <div className="flex items-start gap-3">
                             <div className="mt-1 h-8 w-8 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center">
@@ -709,18 +720,13 @@ export default function EventPage() {
                                 <p className="font-medium text-stone-800 line-clamp-3">
                                   {p.text}
                                 </p>
-                                {isZero && (
-                                  <span className="shrink-0 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs ring-1 bg-rose-50 text-rose-700 ring-rose-200">
-                                    <Sparkles className="w-3.5 h-3.5" />
-                                    Noch keine Fotos
-                                  </span>
-                                )}
                               </div>
                               <div className="mt-1 text-xs text-stone-500">
-                                <span>
-                                  {p._count.uploads} Fotos
-                                </span>
+                                <span>{p._count.uploads} Fotos</span>
                               </div>
+                            </div>
+                            <div className="shrink-0 text-stone-400 group-hover:text-rose-600 transition group-hover:translate-x-0.5">
+                              <ChevronRight className="w-4 h-4" />
                             </div>
                           </div>
                         </button>

@@ -46,7 +46,7 @@ export default async function DashboardPage() {
               className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
             >
               <Plus className="w-4 h-4" />
-              Foto‑Aufgaben erstellen
+              Neues Event erstellen
             </Link>
           </div>
         </div>

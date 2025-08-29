@@ -68,6 +68,7 @@ export default function EventPage() {
     } catch {}
 
     fetchEventAndPrompt()
+    void fetchEventMeta()
   }, [slug])
 
   const fetchEventAndPrompt = async () => {
@@ -94,12 +95,12 @@ export default function EventPage() {
         setCurrentPrompt(data.prompt)
         // Mark prompt as seen locally
         addSeenPromptId(data.prompt.id)
-        setEvent({
+        setEvent((prev) => ({
           id: data.prompt.eventId,
-          name: slug,
+          name: prev?.name || '',
           slug,
           isActive: true,
-        })
+        }))
         void prefetchNextPrompts(3)
       } else {
         setError('Keine Aufgaben für dieses Event verfügbar')
@@ -110,6 +111,33 @@ export default function EventPage() {
       setIsLoading(false)
     }
   }
+
+  const fetchEventMeta = async () => {
+    try {
+      const response = await fetch(`/api/events/${slug}`)
+      if (!response.ok) return
+      const data = await response.json()
+      const ev = (data && (data.event || data)) || null
+      if (!ev) return
+      setEvent((prev) => {
+        const base = prev || {
+          id: ev.id || '',
+          name: ev.name || slug,
+          slug,
+          description: ev.description,
+          isActive: !!ev.isActive,
+        }
+        return {
+          ...base,
+          name: ev.name || base.name,
+          description: ev.description ?? base.description,
+          isActive: ev.isActive ?? base.isActive,
+        }
+      })
+    } catch {}
+  }
+
+  
 
   const addSeenPromptId = (id: string) => {
     setSeenPromptIds((prev) => {
@@ -400,11 +428,19 @@ export default function EventPage() {
               <Sparkles className="w-5 h-5" />
             </div>
             <h1 className="mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
-              Teile eure schönsten Augenblicke
+              Teilt eure schönsten Augenblicke
+              {event?.name && (
+                <span className="block mt-2 text-rose-700 text-2xl md:text-3xl font-serif font-semibold">{event.name}</span>
+              )}
             </h1>
+            {event?.name && (
+              <div className="mt-3 flex justify-center">
+                <div className="h-px w-24 md:w-32 bg-gradient-to-r from-transparent via-rose-300 to-transparent" />
+              </div>
+            )}
             
 
-            <div className="mt-6 flex justify-center">
+            <div className="mt-5 flex justify-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1.5 text-stone-700 ring-1 ring-stone-200 shadow-sm">
                 <Heart className="w-4 h-4 text-rose-500" />
                 <span className="text-xs">
@@ -421,7 +457,7 @@ export default function EventPage() {
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
             <div className="relative bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">
               {/* Prompt Banner */}
-              <div className="px-6 md:px-10 py-8 md:py-12">
+              <div className="px-6 md:px-10 pt-8 md:py-12">
                 <div className="flex flex-col items-center text-center">
                   <div className="mb-5 h-14 w-14 rounded-full bg-rose-600 text-rose-50 flex items-center justify-center shadow-lg shadow-rose-600/20">
                     <Camera className="w-7 h-7" />
@@ -431,9 +467,7 @@ export default function EventPage() {
                   </h2>
                   <p className="mt-2 text-sm text-stone-600">
                     Lasst euch inspirieren und fangt den Moment ein.
-                  </p>
-                  {/* Browse prompts entry */}
-                  
+                  </p>                  
                 </div>
               </div>
 

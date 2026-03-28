@@ -38,7 +38,7 @@ interface Event {
   isActive: boolean
 }
 
-type SortOrder = 'new' | 'old'
+type SortOrder = 'new' | 'old' | 'prompt-az' | 'prompt-za'
 type ViewMode = 'grid' | 'list'
 
 export default function GalleryPage() {
@@ -65,6 +65,8 @@ export default function GalleryPage() {
   const [hasMore, setHasMore] = useState<boolean>(true)
   const [offset, setOffset] = useState<number>(0)
   const [isFetchingPage, setIsFetchingPage] = useState<boolean>(false)
+  const [groupByPrompt, setGroupByPrompt] = useState<boolean>(false)
+  const [promptOrderMap, setPromptOrderMap] = useState<Record<string, number> | null>(null)
 
   const markLoaded = (id: string) => {
     setLoadedIds((prev) => new Set(prev).add(id))
@@ -114,6 +116,27 @@ export default function GalleryPage() {
       setError('Event-Informationen konnten nicht geladen werden')
     }
   }
+
+  // Try to fetch prompts to know their intended order; fall back to A–Z if unavailable
+  useEffect(() => {
+    const loadPrompts = async () => {
+      try {
+        const res = await fetch(`/api/galleries/${uuid}/prompts`)
+        if (!res.ok) return
+        const data = await res.json()
+        if (data?.success && Array.isArray(data.prompts)) {
+          const map: Record<string, number> = {}
+          data.prompts.forEach((p: { id: string }, idx: number) => {
+            map[p.id] = idx
+          })
+          setPromptOrderMap(map)
+        }
+      } catch {
+        // ignore
+      }
+    }
+    loadPrompts()
+  }, [uuid])
 
   const fetchUploadsPage = useCallback(async (nextOffset: number) => {
     try {
@@ -315,11 +338,13 @@ export default function GalleryPage() {
         (u.uploaderName || '').toLowerCase().includes(q)
       )
     }
-    next = [...next].sort((a, b) =>
-      sort === 'new'
-        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    )
+    next = [...next].sort((a, b) => {
+      if (sort === 'new') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      if (sort === 'old') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      const at = (a.prompt?.text || '').toLocaleLowerCase('de-DE')
+      const bt = (b.prompt?.text || '').toLocaleLowerCase('de-DE')
+      return sort === 'prompt-az' ? at.localeCompare(bt) : bt.localeCompare(at)
+    })
     setFilteredUploads(next)
     setVisibleCount(PAGE_SIZE)
   }, [query, sort])
@@ -335,11 +360,13 @@ export default function GalleryPage() {
         (u.uploaderName || '').toLowerCase().includes(q)
       )
     }
-    next = [...next].sort((a, b) =>
-      sort === 'new'
-        ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-    )
+    next = [...next].sort((a, b) => {
+      if (sort === 'new') return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      if (sort === 'old') return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      const at = (a.prompt?.text || '').toLocaleLowerCase('de-DE')
+      const bt = (b.prompt?.text || '').toLocaleLowerCase('de-DE')
+      return sort === 'prompt-az' ? at.localeCompare(bt) : bt.localeCompare(at)
+    })
     setFilteredUploads(next)
     setVisibleCount((c) => Math.min(c, next.length))
   }, [uploads])
@@ -412,21 +439,21 @@ export default function GalleryPage() {
         </div>
 
         <div className="mx-auto w-full max-w-6xl px-6 pt-10 pb-6">
-          <div className="flex items-center justify-center gap-2 text-rose-600">
+          <div className="animate-fade-up stagger-1 flex items-center justify-center gap-2 text-rose-600">
             <Sparkles className="w-5 h-5" />
             <span className="uppercase tracking-widest text-xs font-semibold">
               Traumtag Momente
             </span>
             <Sparkles className="w-5 h-5" />
           </div>
-          <h1 className="mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
+          <h1 className="animate-fade-up stagger-2 mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
             Galerie der Herzensmomente
           </h1>
-          <p className="mt-3 text-center text-stone-600 max-w-2xl mx-auto">
+          <p className="animate-fade-up stagger-3 mt-3 text-center text-stone-600 max-w-2xl mx-auto">
           Eure Erinnerungen, gesammelt an einem Ort – viel Freude beim Stöbern.
           </p>
 
-          <div className="mt-6 flex justify-center">
+          <div className="animate-fade-up stagger-4 mt-6 flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1.5 text-stone-700 ring-1 ring-stone-200 shadow-sm">
               <Heart className="w-4 h-4 text-rose-500" />
               <span className="text-xs">
@@ -438,7 +465,7 @@ export default function GalleryPage() {
       </div>
 
       {/* Toolbar Card */}
-      <div className="mx-auto w-full max-w-6xl px-4 md:px-6">
+      <div className="mx-auto w-full max-w-6xl px-4 md:px-6 animate-fade-up stagger-5">
         <div className="relative mb-8">
           <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
           <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">
@@ -507,23 +534,7 @@ export default function GalleryPage() {
                   )}
                 </div>
                 {/* Sort */}
-                <div className="hidden sm:flex rounded-2xl overflow-hidden ring-1 ring-stone-200 bg-white/80 divide-x divide-stone-200">
-                  <button
-                    onClick={() => setSort('new')}
-                    className={`px-3 h-10 text-sm ${sort === 'new' ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-50'}`}
-                    aria-pressed={sort === 'new'}
-                  >
-                    Neueste
-                  </button>
-                  <button
-                    onClick={() => setSort('old')}
-                    className={`px-3 h-10 text-sm ${sort === 'old' ? 'bg-stone-900 text-white' : 'text-stone-700 hover:bg-stone-50'}`}
-                    aria-pressed={sort === 'old'}
-                  >
-                    Älteste
-                  </button>
-                </div>
-                <div className="sm:hidden">
+                <div className="w-full sm:w-auto">
                   <label className="sr-only" htmlFor="sort-select">Sortierung</label>
                   <select
                     id="sort-select"
@@ -533,8 +544,19 @@ export default function GalleryPage() {
                   >
                     <option value="new">Neueste</option>
                     <option value="old">Älteste</option>
+                    <option value="prompt-az">Aufgabe A–Z</option>
+                    <option value="prompt-za">Aufgabe Z–A</option>
                   </select>
                 </div>
+                {/* Group by prompt toggle */}
+                <button
+                  type="button"
+                  onClick={() => setGroupByPrompt((v) => !v)}
+                  className={`w-full sm:w-auto inline-flex items-center justify-center rounded-2xl px-3 h-10 text-sm ring-1 transition ${groupByPrompt ? 'bg-stone-900 text-white ring-stone-900' : 'bg-white/80 text-stone-800 ring-stone-200 hover:bg-white'}`}
+                  aria-pressed={groupByPrompt}
+                >
+                  Nach Aufgabe gruppieren
+                </button>
                 <button
                   onClick={handleDownloadAll}
                   disabled={filteredUploads.length === 0 || isDownloadingAll}
@@ -596,93 +618,204 @@ export default function GalleryPage() {
           </div>
         ) : viewMode === 'grid' ? (
           <>
-            <ul className="columns-2 sm:columns-3 lg:columns-4 gap-x-4 [column-gap:1rem]" role="list">
-              {filteredUploads.slice(0, visibleCount).map((upload) => (
-                loadedIds.has(upload.id) && (
-                <li
-                  key={upload.id}
-                  className="group relative mb-4 break-inside-avoid rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
-                  role="listitem"
-                >
-                  <div
-                    className="relative overflow-hidden cursor-zoom-in"
-                    onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
-                    aria-label="Foto ansehen"
+            {groupByPrompt ? (
+              // Grouped grid view
+              <div className="space-y-8">
+                {(() => {
+                  const slice = filteredUploads.slice(0, visibleCount)
+                  const groups = new Map<string, { id: string, text: string, items: Upload[] }>()
+                  slice.forEach((u) => {
+                    const key = u.prompt?.id || u.prompt?.text || 'ohne-aufgabe'
+                    const label = u.prompt?.text || 'Ohne Aufgabe'
+                    if (!groups.has(key)) groups.set(key, { id: key, text: label, items: [] })
+                    groups.get(key)!.items.push(u)
+                  })
+                  const arr = Array.from(groups.values())
+                  arr.sort((a, b) => {
+                    if (promptOrderMap && a.id in promptOrderMap && b.id in promptOrderMap) {
+                      return (promptOrderMap[a.id] - promptOrderMap[b.id])
+                    }
+                    return a.text.toLocaleLowerCase('de-DE').localeCompare(b.text.toLocaleLowerCase('de-DE'))
+                  })
+                  return arr.map((g) => (
+                    <div key={g.id}>
+                      <div className="flex items-center justify-between mb-3">
+                        <h3 className="text-sm font-semibold text-stone-900">{g.text}</h3>
+                        <span className="text-xs text-stone-500">{g.items.length}</span>
+                      </div>
+                      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" role="list">
+                        {g.items
+                          .slice()
+                          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                          .map((upload) => (
+                            loadedIds.has(upload.id) && (
+                            <li
+                              key={upload.id}
+                              className="group relative rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
+                              role="listitem"
+                            >
+                              <div
+                                className="relative overflow-hidden cursor-zoom-in"
+                                onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
+                                aria-label="Foto ansehen"
+                              >
+                                <img
+                                  src={upload.r2Url}
+                                  alt={upload.prompt.text || upload.caption || 'Event photo'}
+                                  className={`block w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02] z-0 select-none transition-opacity ${loadedIds.has(upload.id) ? 'opacity-100' : 'opacity-0'}`}
+                                  loading="lazy"
+                                  decoding="async"
+                                  onLoad={() => markLoaded(upload.id)}
+                                  onError={(e) => {
+                                    const imgEl = e.currentTarget as HTMLImageElement
+                                    if (!(imgEl as any)._retried) {
+                                      ;(imgEl as any)._retried = true
+                                      imgEl.src = `${upload.r2Url}?v=${Date.now()}`
+                                      return
+                                    }
+                                    markLoaded(upload.id)
+                                  }}
+                                />
+                                <div
+                                  className="absolute inset-0 z-10 bg-black/0 sm:group-hover:bg-black/20 transition"
+                                  aria-hidden
+                                />
+                                <div className="absolute inset-0 z-20">
+                                  <div className="absolute right-3 top-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition flex items-center gap-2">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id)) }}
+                                      aria-label="Bild ansehen"
+                                      className="hidden sm:inline-flex rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                                    >
+                                      <Eye className="h-5 w-5 text-stone-900" />
+                                    </button>
+                                    {isOwner && (
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); deleteUpload(upload) }}
+                                        aria-label="Löschen"
+                                        title="Foto löschen"
+                                        className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300 hover:bg-white"
+                                        disabled={deletingId === upload.id}
+                                      >
+                                        <Trash2 className="h-5 w-5 text-rose-600" />
+                                      </button>
+                                    )}
+                                  </div>
+                                  <div className="absolute left-3 bottom-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition">
+                                    <button
+                                      onClick={(e) => { e.stopPropagation(); downloadImage(upload) }}
+                                      className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 px-3 py-1 text-xs ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                                    >
+                                      <Download className="h-3.5 w-3.5" />
+                                      Herunterladen
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="p-4">
+                                {upload.caption && (
+                                  <p className="text-sm text-stone-800 line-clamp-2 mb-2">
+                                    {upload.caption}
+                                  </p>
+                                )}
+                                <div className="flex items-center justify-between text-xs text-stone-500">
+                                  <span>{upload.uploaderName || 'Anonym'}</span>
+                                  <span>{formatDate(upload.createdAt)}</span>
+                                </div>
+                              </div>
+                            </li>)
+                          ))}
+                      </ul>
+                    </div>
+                  ))
+                })()}
+              </div>
+            ) : (
+              // Ungrouped original masonry view
+              <ul className="columns-2 sm:columns-3 lg:columns-4 gap-x-4 [column-gap:1rem]" role="list">
+                {filteredUploads.slice(0, visibleCount).map((upload) => (
+                  loadedIds.has(upload.id) && (
+                  <li
+                    key={upload.id}
+                    className="group relative mb-4 break-inside-avoid rounded-2xl border border-stone-200 bg-white/80 backdrop-blur shadow-sm hover:shadow-md transition"
+                    role="listitem"
                   >
-                    <img
-                      src={upload.r2Url}
-                      alt={upload.prompt.text || upload.caption || 'Event photo'}
-                      className={`block w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02] z-0 select-none transition-opacity ${loadedIds.has(upload.id) ? 'opacity-100' : 'opacity-0'}`}
-                      loading="lazy"
-                      decoding="async"
-                      onLoad={() => markLoaded(upload.id)}
-                      onError={(e) => {
-                        const imgEl = e.currentTarget as HTMLImageElement
-                        if (!(imgEl as any)._retried) {
-                          ;(imgEl as any)._retried = true
-                          imgEl.src = `${upload.r2Url}?v=${Date.now()}`
-                          return
-                        }
-                        markLoaded(upload.id)
-                      }}
-                    />
-                    {/* Overlay tint on hover (desktop) */}
                     <div
-                      className="absolute inset-0 z-10 bg-black/0 sm:group-hover:bg-black/20 transition"
-                      aria-hidden
-                    />
-                    {/* Action buttons layer */}
-                    <div className="absolute inset-0 z-20">
-                      {/* Top-right actions */}
-                      <div className="absolute right-3 top-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition flex items-center gap-2">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id)) }}
-                          aria-label="Bild ansehen"
-                          className="hidden sm:inline-flex rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
-                        >
-                          <Eye className="h-5 w-5 text-stone-900" />
-                        </button>
-                        {isOwner && (
+                      className="relative overflow-hidden cursor-zoom-in"
+                      onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
+                      aria-label="Foto ansehen"
+                    >
+                      <img
+                        src={upload.r2Url}
+                        alt={upload.prompt.text || upload.caption || 'Event photo'}
+                        className={`block w-full h-auto object-cover transition-transform duration-500 group-hover:scale-[1.02] z-0 select-none transition-opacity ${loadedIds.has(upload.id) ? 'opacity-100' : 'opacity-0'}`}
+                        loading="lazy"
+                        decoding="async"
+                        onLoad={() => markLoaded(upload.id)}
+                        onError={(e) => {
+                          const imgEl = e.currentTarget as HTMLImageElement
+                          if (!(imgEl as any)._retried) {
+                            ;(imgEl as any)._retried = true
+                            imgEl.src = `${upload.r2Url}?v=${Date.now()}`
+                            return
+                          }
+                          markLoaded(upload.id)
+                        }}
+                      />
+                      <div
+                        className="absolute inset-0 z-10 bg-black/0 sm:group-hover:bg-black/20 transition"
+                        aria-hidden
+                      />
+                      <div className="absolute inset-0 z-20">
+                        <div className="absolute right-3 top-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition flex items-center gap-2">
                           <button
-                            onClick={(e) => { e.stopPropagation(); deleteUpload(upload) }}
-                            aria-label="Löschen"
-                            title="Foto löschen"
-                            className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300 hover:bg-white"
-                            disabled={deletingId === upload.id}
+                            onClick={(e) => { e.stopPropagation(); openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id)) }}
+                            aria-label="Bild ansehen"
+                            className="hidden sm:inline-flex rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
                           >
-                            <Trash2 className="h-5 w-5 text-rose-600" />
+                            <Eye className="h-5 w-5 text-stone-900" />
                           </button>
-                        )}
-                      </div>
-                      {/* Bottom-left download button */}
-                      <div className="absolute left-3 bottom-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition">
-                        <button
-                          onClick={(e) => { e.stopPropagation(); downloadImage(upload) }}
-                          className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 px-3 py-1 text-xs ring-1 ring-rose-200 hover:bg-rose-100 transition"
-                        >
-                          <Download className="h-3.5 w-3.5" />
-                          Herunterladen
-                        </button>
+                          {isOwner && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); deleteUpload(upload) }}
+                              aria-label="Löschen"
+                              title="Foto löschen"
+                              className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300 hover:bg-white"
+                              disabled={deletingId === upload.id}
+                            >
+                              <Trash2 className="h-5 w-5 text-rose-600" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="absolute left-3 bottom-3 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); downloadImage(upload) }}
+                            className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 px-3 py-1 text-xs ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                            Herunterladen
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="p-4">
-                    <p className="text-xs text-stone-500 mb-1 truncate">
-                      {upload.prompt.text}
-                    </p>
-                    {upload.caption && (
-                      <p className="text-sm text-stone-800 line-clamp-2 mb-2">
-                        {upload.caption}
+                    <div className="p-4">
+                      <p className="text-xs text-stone-500 mb-1 truncate">
+                        {upload.prompt.text}
                       </p>
-                    )}
-                    <div className="flex items-center justify-between text-xs text-stone-500">
-                      <span>{upload.uploaderName || 'Anonym'}</span>
-                      <span>{formatDate(upload.createdAt)}</span>
+                      {upload.caption && (
+                        <p className="text-sm text-stone-800 line-clamp-2 mb-2">
+                          {upload.caption}
+                        </p>
+                      )}
+                      <div className="flex items-center justify-between text-xs text-stone-500">
+                        <span>{upload.uploaderName || 'Anonym'}</span>
+                        <span>{formatDate(upload.createdAt)}</span>
+                      </div>
                     </div>
-                  </div>
-                </li>)
-              ))}
-            </ul>
+                  </li>)
+                ))}
+              </ul>
+            )}
             {pendingVisibleCount > 0 && (
               <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mt-2">
                 <Loader className="w-4 h-4 animate-spin" />
@@ -696,80 +829,171 @@ export default function GalleryPage() {
             )}
           </>
         ) : (
-          <div className="space-y-4">
-            {filteredUploads.map((upload) => (
-              loadedIds.has(upload.id) && (
-              <div
-                key={upload.id}
-                className="rounded-2xl border border-stone-200 bg-white/80 backdrop-blur p-4 shadow-sm hover:shadow-md transition flex items-center gap-5"
-              >
-                <button
-                  className="relative w-28 h-28 overflow-hidden rounded-xl ring-1 ring-stone-200"
-                  onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
-                  aria-label="Foto ansehen"
-                >
-                  <img
-                    src={upload.r2Url}
-                    alt={upload.prompt.text || upload.caption || 'Event photo'}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
-                    decoding="async"
-                  />
-                </button>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-stone-500 mb-1 truncate">
-                    {upload.prompt.text}
-                  </p>
-                  {upload.caption && (
-                    <p className="text-stone-800 mb-2 truncate">
-                      {upload.caption}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
-                    <span>Von {upload.uploaderName || 'Anonym'}</span>
-                    <span className="opacity-50">•</span>
-                    <span>{formatDate(upload.createdAt)}</span>
+          groupByPrompt ? (
+            // Grouped list view
+            <div className="space-y-8">
+              {(() => {
+                const slice = filteredUploads
+                const groups = new Map<string, { id: string, text: string, items: Upload[] }>()
+                slice.forEach((u) => {
+                  const key = u.prompt?.id || u.prompt?.text || 'ohne-aufgabe'
+                  const label = u.prompt?.text || 'Ohne Aufgabe'
+                  if (!groups.has(key)) groups.set(key, { id: key, text: label, items: [] })
+                  groups.get(key)!.items.push(u)
+                })
+                const arr = Array.from(groups.values())
+                arr.sort((a, b) => {
+                  if (promptOrderMap && a.id in promptOrderMap && b.id in promptOrderMap) {
+                    return (promptOrderMap[a.id] - promptOrderMap[b.id])
+                  }
+                  return a.text.toLocaleLowerCase('de-DE').localeCompare(b.text.toLocaleLowerCase('de-DE'))
+                })
+                return arr.map((g) => (
+                  <div key={g.id}>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="text-sm font-semibold text-stone-900">{g.text}</h3>
+                      <span className="text-xs text-stone-500">{g.items.length}</span>
+                    </div>
+                    <div className="space-y-4">
+                      {g.items.map((upload) => (
+                        loadedIds.has(upload.id) && (
+                        <div
+                          key={upload.id}
+                          className="rounded-2xl border border-stone-200 bg-white/80 backdrop-blur p-4 shadow-sm hover:shadow-md transition flex items-center gap-5"
+                        >
+                          <button
+                            className="relative w-28 h-28 overflow-hidden rounded-xl ring-1 ring-stone-200"
+                            onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
+                            aria-label="Foto ansehen"
+                          >
+                            <img
+                              src={upload.r2Url}
+                              alt={upload.prompt.text || upload.caption || 'Event photo'}
+                              className="absolute inset-0 w-full h-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          </button>
+                          <div className="flex-1 min-w-0">
+                            {upload.caption && (
+                              <p className="text-stone-800 mb-2 truncate">
+                                {upload.caption}
+                              </p>
+                            )}
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                              <span>Von {upload.uploaderName || 'Anonym'}</span>
+                              <span className="opacity-50">•</span>
+                              <span>{formatDate(upload.createdAt)}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {isOwner && (
+                              <button
+                                onClick={() => deleteUpload(upload)}
+                                className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-50 transition disabled:opacity-50"
+                                aria-label="Löschen"
+                                disabled={deletingId === upload.id}
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            )}
+                            <button
+                              onClick={() => downloadImage(upload)}
+                              className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                              aria-label="Herunterladen"
+                            >
+                              <Download className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>)
+                      ))}
+                    </div>
                   </div>
+                ))
+              })()}
+              {pendingVisibleCount > 0 && (
+                <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mt-2">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  <span>Fotos werden geladen …</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  {isOwner && (
-                    <button
-                      onClick={() => deleteUpload(upload)}
-                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-50 transition disabled:opacity-50"
-                      aria-label="Löschen"
-                      disabled={deletingId === upload.id}
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                  )}
+              )}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredUploads.map((upload) => (
+                loadedIds.has(upload.id) && (
+                <div
+                  key={upload.id}
+                  className="rounded-2xl border border-stone-200 bg-white/80 backdrop-blur p-4 shadow-sm hover:shadow-md transition flex items-center gap-5"
+                >
                   <button
-                    onClick={() => downloadImage(upload)}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100 transition"
-                    aria-label="Herunterladen"
+                    className="relative w-28 h-28 overflow-hidden rounded-xl ring-1 ring-stone-200"
+                    onClick={() => openAtIndex(filteredUploads.findIndex((u) => u.id === upload.id))}
+                    aria-label="Foto ansehen"
                   >
-                    <Download className="w-5 h-5" />
+                    <img
+                      src={upload.r2Url}
+                      alt={upload.prompt.text || upload.caption || 'Event photo'}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </button>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-stone-500 mb-1 truncate">
+                      {upload.prompt.text}
+                    </p>
+                    {upload.caption && (
+                      <p className="text-stone-800 mb-2 truncate">
+                        {upload.caption}
+                      </p>
+                    )}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                      <span>Von {upload.uploaderName || 'Anonym'}</span>
+                      <span className="opacity-50">•</span>
+                      <span>{formatDate(upload.createdAt)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {isOwner && (
+                      <button
+                        onClick={() => deleteUpload(upload)}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-50 transition disabled:opacity-50"
+                        aria-label="Löschen"
+                        disabled={deletingId === upload.id}
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => downloadImage(upload)}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-200 hover:bg-rose-100 transition"
+                      aria-label="Herunterladen"
+                    >
+                      <Download className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>)
+              ))}
+              {pendingVisibleCount > 0 && (
+                <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mt-2">
+                  <Loader className="w-4 h-4 animate-spin" />
+                  <span>Fotos werden geladen …</span>
                 </div>
-              </div>)
-            ))}
-            {pendingVisibleCount > 0 && (
-              <div className="flex items-center justify-center gap-2 text-stone-600 text-sm mt-2">
-                <Loader className="w-4 h-4 animate-spin" />
-                <span>Fotos werden geladen …</span>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )
         )}
       </div>
 
       {/* Image Modal */}
       {selectedImage && loadedIds.has(selectedImage.id) && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-fade-in"
           onClick={() => closeLightbox()}
         >
           <div
-            className="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white/90 backdrop-blur ring-1 ring-white/60"
+            className="relative w-full max-w-5xl rounded-3xl overflow-hidden bg-white/90 backdrop-blur ring-1 ring-white/60 animate-scale-fade"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="relative bg-stone-900" onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
@@ -781,6 +1005,12 @@ export default function GalleryPage() {
                   loading="eager"
                   decoding="async"
                 />
+              </div>
+              {/* Image counter */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-10">
+                <span className="rounded-full bg-black/50 backdrop-blur-sm px-3 py-1 text-xs text-white/90 tabular-nums">
+                  {selectedIndex + 1} / {filteredUploads.length}
+                </span>
               </div>
               {/* Lightbox nav */}
               <div className="hidden sm:flex absolute inset-y-0 left-0 items-center">

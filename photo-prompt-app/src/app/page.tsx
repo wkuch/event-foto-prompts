@@ -2,14 +2,11 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import RevealOnScroll from "@/components/RevealOnScroll";
 import {
   Camera,
   CheckCircle2,
-  Download,
-  Eye,
   Heart,
-  Sparkles,
-  X,
 } from "lucide-react";
 
 
@@ -17,25 +14,33 @@ export default async function HomePage() {
   const session = await getServerSession(authOptions);
   return (
     <div className="min-h-screen bg-stone-50 antialiased">
-      {/* Background glow layers */}
+      {/* Watercolor background */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(800px 400px at 20% 10%, rgba(244,114,182,0.15), transparent 60%), radial-gradient(700px 300px at 80% 20%, rgba(251,191,36,0.10), transparent 60%)",
-        }}
-      />
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/background.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'top center',
+            backgroundRepeat: 'no-repeat',
+            opacity: 0.18,
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-white/40 via-transparent to-white/80" />
+      </div>
 
       {/* Header / Nav */}
       <header className="sticky top-0 z-20 backdrop-blur-xl bg-white/60 border-b border-stone-200/60">
         <div className="container mx-auto max-w-6xl px-4 py-3 flex flex-wrap items-center gap-3 justify-between">
-          <div className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-rose-600" />
-            <span className="text-sm font-semibold uppercase tracking-widest text-rose-600">
+          <Link href="/" className="flex items-center gap-2 group">
+            <Heart className="h-4 w-4 text-rose-500 transition-transform group-hover:scale-110" />
+            <span className="font-serif text-lg font-semibold text-stone-900">
               Traumtag Momente
             </span>
-          </div>
+          </Link>
           <nav className="hidden md:flex items-center gap-6 text-sm text-stone-700">
             <a
               href="#funktionen"
@@ -86,83 +91,69 @@ export default async function HomePage() {
 
       <main>
         {/* Hero */}
-        <section className="relative">
-          <div className="container mx-auto max-w-6xl px-4 pt-16 pb-10 md:pt-24 md:pb-16">
-            <div className="mx-auto max-w-4xl text-center">
-              <div className="flex items-center justify-center gap-2 text-rose-600 mb-5">
-                <Sparkles className="w-6 h-6" />
-                <span className="uppercase tracking-widest text-xs md:text-sm font-semibold">
-                  Traumtag Momente
-                </span>
-                <Sparkles className="w-6 h-6" />
+        <section className="relative isolate overflow-hidden">
+          {/* Hero image */}
+          <div className="absolute inset-0 z-0" aria-hidden>
+            <img
+              src="/hero.png"
+              alt=""
+              className="h-full w-full object-cover object-[center_30%] animate-fade-in"
+              style={{ filter: 'saturate(1.1) brightness(1.05)' }}
+            />
+            {/* Gradient overlays for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-white/90 via-white/75 to-white/30 md:from-white/95 md:via-white/80 md:to-white/20" />
+            <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-white/50" />
+          </div>
+
+          <div className="relative z-10 container mx-auto max-w-6xl px-4 pt-20 pb-16 md:pt-32 md:pb-28 lg:pt-40 lg:pb-36">
+            <div className="max-w-2xl">
+              <div className="animate-fade-up stagger-1 mb-5">
+                <div className="inline-flex items-center gap-3">
+                  <div className="h-px w-8 bg-rose-300/70" />
+                  <span className="text-xs font-medium tracking-[0.2em] uppercase text-stone-500">
+                    Foto-Gästebuch
+                  </span>
+                  <div className="h-px w-8 bg-rose-300/70" />
+                </div>
               </div>
-              <h1 className="font-serif text-4xl leading-[1.1] md:text-6xl font-bold tracking-tight text-stone-900">
-                Romantische Foto-Aufgaben für eure Hochzeit –{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-400">
-                  echte Momente, gemeinsam gesammelt
+              <h1 className="animate-fade-up stagger-2 font-serif text-4xl leading-[1.08] md:text-6xl lg:text-7xl font-bold tracking-tight text-stone-900">
+                Eure Gäste erzählen{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 via-rose-500 to-amber-400">
+                  eure Geschichte
                 </span>
               </h1>
-              <p className="mt-6 text-base md:text-xl text-stone-700 leading-relaxed">
-                Verwandelt eure Gäste in Geschichtenerzähler. Mit liebevollen
-                Foto‑Aufgaben, sofortigen Uploads und einer gemeinsamen, eleganten
-                Galerie für alle unvergesslichen Augenblicke.
+              <p className="animate-fade-up stagger-3 mt-6 max-w-lg text-base md:text-lg text-stone-600 leading-relaxed">
+                Romantische Foto‑Aufgaben, die eure Gäste zu Geschichtenerzählern
+                machen. Alle Bilder in einer gemeinsamen Galerie&nbsp;–
+                ohne App, einfach per QR‑Code.
               </p>
 
-              {/* Soft badge */}
-              <div className="mt-6 inline-flex items-center gap-2 rounded-full ring-1 ring-stone-200 bg-white/80 px-4 py-1.5 text-sm text-stone-700 backdrop-blur-xl">
-                <Heart className="h-4 w-4 text-rose-600" />
-                Für Paare, die Erinnerungen feiern
-              </div>
-
               {/* CTA group */}
-              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
+              <div className="animate-fade-up stagger-4 mt-10 flex flex-col sm:flex-row items-start gap-3 sm:gap-4">
                 <Link
                   href="/dashboard/create"
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-[0_6px_20px_-6px_rgba(28,25,23,0.4)]"
+                  className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.98] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-[0_8px_24px_-8px_rgba(28,25,23,0.45)]"
                 >
-                  Hochzeits‑Event starten
-                  <Heart className="h-5 w-5" />
+                  Kostenlos starten
+                  <Heart className="h-4 w-4 transition-transform group-hover:scale-110" />
                 </Link>
                 <a
                   href="#wie-es-funktioniert"
-                  className="rounded-2xl ring-1 ring-stone-200 bg-white/80 hover:bg-white transition px-5 py-3 text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300 w-full sm:w-auto text-center"
+                  className="rounded-full ring-1 ring-stone-200 bg-white/80 hover:bg-white transition px-6 py-3.5 text-stone-700 focus:outline-none focus:ring-2 focus:ring-rose-300"
                 >
-                  Mehr erfahren
+                  So funktioniert's
                 </a>
               </div>
-            </div>
 
-            {/* Glass Feature / Prompt Card */}
-            <div className="relative mx-auto mt-16 max-w-2xl">
-              <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
-              <div className="relative glass-card">
-                <div className="flex items-center gap-4 flex-wrap">
-                  <div className="h-12 w-12 rounded-full bg-rose-600 shadow-lg shadow-rose-600/20 flex items-center justify-center">
-                    <Camera className="h-6 w-6 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-stone-800 font-medium">
-                      Beispiel‑Aufgabe: „Ein Foto vom ersten Tanz“
-                    </p>
-                    <p className="text-sm text-stone-600">
-                      Gäste laden mobil hoch – mit Namen und kleinem Gruß.
-                    </p>
-                  </div>
-                  <div className="hidden sm:flex">
-                    <a
-                      href="#funktionen"
-                      className="rounded-full px-4 py-2 text-sm bg-white/80 ring-1 ring-stone-200 hover:bg-white transition text-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
-                    >
-                      Zu den Funktionen
-                    </a>
-                  </div>
-                </div>
-              </div>
+              <p className="animate-fade-up stagger-5 mt-5 text-xs text-stone-400">
+                Kostenlos &middot; Keine App nötig &middot; In 2 Minuten startklar
+              </p>
             </div>
           </div>
         </section>
 
         {/* Three-step How It Works */}
+        <RevealOnScroll>
         <section
           id="wie-es-funktioniert"
           className="container mx-auto max-w-6xl px-4 py-16 md:py-20"
@@ -184,7 +175,7 @@ export default async function HomePage() {
                   <Heart className="h-6 w-6 text-rose-600" />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold text-stone-900">
-                  1) Foto-Aufgaben erstellen
+                  Foto-Aufgaben erstellen
                 </h3>
                 <p className="mt-2 text-stone-700">
                   Wählt romantische Prompts aus oder schreibt eigene Ideen –
@@ -200,7 +191,7 @@ export default async function HomePage() {
                   <Camera className="h-6 w-6 text-amber-500" />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold text-stone-900">
-                  2) Gäste einladen
+                  Gäste einladen
                 </h3>
                 <p className="mt-2 text-stone-700">
                   Teilt QR-Codes – Gäste scannen, fotografieren und laden direkt hoch.
@@ -215,7 +206,7 @@ export default async function HomePage() {
                   <CheckCircle2 className="h-6 w-6 text-rose-600" />
                 </div>
                 <h3 className="mt-5 text-lg font-semibold text-stone-900">
-                  3) Erinnerungen genießen
+                  Erinnerungen genießen
                 </h3>
                 <p className="mt-2 text-stone-700">
                   Alle Bilder in eurer eleganten Galerie ansehen, teilen und
@@ -225,8 +216,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </RevealOnScroll>
 
         {/* Feature Split: Why Traumtag Momente */}
+        <RevealOnScroll>
         <section
           id="funktionen"
           className="container mx-auto max-w-6xl px-4 py-16 md:py-20"
@@ -304,8 +297,10 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
+        </RevealOnScroll>
 
         {/* Gallery Teaser */}
+        <RevealOnScroll>
         <section
           id="galerie"
           className="container mx-auto max-w-6xl px-4 py-16 md:py-20"
@@ -331,87 +326,66 @@ export default async function HomePage() {
             ].map((img, i) => (
               <div
                 key={i}
-                className="group relative overflow-hidden rounded-3xl bg-white/80 ring-1 ring-stone-200 backdrop-blur-xl shadow-sm"
+                className="group relative overflow-hidden rounded-2xl shadow-sm"
               >
-                <div className="aspect-[4/3] bg-stone-200">
-                  {/* Use next/image in real app */}
+                <div className="aspect-[4/3] bg-stone-100">
                   <img
                     src={img.src}
                     alt={img.alt}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
                   />
                 </div>
-                {/* Hover overlay */}
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition duration-300" />
-                <div className="absolute right-3 top-3 opacity-0 group-hover:opacity-100 transition">
-                  <button
-                    aria-label="Bild ansehen"
-                    className="rounded-full bg-white/90 backdrop-blur-xl shadow-sm p-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
-                  >
-                    <Eye className="h-5 w-5 text-stone-900" />
-                  </button>
-                </div>
-                <div className="absolute left-3 bottom-3 flex items-center gap-2">
-                  <a
-                    href={`/api/download?url=${encodeURIComponent(img.src)}`}
-                    className="inline-flex items-center gap-1 rounded-full bg-rose-50 text-rose-700 px-3 py-1 text-xs ring-1 ring-rose-200 hover:bg-rose-100 transition"
-                    download
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Herunterladen
-                  </a>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition duration-300" />
+                <div className="absolute left-4 bottom-4 right-4 opacity-0 group-hover:opacity-100 transition duration-300">
+                  <p className="text-sm font-medium text-white drop-shadow-sm">{img.alt}</p>
                 </div>
               </div>
             ))}
           </div>
         </section>
+        </RevealOnScroll>
 
         {/* CTA Banner */}
+        <RevealOnScroll>
         <section className="container mx-auto max-w-6xl px-4 pb-24">
           <div className="relative">
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
             <div className="relative glass-card p-8 md:p-12 text-center">
-              <div className="mx-auto inline-flex items-center gap-2 text-rose-600">
-                <Sparkles className="h-5 w-5" />
-                <span className="uppercase tracking-widest text-xs font-semibold">
-                  Startet jetzt
-                </span>
-              </div>
-              <h3 className="mt-4 font-serif text-3xl md:text-4xl font-bold tracking-tight text-stone-900">
-                Erstellt eure Hochzeits-Foto-Aufgaben in Minuten
+              <h3 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-stone-900">
+                Bereit für unvergessliche Momente?
               </h3>
-              <p className="mt-3 text-stone-700">
-                Intuitive Erstellung, QR-Codes zum Teilen, elegante Galerie –
-                alles an einem Ort.
+              <p className="mt-3 text-stone-600 max-w-xl mx-auto">
+                In 2 Minuten erstellt. Gäste scannen den QR‑Code und eure
+                gemeinsame Galerie füllt sich von selbst.
               </p>
               <div className="mt-8">
                 <Link
                   href="/dashboard/create"
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  className="group inline-flex items-center gap-2 rounded-full px-7 py-3.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.98] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 shadow-[0_8px_24px_-8px_rgba(28,25,23,0.45)]"
                 >
-                  Zum Erstellen
-                  <Heart className="h-5 w-5" />
+                  Jetzt starten
+                  <Heart className="h-4 w-4 transition-transform group-hover:scale-110" />
                 </Link>
               </div>
             </div>
           </div>
         </section>
+        </RevealOnScroll>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-stone-200 bg-white/80 backdrop-blur-xl">
+      <footer className="bg-white/80 backdrop-blur-xl">
+        <div className="mx-auto max-w-xs h-px bg-gradient-to-r from-transparent via-rose-300 to-transparent" />
         <div className="container mx-auto max-w-6xl px-4 py-10">
           <div className="flex flex-col items-center text-center gap-3">
-            <div className="flex items-center justify-center gap-2 text-rose-600">
-              <Heart className="w-5 h-5" />
-              <h3 className="text-base font-semibold text-stone-900">
+            <div className="flex items-center gap-2">
+              <Heart className="w-4 h-4 text-rose-400" />
+              <span className="font-serif text-base font-semibold text-stone-800">
                 Traumtag Momente
-              </h3>
-              <Heart className="w-5 h-5" />
+              </span>
             </div>
-            <p className="text-sm text-stone-600">
-              Hochzeiten unvergesslicher machen – ein Herzensmoment nach dem
-              anderen.
+            <p className="text-sm text-stone-500">
+              Erinnerungen, die bleiben.
             </p>
             <div className="mt-2 text-xs text-stone-500 flex flex-wrap items-center justify-center gap-2">
               <a href="#funktionen" className="hover:text-stone-700">

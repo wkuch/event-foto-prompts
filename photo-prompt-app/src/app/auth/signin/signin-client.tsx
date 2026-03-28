@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { signIn, getSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { Mail, ArrowLeft, Loader, CheckCircle, AlertCircle } from 'lucide-react'
+import { Mail, ArrowLeft, Loader, CheckCircle, AlertCircle, Sparkles, Heart } from 'lucide-react'
 
 export default function SignInClient() {
   const router = useRouter()
@@ -101,89 +101,98 @@ export default function SignInClient() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-rose-500 to-amber-500 px-6 py-8 text-white text-center">
-          <h1 className="text-2xl font-bold mb-2">Willkommen zurück</h1>
-          <p className="text-rose-100">
-Meldet euch an, um eure Hochzeits-Foto-Aufgaben zu verwalten
-          </p>
-        </div>
-
-        {/* Form */}
-        <div className="px-6 py-8">
-          <div className="flex items-center mb-6">
-            <Link
-              href="/"
-              className="mr-4 p-2 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Link>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900">
-                Zugang zu euren Foto-Aufgaben
-              </h2>
-              <p className="text-sm text-gray-600">
-                Gebt eure E-Mail ein, um einen Magic Link zu erhalten
+    <div className="min-h-screen bg-stone-50 antialiased flex items-center justify-center p-4">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 -z-10"
+        style={{
+          background:
+            'radial-gradient(800px 400px at 20% 10%, rgba(244,114,182,0.15), transparent 60%), radial-gradient(700px 300px at 80% 20%, rgba(251,191,36,0.10), transparent 60%)',
+        }}
+      />
+      <div className="max-w-md w-full animate-scale-fade">
+        <div className="relative">
+          <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
+          <div className="relative glass-card p-8">
+            <div className="text-center mb-8">
+              <div className="flex items-center justify-center gap-2 text-rose-600 mb-4">
+                <Sparkles className="w-5 h-5" />
+                <span className="uppercase tracking-widest text-xs font-semibold">Traumtag Momente</span>
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <h1 className="font-serif text-2xl font-bold text-stone-900 mb-2">
+                Willkommen zurück
+              </h1>
+              <p className="text-stone-600 text-sm">
+                Meldet euch an, um eure Hochzeits-Foto-Aufgaben zu verwalten
               </p>
             </div>
-          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                E-Mail-Adresse
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-5 w-5 text-gray-400" />
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
+                  E-Mail-Adresse
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <Mail className="h-5 w-5 text-stone-400" />
+                  </div>
+                  <input
+                    id="email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="eure@email.de"
+                    className="block w-full pl-10 pr-3 py-2.5 rounded-xl ring-1 ring-stone-200 bg-white/80 backdrop-blur leading-5 placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-rose-300 focus:border-transparent transition"
+                  />
                 </div>
-                <input
-                  id="email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-placeholder="Gebt die E-Mail ein, mit der ihr eure Foto-Aufgaben erstellt habt"
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-2 focus:ring-rose-500 focus:border-transparent"
-                />
               </div>
+
+              {error && (
+                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 flex items-center">
+                  <AlertCircle className="w-5 h-5 text-rose-500 mr-2 flex-shrink-0" />
+                  <p className="text-sm text-rose-700">{error}</p>
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isLoading || !email.trim()}
+                className="w-full inline-flex justify-center items-center gap-2 rounded-full px-6 py-3 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    Magic Link wird gesendet...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-5 h-5" />
+                    Magic Link senden
+                  </>
+                )}
+              </button>
+            </form>
+
+            <div className="mt-6 pt-6 border-t border-stone-200">
+              <p className="text-xs text-stone-500 text-center">
+                Noch keine Foto-Aufgaben erstellt?{' '}
+                <Link href="/dashboard/create" className="text-rose-600 hover:text-rose-500 font-medium">
+                  Jetzt erstellen
+                </Link>
+              </p>
             </div>
 
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-3 flex items-center">
-                <AlertCircle className="w-5 h-5 text-red-400 mr-2" />
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoading || !email.trim()}
-              className="w-full flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? (
-                <>
-                  <Loader className="w-5 h-5 mr-2 animate-spin" />
-                  Magic Link wird gesendet...
-                </>
-              ) : (
-                <>
-                  <Mail className="w-5 h-5 mr-2" />
-                  Magic Link senden
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-xs text-gray-500 text-center">
-              Noch keine Foto-Aufgaben erstellt?{' '}
-              <Link href="/dashboard/create" className="text-rose-600 hover:text-rose-500 font-medium">
-                Erstellt Hochzeits-Foto-Aufgaben
+            <div className="mt-4 text-center">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-sm text-stone-500 hover:text-stone-700 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Zur Startseite
               </Link>
-            </p>
+            </div>
           </div>
         </div>
       </div>

@@ -43,7 +43,7 @@ export default async function DashboardPage() {
             </div>
             <Link
               href="/dashboard/create"
-              className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
             >
               <Plus className="w-4 h-4" />
               Neues Event erstellen
@@ -54,28 +54,33 @@ export default async function DashboardPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {events.length === 0 ? (
-          <div className="max-w-2xl mx-auto text-center">
-            <div className="glass-card">
-              <div className="w-16 h-16 mx-auto mb-4 bg-rose-100 rounded-full flex items-center justify-center">
-                <Plus className="w-7 h-7 text-rose-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-stone-900">Noch keine Foto‑Aufgaben</h3>
-              <p className="text-stone-700 mt-2">Startet eure erste Sammlung und macht eure Hochzeit interaktiv.</p>
-              <div className="mt-6">
-                <Link
-                  href="/dashboard/create"
-                  className="inline-flex items-center gap-2 rounded-xl px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
-                >
-                  <Plus className="w-4 h-4" />
-                  Hochzeits‑Event erstellen
-                </Link>
+          <div className="max-w-2xl mx-auto text-center animate-scale-fade">
+            <div className="relative">
+              <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
+              <div className="relative glass-card">
+                <div className="w-16 h-16 mx-auto mb-4 bg-rose-100 rounded-full flex items-center justify-center">
+                  <Plus className="w-7 h-7 text-rose-600" />
+                </div>
+                <h3 className="text-xl font-semibold text-stone-900">Noch keine Foto‑Aufgaben</h3>
+                <p className="text-stone-700 mt-2">Startet eure erste Sammlung und macht eure Hochzeit interaktiv.</p>
+                <div className="mt-6">
+                  <Link
+                    href="/dashboard/create"
+                    className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Hochzeits‑Event erstellen
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {events.map((event) => (
-              <div key={event.id} className="glass-card">
+            {events.map((event, i) => (
+              <div key={event.id} className="animate-fade-up group relative" style={{ animationDelay: `${i * 0.08}s` }}>
+                <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/0 via-rose-400/0 to-amber-300/0 blur-xl group-hover:from-rose-300/30 group-hover:via-rose-400/30 group-hover:to-amber-300/30 transition-all duration-500" />
+              <div className="relative glass-card">
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-semibold text-stone-900 truncate">{event.name}</h3>
                   <span
@@ -106,17 +111,18 @@ export default async function DashboardPage() {
                 <div className="grid gap-2 grid-cols-1 sm:grid-cols-2">
                   <Link
                     href={`/dashboard/events/${event.slug}`}
-                    className="text-center px-3 py-2 rounded-xl ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white focus:outline-none focus:ring-2 focus:ring-rose-300"
+                    className="text-center px-3 py-2 rounded-full ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-rose-300"
                   >
                     Verwalten
                   </Link>
                   <Link
                     href={`/event/${event.slug}`}
-                    className="text-center px-3 py-2 rounded-xl bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                    className="text-center px-3 py-2 rounded-full bg-stone-900 text-white hover:bg-stone-800 transition focus:outline-none focus:ring-2 focus:ring-rose-300"
                   >
                     Aufgaben-Seite
                   </Link>
                 </div>
+              </div>
               </div>
             ))}
           </div>

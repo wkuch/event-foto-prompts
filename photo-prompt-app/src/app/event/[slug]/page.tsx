@@ -420,27 +420,27 @@ export default function EventPage() {
           </div>
 
           <div className="mx-auto w-full max-w-4xl px-6 pt-10 pb-8">
-            <div className="flex items-center justify-center gap-2 text-rose-600">
+            <div className="animate-fade-up stagger-1 flex items-center justify-center gap-2 text-rose-600">
               <Sparkles className="w-5 h-5" />
               <Link href="/" className="uppercase tracking-widest text-xs font-semibold hover:text-stone-900 transition-colors">
                 Traumtag Momente
               </Link>
               <Sparkles className="w-5 h-5" />
             </div>
-            <h1 className="mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
+            <h1 className="animate-fade-up stagger-2 mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
               Teilt eure schönsten Augenblicke
               {event?.name && (
                 <span className="block mt-2 text-rose-700 text-2xl md:text-3xl font-serif font-semibold">{event.name}</span>
               )}
             </h1>
             {event?.name && (
-              <div className="mt-3 flex justify-center">
+              <div className="animate-fade-up stagger-3 mt-3 flex justify-center">
                 <div className="h-px w-24 md:w-32 bg-gradient-to-r from-transparent via-rose-300 to-transparent" />
               </div>
             )}
-            
 
-            <div className="mt-5 flex justify-center">
+
+            <div className="animate-fade-up stagger-4 mt-5 flex justify-center">
               <div className="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1.5 text-stone-700 ring-1 ring-stone-200 shadow-sm">
                 <Heart className="w-4 h-4 text-rose-500" />
                 <span className="text-xs">
@@ -452,7 +452,7 @@ export default function EventPage() {
         </div>
 
         {/* Main Card */}
-        <div className="mx-auto w-full max-w-4xl px-4 md:px-6 pb-12">
+        <div className="mx-auto w-full max-w-4xl px-4 md:px-6 pb-12 animate-scale-fade stagger-5">
           <div className="relative">
             <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
             <div className="relative bg-white/60 backdrop-blur-2xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">

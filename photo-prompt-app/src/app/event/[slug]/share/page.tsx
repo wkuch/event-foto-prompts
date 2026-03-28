@@ -72,15 +72,15 @@ export default function EventSharePage() {
         </div>
 
         <div className="mx-auto w-full max-w-4xl px-6 pt-10 pb-8">
-          <div className="flex items-center justify-center gap-2 text-rose-600">
+          <div className="animate-fade-up stagger-1 flex items-center justify-center gap-2 text-rose-600">
             <Sparkles className="w-5 h-5" />
             <span className="uppercase tracking-widest text-xs font-semibold">Traumtag Momente</span>
             <Sparkles className="w-5 h-5" />
           </div>
-          <h1 className="mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
+          <h1 className="animate-fade-up stagger-2 mt-4 text-center text-3xl md:text-5xl font-serif tracking-tight text-stone-900">
             QR-Poster teilen
           </h1>
-          <div className="mt-6 flex justify-center">
+          <div className="animate-fade-up stagger-3 mt-6 flex justify-center">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/80 backdrop-blur px-3 py-1.5 text-stone-700 ring-1 ring-stone-200 shadow-sm">
               <Camera className="w-4 h-4 text-rose-500" />
               <span className="text-xs">Scannen, Fotos hochladen, Erinnerungen sammeln</span>
@@ -89,7 +89,7 @@ export default function EventSharePage() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 md:px-6 pb-12">
+      <div className="relative z-10 mx-auto w-full max-w-6xl px-4 md:px-6 pb-12 animate-scale-fade stagger-4">
         <div className="relative">
           <div className="absolute -inset-0.5 rounded-3xl bg-gradient-to-r from-rose-300/40 via-rose-400/40 to-amber-300/40 blur-xl" />
           <div className="relative bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl ring-1 ring-white/60 overflow-hidden">

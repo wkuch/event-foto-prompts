@@ -191,7 +191,7 @@ export default function CreateEventPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-stone-50 flex items-center justify-center p-4">
-        <div className="max-w-md w-full glass-card rounded-2xl p-8 text-center">
+        <div className="max-w-md w-full glass-card rounded-2xl p-8 text-center animate-scale-fade">
           <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <Heart className="w-8 h-8 text-rose-600" />
           </div>
@@ -239,7 +239,7 @@ export default function CreateEventPage() {
       <div className="sticky top-0 z-10 backdrop-blur-xl bg-white/70 border-b border-stone-200/60">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center py-4 gap-3">
-            <Link href="/" className="p-2 rounded-md text-stone-500 hover:text-stone-800 hover:bg-white/70 ring-1 ring-transparent hover:ring-stone-200">
+            <Link href="/" className="p-2 rounded-xl text-stone-500 hover:text-stone-800 hover:bg-white/70 ring-1 ring-transparent hover:ring-stone-200 transition">
               <ArrowLeft className="w-5 h-5" />
             </Link>
             <div className="flex items-center gap-2 text-rose-600">
@@ -251,7 +251,7 @@ export default function CreateEventPage() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-3xl mb-8">
+        <div className="max-w-3xl mb-8 animate-fade-up">
           <h1 className="font-serif text-3xl md:text-4xl font-bold tracking-tight text-stone-900">
             Foto‑Aufgaben für euer Hochzeits‑Event
           </h1>
@@ -268,7 +268,7 @@ export default function CreateEventPage() {
           )}
 
           {/* Basic Info */}
-          <div className="glass-card rounded-2xl p-6">
+          <div className="glass-card rounded-2xl p-6 animate-fade-up stagger-1">
             <h2 className="text-lg font-semibold text-stone-900 mb-6">Eventdetails</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -386,7 +386,7 @@ export default function CreateEventPage() {
           </div>
 
           {/* Foto‑Aufgaben */}
-          <div className="glass-card rounded-2xl p-6">
+          <div className="glass-card rounded-2xl p-6 animate-fade-up stagger-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-stone-900">Foto‑Aufgaben</h2>
               <div className="flex items-center gap-3">
@@ -428,7 +428,7 @@ export default function CreateEventPage() {
               <button
                 type="button"
                 onClick={addPrompt}
-                className="inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+                className="inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
               >
                 <Plus className="w-4 h-4" />
                 Hinzufügen
@@ -437,17 +437,17 @@ export default function CreateEventPage() {
           </div>
 
           {/* Submit */}
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 animate-fade-up stagger-3">
             <Link
               href="/"
-              className="px-4 py-2 rounded-xl ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white focus:outline-none focus:ring-2 focus:ring-rose-300"
+              className="px-5 py-2.5 rounded-full ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white transition focus:outline-none focus:ring-2 focus:ring-rose-300"
             >
               Abbrechen
             </Link>
             <button
               type="submit"
               disabled={isSubmitting || !nameValid || !slugValid || !emailValid}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white bg-stone-900 hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-white bg-stone-900 hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
               {isSubmitting ? 'Erstelle …' : 'Foto‑Aufgaben erstellen'}

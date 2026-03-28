@@ -213,7 +213,7 @@ export default function EventManagePage() {
           <h2 className="text-xl font-serif font-semibold text-stone-900 mb-2">{error || 'Event nicht gefunden'}</h2>
           <Link
             href="/dashboard"
-            className="inline-flex items-center justify-center rounded-xl px-4 py-2.5 bg-stone-900 text-white hover:bg-stone-800 focus:outline-none focus:ring-2 focus:ring-rose-300"
+            className="inline-flex items-center justify-center rounded-full px-5 py-2.5 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all focus:outline-none focus:ring-2 focus:ring-rose-300"
           >
             Zurück zum Dashboard
           </Link>
@@ -232,7 +232,7 @@ export default function EventManagePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-5">
             <div className="flex items-center mb-4">
-              <Link href="/dashboard" className="mr-3 p-2 rounded-md text-stone-500 hover:text-stone-800 hover:bg-white/70 ring-1 ring-transparent hover:ring-stone-200">
+              <Link href="/dashboard" className="mr-3 p-2 rounded-xl text-stone-500 hover:text-stone-800 hover:bg-white/70 ring-1 ring-transparent hover:ring-stone-200 transition">
                 <ArrowLeft className="w-5 h-5" />
               </Link>
               <div className="flex-1 min-w-0">
@@ -244,15 +244,15 @@ export default function EventManagePage() {
               </div>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Link href={`/gallery/${event.id}`} className="inline-flex items-center justify-center rounded-xl px-3 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white">
+              <Link href={`/gallery/${event.id}`} className="inline-flex items-center justify-center rounded-full px-4 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white transition">
                 <Image className="w-4 h-4 mr-2" />
                 Galerie
               </Link>
-              <Link href={`/event/${event.slug}`} className="inline-flex items-center justify-center rounded-xl px-3 py-2 bg-stone-900 text-white hover:bg-stone-800">
+              <Link href={`/event/${event.slug}`} className="inline-flex items-center justify-center rounded-full px-4 py-2 bg-stone-900 text-white hover:bg-stone-800 transition">
                 <Eye className="w-4 h-4 mr-2" />
                 Aufgaben-Seite
               </Link>
-              <Link href={`/event/${event.slug}/share`} className="inline-flex items-center justify-center rounded-xl px-3 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white">
+              <Link href={`/event/${event.slug}/share`} className="inline-flex items-center justify-center rounded-full px-4 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white transition">
                 <QrCode className="w-4 h-4 mr-2" />
                 QR‑Poster
               </Link>
@@ -264,10 +264,10 @@ export default function EventManagePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="glass-card">
+          <div className="glass-card animate-fade-up stagger-1">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center">
-                <Image className="h-5 w-5 text-stone-800" />
+              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center">
+                <Image className="h-5 w-5 text-rose-600" />
               </div>
               <div>
                 <p className="text-xs text-stone-600">Fotos insgesamt</p>
@@ -276,10 +276,10 @@ export default function EventManagePage() {
             </div>
           </div>
 
-          <div className="glass-card">
+          <div className="glass-card animate-fade-up stagger-2">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center">
-                <Settings className="h-5 w-5 text-stone-800" />
+              <div className="w-9 h-9 rounded-full bg-amber-100 flex items-center justify-center">
+                <Settings className="h-5 w-5 text-amber-600" />
               </div>
               <div>
                 <p className="text-xs text-stone-600">Aufgaben insgesamt</p>
@@ -288,10 +288,10 @@ export default function EventManagePage() {
             </div>
           </div>
 
-          <div className="glass-card">
+          <div className="glass-card animate-fade-up stagger-3">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-full bg-stone-100 flex items-center justify-center">
-                <Users className="h-5 w-5 text-stone-800" />
+              <div className="w-9 h-9 rounded-full bg-rose-100 flex items-center justify-center">
+                <Users className="h-5 w-5 text-rose-600" />
               </div>
               <div>
                 <p className="text-xs text-stone-600">Feier‑Art</p>
@@ -364,8 +364,8 @@ export default function EventManagePage() {
               </div>
               <p className="text-sm text-stone-700 mb-4">Teilt diesen QR‑Code mit euren Gästen, um Foto‑Aufgaben und Uploads zu starten.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <Link href={`/api/events/${event.slug}/qr?format=png&download=true`} className="rounded-xl px-4 py-2 bg-stone-900 text-white hover:bg-stone-800">PNG herunterladen</Link>
-                <Link href={`/api/events/${event.slug}/qr?format=svg&download=true`} className="rounded-xl px-4 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white">SVG herunterladen</Link>
+                <Link href={`/api/events/${event.slug}/qr?format=png&download=true`} className="rounded-full px-4 py-2 bg-stone-900 text-white hover:bg-stone-800 transition text-center">PNG herunterladen</Link>
+                <Link href={`/api/events/${event.slug}/qr?format=svg&download=true`} className="rounded-full px-4 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white transition text-center">SVG herunterladen</Link>
               </div>
             </div>
           </div>
@@ -444,8 +444,8 @@ export default function EventManagePage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:ml-auto sm:flex-none sm:shrink-0">
-                  <button onClick={addPrompt} disabled={!newPromptText.trim() || isAddingPrompt} className="rounded-xl px-3 py-2 bg-stone-900 text-white hover:bg-stone-800 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center">{isAddingPrompt ? 'Wird hinzugefügt …' : 'Hinzufügen'}</button>
-                  {newPromptText.trim() && <button onClick={() => setNewPromptText('')} className="rounded-xl px-3 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white w-full sm:w-auto text-center">Löschen</button>}
+                  <button onClick={addPrompt} disabled={!newPromptText.trim() || isAddingPrompt} className="rounded-full px-4 py-2 bg-stone-900 text-white hover:bg-stone-800 active:scale-[0.99] transition-all disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto text-center">{isAddingPrompt ? 'Wird hinzugefügt …' : 'Hinzufügen'}</button>
+                  {newPromptText.trim() && <button onClick={() => setNewPromptText('')} className="rounded-full px-4 py-2 ring-1 ring-stone-200 bg-white/80 text-stone-800 hover:bg-white transition w-full sm:w-auto text-center">Löschen</button>}
                 </div>
               </div>
             </div>
